@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>志愿者感谢墙</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="/layuimini/lib/layui-v2.5.5/css/layui.css">
+
+  <style>
+  /* —— 背景 —— */
+  html{overflow-y:scroll;}
+  body{margin:0;background:#dfe1e4;font-family:"PingFang SC",sans-serif;overflow-x:hidden;overflow-y:auto;}
+
+  .wall-intro{padding:18px 24px 4px;color:#344256;}
+  .wall-intro h1{margin:0 0 6px;font-size:22px;font-weight:600;}
+  #wallStatus{margin:0;font-size:13px;line-height:1.8;}
+
+  /* —— 看板 —— */
+  #wall{position:relative;width:100%;min-height:240px;box-sizing:border-box;}
+
+  /* —— 便签 —— */
+  .note{position:absolute;width:200px;cursor:pointer;
+        opacity:0;transform-origin:center top;
+        animation:drop .5s ease-out forwards;
+        --deg:0deg;--z:1;
+        transform:rotate(var(--deg));z-index:var(--z);}
+  @keyframes drop{0%{transform:translateY(-24px) rotate(calc(var(--deg) - 4deg));opacity:0;}
+                  100%{transform:rotate(var(--deg));opacity:1;}}
+
+  .paper{position:relative;border-radius:16px;padding:26px 18px 16px;
+         min-height:142px;box-sizing:border-box;background:var(--bg);color:#243549;
+         box-shadow:0 5px 13px rgba(0,0,0,.16);transition:transform .2s;}
+  .note:hover .paper{transform:scale(1.025);}
+  .note:focus-visible{outline:2px solid #64748b;outline-offset:5px;border-radius:16px;}
+
+  .content{font-size:17px;line-height:1.65;overflow-wrap:anywhere;white-space:pre-wrap;}
+  .demo-badge{display:inline-block;margin-bottom:9px;padding:2px 8px;border:1px solid rgba(36,53,73,.28);
+              border-radius:4px;background:rgba(255,255,255,.6);color:#30435b;font-size:12px;font-weight:600;line-height:18px;}
+
+  /* 胶条 */
+  .note::before{content:'';position:absolute;top:-10px;left:50%;margin-left:-26px;
+                width:52px;height:30px;background:#ffe496;opacity:.9;
+                clip-path:polygon(0 0,100% 0,88% 100%,12% 100%);
+                box-shadow:0 4px 8px rgba(0,0,0,.18);transform:rotate(4deg);z-index:2;pointer-events:none;}
+
+  .note footer{margin-top:14px;padding-top:10px;border-top:1px solid rgba(36,53,73,.13);
+               font-size:12px;line-height:1.5;color:#42536a;overflow-wrap:anywhere;}
+
+  /* —— 新增按钮 —— */
+  #addBtn{position:fixed;right:24px;bottom:24px;z-index:100;width:60px;height:60px;
+          border:0;border-radius:50%;background:linear-gradient(135deg,#ff6a88,#ff99ac);
+          display:flex;align-items:center;justify-content:center;
+          color:#fff;font-size:38px;box-shadow:0 6px 18px rgba(0,0,0,.35);
+          cursor:pointer;transition:.25s;}
+  #addBtn:hover{transform:scale(1.1);}
+
+  /* —— 拖动细节 —— */
+  .note{user-select:none;}      /* 禁止拖动时误选中文字 */
+  .paper{cursor:move;}          /* 光标提示可拖动 */
+  .note.dragging .paper{touch-action:none;}
+  .note.dragging{z-index:999;}  /* 拖动过程置顶 */
+  @media(max-width:480px){.wall-intro{padding:16px 16px 4px;}#addBtn{right:16px;bottom:16px;width:52px;height:52px;}}
+  @media(prefers-reduced-motion:reduce){.note{animation:none;opacity:1;}.paper,#addBtn{transition:none;}}
+  </style>
+</head>
+
+<body>
+  <header class="wall-intro"><h1>感谢墙</h1><p id="wallStatus" role="status">正在读取感谢墙…</p></header>
+  <div id="wall" aria-label="感谢留言"></div>
+  <button id="addBtn" type="button" aria-label="提交感谢或反馈">+</button>
+
+  <!-- 依赖 -->
+  <script src="/layuimini/lib/jquery-3.4.1/jquery-3.4.1.min.js"></script>
+  <script src="/layuimini/lib/layui-v2.5.5/layui.js"></script>
+
+  <!-- 主逻辑 -->
+  <script src="/js/guitu-api.js?v=20260923-features"></script>
+<script src="/js/thanks-wall.js?v=20261019-scatter"></script>
+</body>
+</html>

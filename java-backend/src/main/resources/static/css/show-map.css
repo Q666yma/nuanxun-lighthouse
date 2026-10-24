@@ -1,0 +1,95 @@
+.rescue-map-integrated {
+    width: 100%;
+    position: relative;
+    padding: 0.1rem;
+    box-sizing: border-box;
+}
+
+.rescue-map-panel {
+    color: #e2ecf5;
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: left;
+}
+
+.rescue-map-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+    padding: 12px 4px 4px;
+}
+
+.rescue-map-toolbar h2 {
+    color: #fff;
+    font-size: 18px;
+    line-height: 1.5;
+    margin: 0 auto 0 0;
+}
+
+.rescue-map-toolbar label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rescue-map-toolbar select,
+.rescue-map-toolbar button,
+.rescue-map-status button {
+    padding: 6px 10px;
+    color: #fff;
+    background: #123858;
+    border: 1px solid #3684b9;
+    border-radius: 4px;
+    font: inherit;
+    cursor: pointer;
+}
+
+.rescue-map-toolbar button[aria-pressed="true"] {
+    background: #0969aa;
+}
+
+.rescue-map-toolbar :disabled {
+    cursor: default;
+    opacity: 0.65;
+}
+
+.rescue-map-toolbar select:focus-visible,
+.rescue-map-toolbar button:focus-visible,
+.rescue-map-status button:focus-visible {
+    outline: 2px solid #84d2ff;
+    outline-offset: 2px;
+}
+
+.rescue-map-panel .map-container {
+    width: 100%;
+    height: 500px;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #001529;
+    margin: 8px 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+#rescue-map {
+    width: 100%;
+    height: 100%;
+}
+
+.rescue-map-status,
+.rescue-heat-status {
+    color: #c7d9e8;
+    font-size: 13px;
+    line-height: 1.7;
+    margin: 6px 4px;
+}
+
+.rescue-map-status button {
+    margin-left: 10px;
+}
+
+@media (max-width: 768px) {
+    .rescue-map-panel .map-container { height: 360px; }
+    .rescue-map-toolbar { gap: 8px; }
+    .rescue-map-toolbar h2 { flex-basis: 100%; }
+}

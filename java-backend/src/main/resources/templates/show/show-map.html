@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>搜救地图</title>
+</head>
+<body>
+    <div th:fragment="mapfrag">
+        <section class="rescue-map-panel" aria-labelledby="rescue-map-title">
+            <div class="rescue-map-toolbar">
+                <h2 id="rescue-map-title">搜救热力图</h2>
+                <label for="rescue-heat-source">热力来源
+                    <select id="rescue-heat-source" disabled>
+                        <option value="markers">搜救标记</option>
+                        <option value="tasks">求助地点</option>
+                    </select>
+                </label>
+                <button id="rescue-heat-toggle" type="button" aria-pressed="true" disabled>关闭热力图</button>
+            </div>
+            <p id="rescue-heat-status" class="rescue-heat-status" role="status">正在读取热力数据…</p>
+            <div class="map-container">
+                <div id="rescue-map"></div>
+            </div>
+            <p id="rescue-map-status" class="rescue-map-status" role="status">正在读取授权范围内的任务和队员位置…</p>
+        </section>
+
+        <!-- 引入独立的CSS和JS文件 -->
+        <link th:href="@{/css/show-map.css(v='20260924-heatmap')}" rel="stylesheet">
+        
+        <!-- 使用项目中已有的 echarts.min.js -->
+        
+        <!-- 引入jQuery用于Ajax请求 -->
+        
+        <!-- 引入高德地图API用于地理位置识别 -->
+        
+        
+        
+    </div>
+    <script type="text/javascript">
+    window._AMapSecurityConfig = {
+        securityJsCode: "YOUR_AMAP_SECURITY_JS_CODE",
+    };
+    </script>
+    <script src="https://webapi.amap.com/maps?v=2.0&key=YOUR_AMAP_WEB_KEY&plugin=AMap.Geocoder"></script>
+<script src="/js/show-map.js?v=20260924-heatmap"></script>
+</body>
+</html>

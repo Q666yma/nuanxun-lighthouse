@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.maka.mapper.TaskMapper">
+
+    <!-- resultMap 映射 -->
+    <resultMap id="TaskResultMap" type="com.maka.pojo.Task">
+        <id property="id" column="id"/>
+        <result property="elderName" column="elder_name"/>
+        <result property="lostTime" column="lost_time"/>
+        <result property="photoUrl" column="photo_url"/>
+        <result property="audioUrl" column="audio_url"/>
+        <result property="location" column="location"/>
+        <result property="status" column="status"/>
+        <result property="extraInfo" column="extra_info"/>
+    </resultMap>
+
+    <!-- 插入新任务 -->
+    <insert id="insert" parameterType="com.maka.pojo.Task" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tasks
+        (elder_name, lost_time, photo_url, audio_url, location, status, extra_info)
+        VALUES
+        (#{elderName}, #{lostTime}, #{photoUrl}, #{audioUrl}, #{location}, #{status}, #{extraInfo})
+    </insert>
+
+    <!-- 根据ID更新任务 -->
+    <update id="update" parameterType="com.maka.pojo.Task">
+        UPDATE tasks
+        SET
+            elder_name = #{elderName},
+            lost_time = #{lostTime},
+            photo_url = #{photoUrl},
+            audio_url = #{audioUrl},
+            location = #{location},
+            status = #{status},
+            extra_info = #{extraInfo}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据ID查询任务 -->
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="TaskResultMap">
+        SELECT
+            id,
+            elder_name,
+            lost_time,
+            photo_url,
+            audio_url,
+            location,
+            status,
+            extra_info
+        FROM tasks
+        WHERE id = #{id}
+    </select>
+
+    <!-- 获取所有任务 -->
+    <select id="selectAll" resultMap="TaskResultMap">
+        SELECT
+            id,
+            elder_name,
+            lost_time,
+            photo_url,
+            audio_url,
+            location,
+            status,
+            extra_info
+        FROM tasks
+    </select>
+
+    <!-- 根据状态查询任务 -->
+    <select id="selectByStatus" resultType="com.maka.pojo.Task">
+        SELECT * FROM tasks WHERE status = #{status}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE tasks SET status = #{status} WHERE id = #{id}
+    </update>
+
+
+
+    <!-- 根据ID删除任务 -->
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        DELETE FROM tasks WHERE id = #{id}
+    </delete>
+
+    <!-- 根据ID列表批量查询任务 -->
+    <select id="selectByIdList" resultMap="TaskResultMap">
+        SELECT
+            id,
+            elder_name,
+            lost_time,
+            photo_url,
+            audio_url,
+            location,
+            status,
+            extra_info
+        FROM tasks
+        WHERE id IN
+        <foreach collection="idList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY lost_time DESC
+    </select>
+
+
+    <!-- 统计总数 -->
+    <select id="countTasks" resultType="int">
+    SELECT COUNT(*) FROM tasks
+    WHERE
+        (#{elderName} IS NULL OR elder_name LIKE CONCAT('%', #{elderName}, '%'))
+        AND (#{location} IS NULL OR location LIKE CONCAT('%', #{location}, '%'))
+        AND (#{status} IS NULL OR status = #{status})
+    </select>
+
+    <!-- 分页查询 -->
+    <!-- 4-1  分页查询，等待任务优先，其次 rescuing -->
+    <select id="selectTasksByPage" resultType="com.maka.pojo.Task">
+    SELECT * FROM tasks
+    <where>
+        <if test="elderName != null and elderName != ''">
+            AND elder_name LIKE CONCAT('%',#{elderName},'%')
+        </if>
+        <if test="location != null and location != ''">
+            AND location LIKE CONCAT('%',#{location},'%')
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+    </where>
+    ORDER BY
+        CASE
+            WHEN status = 'waiting'   THEN 0
+            WHEN status = 'rescuing'  THEN 1
+            WHEN status = 'finished'  THEN 2
+            ELSE 3
+        END,
+        id DESC
+    LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 4-2  仅当任务仍为 waiting 时才更新为 rescuing -->
+    <update id="updateTaskStatus">
+    UPDATE tasks
+    SET status = #{status}
+    WHERE id = #{id}
+        <if test="_parameter == 'rescuing'">
+            /* 若只想在 waiting → rescuing 时更新可在此加判断 */
+            AND status = 'waiting'
+        </if>
+    </update>
+
+
+</mapper>

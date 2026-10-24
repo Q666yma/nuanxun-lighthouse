@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>救援地图</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="/layuimini/lib/layui-v2.5.5/css/layui.css">
+  <style>
+    body { background: #f2f2f2; margin: 0; padding: 0; }
+    .layuimini-container { margin: 20px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.1); padding: 20px; }
+    .map-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .map-title { font-size: 18px; font-weight: bold; }
+    .map-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+    #map-container { width: 100%; height: 600px; border-radius: 5px; overflow: hidden; position: relative; }
+    #map { width: 100%; height: 100%; position: relative; z-index: 0; }
+    #draw-canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 99; pointer-events: none; display: none; }
+    #draw-hint { position:absolute;left:50%;top:15px;z-index:100; font-size:14px;padding:6px 18px;transform:translateX(-50%); background:rgba(255,255,0,.85);border-radius:6px;display:none;}
+    .marker-info { margin-top: 15px; padding: 15px; background: #f9f9f9; border-radius: 5px; display: none; position:absolute; left:50%; top:80px; z-index:200; min-width:280px; transform:translateX(-50%);}
+    .marker-info textarea { width: 100%; min-height: 80px; padding: 10px; border: 1px solid #e6e6e6; border-radius: 4px; margin-bottom: 10px; resize: none; }
+    .color-options { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
+    .type-options { display: flex; gap: 10px; margin-bottom: 15px; }
+    .marker-actions { display: flex; justify-content: flex-end; gap: 10px; }
+  </style>
+  <script>window._AMapSecurityConfig = {securityJsCode:"YOUR_AMAP_SECURITY_JS_CODE"};</script>
+  <script src="https://webapi.amap.com/maps?v=2.0&key=YOUR_AMAP_WEB_KEY"></script>
+</head>
+<body>
+<div class="layuimini-container">
+  <div class="layuimini-main">
+    <div class="map-header">
+      <div class="map-title">救援地图</div>
+    </div>
+    <div class="map-toolbar">
+      <button type="button" class="layui-btn layui-btn-normal" id="draw-area">绘制区域</button>
+      <button type="button" class="layui-btn layui-btn-normal" id="draw-path">绘制路径</button>
+      <button type="button" class="layui-btn layui-btn-normal" id="add-marker">添加标记</button>
+      <button type="button" class="layui-btn layui-btn-danger" id="toggle-heatmap">显示搜救热力图</button>
+      <select id="heat-palette" aria-label="热力配色" class="layui-input" style="width:145px"><option value="redblue">热力：红 / 蓝</option><option value="orangegreen">热力：橙 / 绿</option></select>
+      <button type="button" class="layui-btn layui-btn-primary" id="clear-current">清除当前</button>
+      <button type="button" class="layui-btn layui-btn-primary" id="backToDetailBtn">返回任务详情</button>
+    </div>
+    <p class="layui-word-aux">红色／橙色：需关注或风险提醒；蓝色／绿色：已标记排查，并不代表安全。区域按绘制边界显示，点状光晕仅作邻近示意；不是走失概率，透明区域未经评估；虚线是路线标记，不代表已完成排查。</p>
+    <p id="heatmap-status" role="status" style="margin:8px 0;color:#666">点击“显示搜救热力图”，根据本任务已保存的地图标记生成热力。</p>
+    <p id="map-demo-notice" role="note" hidden style="margin:8px 0;color:#8a641c">此任务含【演示】标记，均为虚构线索及排查示例，不代表现场警情或实时人员位置。</p>
+    <div id="taskLocationControls" class="map-toolbar" style="display:block"></div>
+    <div id="map-container">
+      <div id="map"></div>
+      <canvas id="draw-canvas"></canvas>
+      <div id="draw-hint">正在绘制，地图已锁定。单击添加，双击结束，ESC取消</div>
+    </div>
+    <div class="marker-info" id="marker-info">
+      <div class="layui-form">
+        <div class="layui-form-item">
+          <label class="layui-form-label">描述</label>
+          <div class="layui-input-block">
+            <textarea id="marker-description" placeholder="请输入标记描述信息..." class="layui-textarea"></textarea>
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">类型</label>
+          <div class="layui-input-block type-options">
+            <input type="radio" name="marker-type" value="searched" title="已搜索区域" checked>
+            <input type="radio" name="marker-type" value="danger" title="危险区域">
+            <input type="radio" name="marker-type" value="poi" title="兴趣点">
+            <input type="radio" name="marker-type" value="path" title="搜索路径">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">颜色</label>
+          <div class="layui-input-block color-options">
+            <input type="color" id="marker-color" value="#5FB878">
+            <span id="color-preview" style="display:inline-block; width:20px; height:20px; background:#5FB878; border-radius:4px;"></span>
+          </div>
+        </div>
+        <div class="layui-form-item marker-actions">
+          <button type="button" class="layui-btn layui-btn-primary" id="cancel-marker">取消</button>
+          <button type="button" class="layui-btn" id="save-marker">保存标记</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/js/jquery.js"></script>
+<script src="/layuimini/lib/layui-v2.5.5/layui.js"></script>
+<script th:inline="javascript">
+  var mapConfig = [[${mapConfig}]];
+  var taskId = [[${task.id}]];
+  var taskStatus = [[${task.status}]];
+  var userType = [[${userType}]];
+  var currentUserId = [[${session.userId}]];
+  var userName = '[[${userName}]]';
+</script>
+<script src="/js/task-heat-renderer.js?v=20261019-localheat-display"></script>
+<script th:inline="none">
+  // 地图初始化
+  var map = new AMap.Map('map', {
+    center: [mapConfig.centerLng, mapConfig.centerLat],
+    zoom: mapConfig.zoomLevel,
+    resizeEnable: true
+  });
+  window.GuituTaskMap = {map:map,taskId:taskId,taskStatus:taskStatus,userType:userType};
+
+  // 类型颜色等定义
+  const TYPE_COLORS = {
+    searched: '#5FB878',
+    danger:   '#FF5722',
+    path:     '#1E9FFF',
+    poi:      '#FFB800'
+  };
+  const TYPE_FILL = {
+    searched: 'rgba(95,184,120,0.18)',
+    danger:   'rgba(255,87,34,0.13)',
+    path:     'rgba(30,159,255,0.09)',
+    poi:      'rgba(255,184,0,0.18)'
+  };
+
+  const TYPE_LABELS = {
+    searched: '已搜索区域',
+    danger: '危险区域',
+    poi: '兴趣点',
+    path: '搜索路径',
+    marker: '标记'
+  };
+
+  let drawCanvas, drawCtx, drawHint;
+  let drawMode = null; // polygon|polyline|marker
+  let drawEnable = false;
+  let drawPoints = [];
+  let overlays = [];
+  let pendingDrawType = null;
+  let pendingDrawGeometry = null;
+
+  // ----------- 热力掩码CanvasLayer部分 -------------
+  // 动态热力点数据，可由AI/后端实时赋值
+  let heatmapData = [];
+  let heatVisible = false;
+  let heatCanvas = null, heatCtx = null, heatmapLayer = null, heatAnimId = null;
+
+  // 与地图同尺寸的透明画布，避免纹理边界和固定大半径遮盖街区。
+  function createHeatmapLayer() {
+    heatCanvas = document.createElement('canvas');
+    heatCanvas.id = 'task-heat-overlay';
+    heatCanvas.setAttribute('aria-hidden', 'true');
+    heatCanvas.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none;z-index:20;';
+    heatCtx = heatCanvas.getContext('2d');
+    document.getElementById('map-container').appendChild(heatCanvas);
+    return heatCanvas;
+  }
+
+    // 从AI服务获取热力图数据
+  let aiLoading = false; // 防止并发
+
+  function fetchHeatmapDataAndReplace() {
+    if (aiLoading) return;
+    aiLoading = true;
+    $('#toggle-heatmap').prop('disabled', true);
+    $('#heatmap-status').text('正在分析本任务的地图标记，请稍候…');
+    $.ajax({
+      url: '/api/map/heatmap/' + taskId,
+      type: 'GET',
+      timeout: 60000,
+      success: function(res) {
+        if (res.code === 0 && Array.isArray(res.data)) {
+          heatmapData = res.data;
+          updateHeatmapData(heatmapData);
+          var positives=heatmapData.filter(function(p){return p.value>0;}).length,negatives=heatmapData.filter(function(p){return p.value<0;}).length;
+          var ruleOnly=heatmapData.some(function(p){return p.scoreSource==='marker_rules_ai_unavailable';});
+          $('#heatmap-status').text(heatmapData.length ? (ruleOnly?'AI 暂不可用，当前按已保存标记显示规则示意。':'')+'已生成 ' + heatmapData.length + ' 个标记的热力结果：关注 '+positives+'，已标记排查 '+negatives+'，中性 '+(heatmapData.length-positives-negatives)+'。可切换配色查看。' : '本任务暂无已保存的地图标记，暂时无法生成热力图。');
+        } else {
+          stopHeatmap();
+          $('#heatmap-status').text('热力图生成失败：' + (res.msg || '请稍后重试'));
+        }
+      },
+      error: function(xhr) {
+        stopHeatmap();
+        var error = xhr.responseJSON || {};
+        $('#heatmap-status').text(error.message || error.msg || error.error || '热力图服务暂时不可用，请稍后重试');
+      },
+      complete: function() {
+        aiLoading = false;
+        $('#toggle-heatmap').prop('disabled', false);
+      }
+    });
+  }
+
+  // 改进版renderHeatFrame函数：按标记本身的范围绘制，未评估处透明。
+  function renderHeatFrame() {
+    if (!heatVisible || !heatmapLayer) return;
+    window.GuituHeatRenderer.render(heatCanvas, map, heatmapData, document.getElementById('heat-palette').value);
+    heatCanvas.style.visibility = 'visible';
+  }
+
+  function startHeatmap() {
+    if (!heatmapLayer) {
+      heatmapLayer = createHeatmapLayer();
+      heatCanvas.hidden = false;
+    }
+    heatVisible = true;
+    if (heatCanvas) heatCanvas.hidden = false;
+    $('#toggle-heatmap').text('关闭搜救热力图');
+    if (heatAnimId) cancelAnimationFrame(heatAnimId);
+    heatAnimId = null;
+    renderHeatFrame();
+  }
+  function stopHeatmap() {
+    heatVisible = false;
+    $('#toggle-heatmap').text('显示搜救热力图');
+    if (heatAnimId) cancelAnimationFrame(heatAnimId);
+    heatAnimId = null;
+    if (heatCtx) heatCtx.clearRect(0, 0, heatCanvas.width, heatCanvas.height);
+    if (heatCanvas) heatCanvas.hidden = true;
+  }
+  // 修改toggleHeatmap函数
+  function toggleHeatmap() {
+    if (heatVisible) {
+      // 关闭
+      stopHeatmap();
+    } else {
+      // 打开时才请求AI
+      heatVisible = true;
+      if (heatCanvas) heatCanvas.hidden = false;
+      $('#toggle-heatmap').text('关闭搜救热力图');
+      if (!heatmapLayer) {
+        heatmapLayer = createHeatmapLayer();
+        heatCanvas.hidden = false;
+      }
+      fetchHeatmapDataAndReplace(); // 只在这里请求AI
+      renderHeatFrame();
+    }
+  }
+  function updateHeatmapData(newPoints) {
+    heatmapData = newPoints;
+    // 立即刷新一帧
+    if (heatVisible) renderHeatFrame();
+  }
+
+  function queueHeatFrame() {
+    if (!heatVisible || heatAnimId) return;
+    heatAnimId = requestAnimationFrame(function(){ heatAnimId = null; renderHeatFrame(); });
+  }
+  ['movestart','zoomstart'].forEach(function(event){map.on(event,function(){if(heatVisible && heatCanvas)heatCanvas.style.visibility='hidden';});});
+  ['moveend','zoomend','resize'].forEach(function(event){map.on(event,queueHeatFrame);});
+  window.addEventListener('resize', function() {
+    if (heatVisible) renderHeatFrame();
+  });
+
+  // ----------- 你的原有绘制/标记业务逻辑 -----------
+
+  function resizeDrawCanvas() {
+    const mapDom = document.getElementById('map');
+    drawCanvas.width = mapDom.offsetWidth;
+    drawCanvas.height = mapDom.offsetHeight;
+    drawCanvas.style.width = mapDom.offsetWidth + "px";
+    drawCanvas.style.height = mapDom.offsetHeight + "px";
+    drawPolygonOnCanvas();
+  }
+
+  function drawPolygonOnCanvas() {
+    drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+    if (drawPoints.length === 0 || !drawMode) return;
+    const type = drawMode === 'polygon'
+        ? $('input[name="marker-type"]:checked').val() || 'searched'
+        : drawMode === 'polyline'
+        ? 'path'
+        : 'poi';
+    const color = TYPE_COLORS[type];
+    const fill = TYPE_FILL[type];
+
+    if (drawMode === 'polygon' && drawPoints.length > 1) {
+      drawCtx.strokeStyle = color;
+      drawCtx.lineWidth = 2;
+      drawCtx.fillStyle = fill;
+      drawCtx.beginPath();
+      drawCtx.moveTo(drawPoints[0].x, drawPoints[0].y);
+      for(let i=1;i<drawPoints.length;i++) drawCtx.lineTo(drawPoints[i].x, drawPoints[i].y);
+      drawCtx.closePath();
+      drawCtx.stroke();
+      if (drawPoints.length > 2) drawCtx.fill();
+    }
+    if (drawMode === 'polyline' && drawPoints.length > 1) {
+      drawCtx.strokeStyle = color;
+      drawCtx.lineWidth = 4;
+      drawCtx.beginPath();
+      drawCtx.moveTo(drawPoints[0].x, drawPoints[0].y);
+      for(let i=1;i<drawPoints.length;i++) drawCtx.lineTo(drawPoints[i].x, drawPoints[i].y);
+      drawCtx.stroke();
+    }
+    // 点渲染
+    for(let pt of drawPoints){
+      drawCtx.beginPath();
+      drawCtx.arc(pt.x, pt.y, 6, 0, 2*Math.PI);
+      drawCtx.fillStyle = color;
+      drawCtx.fill();
+      drawCtx.strokeStyle="#fff";
+      drawCtx.lineWidth=2;
+      drawCtx.stroke();
+    }
+    if(drawMode === 'marker' && drawPoints.length === 1){
+      drawCtx.beginPath();
+      drawCtx.arc(drawPoints[0].x, drawPoints[0].y, 10, 0, 2*Math.PI);
+      drawCtx.fillStyle = color;
+      drawCtx.fill();
+      drawCtx.strokeStyle="#fff";
+      drawCtx.lineWidth=3;
+      drawCtx.stroke();
+    }
+  }
+
+  function closeDrawCanvas() {
+    drawEnable = false;
+    drawMode = null;
+    drawPoints = [];
+    drawCanvas.style.display = 'none';
+    drawCanvas.style.pointerEvents = 'none';
+    drawHint.style.display = 'none';
+    drawPolygonOnCanvas();
+  }
+
+  function openDrawCanvas(mode) {
+    drawEnable = true;
+    drawMode = mode;
+    drawPoints = [];
+    resizeDrawCanvas();
+    drawCanvas.style.display = 'block';
+    drawCanvas.style.pointerEvents = 'auto';
+    drawHint.style.display = 'block';
+    drawHint.innerText = mode==='polygon' ? '正在绘制区域，单击添加顶点，双击结束，ESC取消'
+      : mode==='polyline' ? '正在绘制路径，单击添加节点，双击结束，ESC取消'
+      : '点击地图添加标记点，ESC取消';
+    drawPolygonOnCanvas();
+  }
+
+  function openMarkerInput(x, y, geometryType) {
+    $('#marker-info').show();
+    $('#marker-description').val('');
+    $('#marker-color').val('#5FB878');
+    $('#color-preview').css('background', '#5FB878');
+    $('input[name="marker-type"][value="searched"]').prop('checked', true);
+    $('#marker-info').data('pos', {x, y});
+    $('#marker-info').data('geometryType', geometryType || 'Point');
+  }
+
+  function openAreaInput(points, geometryType) {
+    let pt = points[points.length-1];
+    openMarkerInput(pt.x, pt.y, geometryType);
+    let infoBox = $('#marker-info');
+    infoBox.show();
+    let container = $('#map-container')[0];
+    let left = pt.x - infoBox.outerWidth()/2;
+    let top = pt.y - infoBox.outerHeight() - 16;
+    left = Math.max(10, Math.min(left, container.offsetWidth-infoBox.outerWidth()-10));
+    top = Math.max(10, top);
+    infoBox.css({left:left+'px',top:top+'px'});
+  }
+
+  function closeMarkerInput() { $('#marker-info').hide(); }
+  function clearMapOverlays() {
+    overlays.forEach(o=>o.setMap(null));
+    overlays = [];
+  }
+
+  function pointsToLngLats(points){
+    return points.map(pt=>{
+      const lnglat = map.containerToLngLat([pt.x, pt.y]);
+      return [lnglat.lng, lnglat.lat];
+    });
+  }
+
+  function saveCurrentDraw() {
+    if(drawMode === 'polygon' && drawPoints.length >= 3){
+      pendingDrawType = 'polygon';
+      let ring = pointsToLngLats(drawPoints);
+      if (ring[0][0] !== ring[ring.length-1][0] || ring[0][1] !== ring[ring.length-1][1]) ring.push(ring[0].slice());
+      pendingDrawGeometry = { type: "Polygon", coordinates: [ring] };
+      openAreaInput(drawPoints, 'Polygon');
+      closeDrawCanvas();
+    } else if(drawMode === 'polyline' && drawPoints.length >= 2) {
+      pendingDrawType = 'polyline';
+      pendingDrawGeometry = { type: "LineString", coordinates: pointsToLngLats(drawPoints) };
+      openAreaInput(drawPoints, 'LineString');
+      closeDrawCanvas();
+    }
+  }
+
+  const API_SAVE = '/api/map/savemarker';
+  const API_LIST = '/api/map/markers/';
+
+  function saveToBackend(markerType, geometry, properties){
+    $.ajax({
+      url: API_SAVE,
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({
+        taskId: taskId,
+        markerType: markerType,
+        geometry: JSON.stringify(geometry),
+        properties: JSON.stringify(properties)
+      }),
+      success: function(res){
+        if(res.code===0){
+          layui.layer.msg('保存成功', {icon:1});
+          if(res.data && res.data.id){renderMarker(res.data);if(heatVisible)fetchHeatmapDataAndReplace();}else loadMarkers();
+        } else {
+          layui.layer.msg('保存失败: '+(res.msg||'未知错误'), {icon:2});
+        }
+      },
+      error: function(err){
+        layui.layer.msg('网络错误，请重试', {icon:2});
+      }
+    });
+  }
+
+  function createMarkerIcon(color) {
+    let canvas = document.createElement('canvas');
+    canvas.width = 32; canvas.height = 32;
+    let ctx = canvas.getContext('2d');
+    ctx.beginPath();
+    ctx.arc(16, 16, 12, 0, 2 * Math.PI);
+    ctx.fillStyle = color;
+    ctx.shadowColor = "#888";
+    ctx.shadowBlur = 3;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(16, 16, 6, 0, 2 * Math.PI);
+    ctx.fillStyle = "#fff";
+    ctx.globalAlpha = 0.5;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    return canvas.toDataURL();
+  }
+
+  function renderMarker(marker){
+    let geometry;
+    try { geometry = typeof marker.geometry === 'string' ? JSON.parse(marker.geometry) : marker.geometry; } catch(e) { return; }
+    if (!geometry || !geometry.coordinates) return;
+    let properties = {};
+    if (marker.properties) {
+      try { properties = typeof marker.properties === 'string' ? JSON.parse(marker.properties) : marker.properties; } catch(e) {}
+    }
+    let color = marker.color || properties.color || "#1E9FFF";
+    let markerType = marker.markerType || properties.markerType || "marker";
+    let description = marker.description || properties.description || "";
+    let createdBy = properties.createdByName || marker.createdBy || properties.createdBy || "";
+
+    let overlay = null;
+    if(markerType === 'polygon'){
+      overlay = new AMap.Polygon({
+        path: geometry.coordinates[0],
+        strokeColor: color,
+        strokeWeight: 2,
+        fillColor: color,
+        fillOpacity: 0.08
+      });
+      overlay.setMap(map);
+    } else if(markerType === 'polyline'){
+      overlay = new AMap.Polyline({
+        path: geometry.coordinates,
+        strokeColor: color,
+        strokeStyle: properties.markerType === 'path' ? 'dashed' : 'solid',
+        strokeWeight: 4
+      });
+      overlay.setMap(map);
+    } else if(markerType === 'marker' || geometry.type==='Point'){
+      overlay = new AMap.Marker({
+        position: geometry.coordinates,
+        title: description,
+        icon: new AMap.Icon({
+          size: new AMap.Size(32, 32),
+          image: createMarkerIcon(color),
+          imageSize: new AMap.Size(32, 32)
+        })
+      });
+      overlay.setMap(map);
+    }
+    
+    // 在创建的覆盖物上添加标记 ID 和点击事件
+    if (overlay) {
+      overlay.markerId = (marker.createdBy === currentUserId && (taskStatus === 'rescuing' || taskStatus === 'confirming')) ? marker.id : null;
+      
+      if (markerType === 'polygon') {
+        overlay.on('click', function(e){
+          showInfoWindow(markerType, description, createdBy, e.lnglat, overlay.markerId);
+        });
+      } else if (markerType === 'polyline') {
+        overlay.on('click', function(e){
+          showInfoWindow(markerType, description, createdBy, e.lnglat, overlay.markerId);
+        });
+      } else if (markerType === 'marker' || geometry.type === 'Point') {
+        overlay.on('click', function(){
+          showInfoWindow(markerType, description, createdBy, geometry.coordinates, overlay.markerId);
+        });
+      }
+      
+      overlays.push(overlay);
+    }
+  }
+
+  function showInfoWindow(type, description, createdBy, lnglat, markerId){
+  // 关闭之前可能存在的InfoWindow
+  if (window.currentInfoWindow) {
+    window.currentInfoWindow.close();
+  }
+  
+  let info = `<div style="padding:10px; max-width:300px;">
+    <div style="font-weight:bold;margin-bottom:5px;">${$('<span>').text(TYPE_LABELS[type] || type || '标记').html()}</div>
+    <div>${$('<span>').text(description).html()}</div>
+    <div style="font-size:12px;color:#999;margin-top:5px;">${createdBy?('创建者: '+$('<span>').text(createdBy).html()):''}</div>
+    ${markerId ? `<div style="text-align:right;margin-top:8px;"><a href="javascript:void(0)" class="delete-marker" data-id="${markerId}">删除</a></div>` : ''}
+  </div>`;
+  
+  // 创建信息窗口并设置在地图中央显示
+  const infoWindow = new AMap.InfoWindow({
+    content: info,
+    offset: new AMap.Pixel(0, 0),
+    closeWhenClickMap: true  // 点击地图关闭
+  });
+  
+  // 保存当前InfoWindow的引用
+  window.currentInfoWindow = infoWindow;
+  
+  // 先将地图中心点移动到标记位置
+  map.setCenter(lnglat);
+  
+  // 打开信息窗口在地图中心
+  infoWindow.open(map, map.getCenter());
+  
+  // 为删除按钮添加点击事件
+  setTimeout(() => {
+    $('.delete-marker').on('click', function(){
+      const markerId = $(this).data('id');
+      console.log("删除标记ID:", markerId);
+      deleteMarker(markerId);
+      infoWindow.close();
+    });
+  }, 100);
+}
+
+function deleteMarker(markerId) {
+  // 确保markerId是整数
+  markerId = parseInt(markerId, 10);
+  
+  layui.layer.confirm('确定要删除这个标记吗？', {icon: 3, title:'提示'}, function(index){
+    $.ajax({
+      url: '/api/map/marker/delete',
+      type: 'POST',
+      data: { id: markerId },  // 使用id作为参数名，与后端@RequestParam匹配
+      success: function(res) {
+        if (res.code === 0) {
+          layui.layer.msg('删除成功', {icon: 1});
+          loadMarkers(); // 重新加载标记
+        } else {
+          layui.layer.msg('删除失败: ' + (res.msg || '未知错误'), {icon: 2});
+        }
+      },
+      error: function(err) {
+        console.error('删除失败:', err);
+        layui.layer.msg('网络错误，请重试', {icon: 2});
+      }
+    });
+    layui.layer.close(index);
+  });
+}
+
+  let hasFittedMarkers = false;
+  function loadMarkers(){
+      $.ajax({
+        url: API_LIST + taskId,
+        type: 'GET',
+        success: function(res){
+          if(res.code===0 && res.data){
+            clearMapOverlays();
+            res.data.forEach(renderMarker);
+            var hasDemo = res.data.some(function(marker){try {var props=typeof marker.properties==='string'?JSON.parse(marker.properties):marker.properties||{};return !!props.demoBatch || String(props.description||'').indexOf('【演示】')>=0;} catch(_){return false;}});
+            document.getElementById('map-demo-notice').hidden = !hasDemo;
+            if (!hasFittedMarkers && overlays.length) {map.setFitView(overlays, false, [60,60,60,60], 17); hasFittedMarkers = true;}
+            if (heatVisible) fetchHeatmapDataAndReplace();
+          }else layui.layer.msg(res.msg||'标记数据读取失败，请刷新重试');
+        },error:function(xhr){var data=xhr.responseJSON||{};layui.layer.msg(data.message||data.msg||'标记数据读取失败，请刷新重试');}
+      });
+    }
+
+  // ---------- 初始化、事件绑定 ----------
+  $(document).ready(function(){
+    drawCanvas = document.getElementById('draw-canvas');
+    drawHint = document.getElementById('draw-hint');
+    drawCtx = drawCanvas.getContext('2d');
+    window.addEventListener('resize', resizeDrawCanvas);
+    resizeDrawCanvas();
+
+    // 加载后端数据
+    loadMarkers();
+    if(taskStatus !== 'rescuing' && taskStatus !== 'confirming')$('#draw-area,#draw-path,#add-marker,#clear-current').prop('disabled',true).addClass('layui-btn-disabled');
+
+    // 按钮绑定
+    $('#draw-area').on('click', function(){ openDrawCanvas('polygon'); });
+    $('#draw-path').on('click', function(){ openDrawCanvas('polyline'); });
+    $('#add-marker').on('click', function(){ openDrawCanvas('marker'); });
+    $('#clear-current').on('click', function(){ closeDrawCanvas(); });
+    $('#toggle-heatmap').off('click').on('click', toggleHeatmap);
+    $('#heat-palette').on('change',function(){if(heatVisible)renderHeatFrame();});
+    $('#backToDetailBtn').on('click', function(){
+      var url = '/task/task-detail/' + taskId;
+      if(window.parent && window.parent.layui && window.parent.layui.index){
+        window.parent.layui.index.openTab({ title: '任务详情', href: url });
+        window.parent.layui.index.closeCurrentTab();
+      } else {
+        window.location.href = url;
+      }
+    });
+
+    // canvas事件
+    drawCanvas.addEventListener('mousedown', function(e){
+      if(!drawEnable) return;
+      const rect = drawCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left, y = e.clientY - rect.top;
+      if(drawMode==='polygon' || drawMode==='polyline'){
+        drawPoints.push({x,y});
+        drawPolygonOnCanvas();
+      }
+      else if(drawMode==='marker'){
+        drawPoints = [{x,y}];
+        drawPolygonOnCanvas();
+        openMarkerInput(x,y,'Point');
+        let infoBox = $('#marker-info');
+        infoBox.show();
+        let container = $('#map-container')[0];
+        let left = x - infoBox.outerWidth()/2;
+        let top = y - infoBox.outerHeight() - 16;
+        left = Math.max(10, Math.min(left, container.offsetWidth-infoBox.outerWidth()-10));
+        top = Math.max(10, top);
+        infoBox.css({left:left+'px',top:top+'px'});
+        closeDrawCanvas();
+      }
+    });
+
+    drawCanvas.addEventListener('dblclick', function(e){
+      if(!drawEnable) return;
+      if(drawMode==='polygon' && drawPoints.length>=3){
+        saveCurrentDraw();
+      }
+      else if(drawMode==='polyline' && drawPoints.length>=2){
+        saveCurrentDraw();
+      }
+    });
+    document.addEventListener('keydown', function(e){
+      if(drawEnable && e.key==='Escape'){
+        closeDrawCanvas();
+      }
+    });
+
+    $('#save-marker').on('click', function(){
+      let type = $('input[name="marker-type"]:checked').val() || 'searched';
+      let color = $('#marker-color').val();
+      let desc = $('#marker-description').val();
+      let pos = $('#marker-info').data('pos');
+      let geometryType = $('#marker-info').data('geometryType') || 'Point';
+
+      if(geometryType==='Point'){
+        const lnglat = map.containerToLngLat([pos.x, pos.y]);
+        const geometry = { type: "Point", coordinates: [lnglat.lng, lnglat.lat] };
+        const props = {
+          color,
+          markerType: type,
+          description: desc,
+          createdBy: userName
+        };
+        saveToBackend('marker', geometry, props);
+      } else if(geometryType==='Polygon'){
+        const props = {
+          color,
+          markerType: type,
+          description: desc,
+          createdBy: userName
+        };
+        saveToBackend('polygon', pendingDrawGeometry, props);
+        pendingDrawGeometry = null;
+        pendingDrawType = null;
+      } else if(geometryType==='LineString'){
+        const props = {
+          color,
+          markerType: type,
+          description: desc,
+          createdBy: userName
+        };
+        saveToBackend('polyline', pendingDrawGeometry, props);
+        pendingDrawGeometry = null;
+        pendingDrawType = null;
+      }
+      closeMarkerInput();
+    });
+    $('#cancel-marker').on('click', function(){
+      closeMarkerInput();
+      pendingDrawGeometry = null;
+      pendingDrawType = null;
+    });
+
+    $('input[name="marker-type"]').on('change', function(){
+      let type = $(this).val();
+      let color = TYPE_COLORS[type];
+      $('#marker-color').val(color);
+      $('#color-preview').css('background', color);
+    });
+    $('#marker-color').on('input', function(){ $('#color-preview').css('background', $(this).val()); });
+  });
+
+  // Example: 动态更新热力点，后端/AI推送时调用
+  // updateHeatmapData([
+  //   { lng: 116.335, lat: 39.941, value: 1 },
+  //   { lng: 116.337, lat: 39.944, value: 0.6 }
+  // ]);
+</script>
+<script src="/js/task-location.js?v=20260923-features"></script>
+<script>if(window.GuituTaskLocation && window.GuituTaskMap)GuituTaskLocation.init(window.GuituTaskMap);</script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!-- 系统设置 - 响应式版本（桌面端布局保持不变，新增手机端适配） -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>系统设置</title>
+  <!-- 视口设置：确保移动端正确缩放 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+  <!-- Layui 样式 -->
+  <link rel="stylesheet" href="../layuimini/lib/layui-v2.5.5/css/layui.css">
+
+  <style>
+    /* ====== 桌面端原有样式 ====== */
+    body {
+      background-color: #f2f2f2;
+      font-family: Arial, sans-serif;
+      transition: background-color 0.3s, font-size 0.3s;
+    }
+    .layuimini-container {
+      padding: 20px;
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .layui-form-item {margin-bottom: 20px;}
+    .button-container {text-align: center; margin-top: 30px;}
+    .layui-btn {margin: 0 10px;}
+
+    /* 黑暗模式样式 */
+    .dark-mode {background-color: #333; color: #ffffff;}
+    .dark-mode .layuimini-container {background-color: #444;}
+
+    /* ====== 移动端适配：宽度 ≤ 992px 时生效 ====== */
+    @media (max-width: 992px) {
+      .layuimini-container {padding: 10px;}
+
+      /* 表单项纵向排列 */
+      .layui-form-item {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+      }
+      .layui-form-label {
+        width: 100%;       /* 标签占满整行 */
+        text-align: left;  /* 左对齐 */
+        margin: 0 0 4px 0; /* 下方留间距 */
+      }
+
+      /* 输入区宽度满屏 */
+      .layui-input-block,
+      .layui-input-inline {
+        width: 100% !important;
+        margin-left: 0 !important;
+      }
+      .layui-input-inline {padding-right: 0;}
+
+      /* 输入控件、选择框、文本域占满宽度 */
+      .layui-input,
+      .layui-select,
+      .layui-textarea {
+        width: 100% !important;
+      }
+
+      /* 操作按钮占满整行，更易点击 */
+      .button-container {text-align: stretch;}
+      .button-container .layui-btn {
+        width: 100%;
+        margin: 10px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="layuimini-container">
+
+  <!-- 标题 -->
+  <fieldset class="layui-elem-field layui-field-title" align="center">
+    <legend>系统设置</legend>
+  </fieldset>
+
+  <!-- 设置表单 -->
+  <form class="layui-form">
+
+    <!-- 账号设置 -->
+    <div class="layui-form-item">
+      <label class="layui-form-label">昵称</label>
+      <div class="layui-input-block">
+        <input type="text" name="nickname" required placeholder="请输入昵称" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+
+    <!-- 绑定手机号 -->
+    <div class="layui-form-item">
+      <label class="layui-form-label">手机号</label>
+      <div class="layui-input-block">
+        <div class="layui-input-inline" style="width: 200px;">
+          <input type="text" name="phone" required placeholder="请输入手机号" autocomplete="off" class="layui-input">
+        </div>
+        <button type="button" id="send-code-btn" class="layui-btn layui-btn-normal">发送验证码</button>
+      </div>
+    </div>
+
+    <div class="layui-form-item" id="code-input" style="display: none;">
+      <label class="layui-form-label">验证码</label>
+      <div class="layui-input-block">
+        <input type="text" name="code" required placeholder="请输入验证码" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+
+    <!-- 外观与字体 -->
+    <div class="layui-form-item">
+      <label class="layui-form-label">外观主题</label>
+      <div class="layui-input-block">
+        <select name="theme" id="theme-select">
+          <option value="default">默认</option>
+          <option value="dark">黑暗模式</option>
+          <option value="light">亮色模式</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <label class="layui-form-label">字体大小</label>
+      <div class="layui-input-block">
+        <select name="font-size" id="font-size-select">
+          <option value="small">小</option>
+          <option value="medium">中</option>
+          <option value="large">大</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 隐私与安全 -->
+    <div class="layui-form-item">
+      <label class="layui-form-label">隐私设置</label>
+      <div class="layui-input-block">
+        <input type="checkbox" name="privacy" lay-skin="primary" title="允许其他人查看我的信息">
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <label class="layui-form-label">修改密码</label>
+      <div class="layui-input-block">
+        <input type="password" name="password" required placeholder="请输入新密码" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+
+    <!-- 通知设置 -->
+    <div class="layui-form-item">
+      <label class="layui-form-label">通知设置</label>
+      <div class="layui-input-block">
+        <input type="checkbox" name="email-notification" lay-skin="primary" title="通过邮件接收通知">
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <label class="layui-form-label">短信通知</label>
+      <div class="layui-input-block">
+        <input type="checkbox" name="sms-notification" lay-skin="primary" title="通过短信接收通知">
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="button-container">
+      <button class="layui-btn layui-btn-normal" type="submit">保存设置</button>
+      <button class="layui-btn layui-btn-primary" onclick="window.history.back(); return false;">返回</button>
+    </div>
+  </form>
+</div>
+
+<!-- Layui 脚本 -->
+<script src="../layuimini/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script>
+  layui.use(['form', 'layer'], function(){
+    var form = layui.form;
+    var layer = layui.layer;
+
+    // 发送验证码逻辑
+    document.getElementById('send-code-btn').addEventListener('click', function() {
+      layer.msg('验证码已发送至您的手机', {icon: 1, time: 2000});
+      document.getElementById('code-input').style.display = 'block';
+    });
+
+    // 外观主题切换
+    document.getElementById('theme-select').addEventListener('change', function() {
+      const theme = this.value;
+      document.body.classList.toggle('dark-mode', theme === 'dark');
+      localStorage.setItem('theme', theme);
+    });
+
+    // 字体大小切换
+    document.getElementById('font-size-select').addEventListener('change', function() {
+      const size = this.value;
+      document.body.style.fontSize = size === 'small' ? '12px' : size === 'medium' ? '16px' : '20px';
+      localStorage.setItem('font-size', size);
+    });
+
+    // 页面加载时应用保存的设置
+    window.onload = function() {
+      const savedTheme = localStorage.getItem('theme') || 'default';
+      const savedSize  = localStorage.getItem('font-size') || 'small';
+
+      document.getElementById('theme-select').value = savedTheme;
+      document.body.classList.toggle('dark-mode', savedTheme === 'dark');
+
+      document.getElementById('font-size-select').value = savedSize;
+      document.body.style.fontSize = savedSize === 'small' ? '12px' : savedSize === 'medium' ? '16px' : '20px';
+    };
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,461 @@
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>暖寻灯塔-用户注册</title>
+    <link rel="icon" type="image/png" href="/layuimini/images/nuanxun-logo-20261014.png">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <link rel="stylesheet" href="/layuimini/lib/layui-v2.5.5/css/layui.css" media="all">
+
+    <style>
+
+        html, body { height: 100%; width: 100%; background-color: rgba(0,0,0,0.7); margin: 0; padding: 0; font-family: "Microsoft YaHei", sans-serif; }
+
+        #background-video { position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%; z-index: -1; object-fit: cover; }
+
+        .main-body { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 430px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border-radius: 12px; }
+
+        .register-header { height: 120px; background-color: #007bff; color: #fff; text-align: center; line-height: 120px; font-size: 28px; position: relative; border-radius: 12px 12px 0 0; }
+
+        .register-header .bg1 { display: inline-block; width: 74px; height: 74px; background: #fff; opacity: .1; border-radius: 0 74px 0 0; position: absolute; left: 0; top: 43px; }
+
+        .register-header .bg2 { display: inline-block; width: 94px; height: 94px; background: #fff; opacity: .1; border-radius: 50%; position: absolute; right: -16px; top: -16px; }
+
+        .register-content { background-color: #fff; padding: 30px; border-radius: 0 0 12px 12px; }
+
+        .form-group { margin-bottom: 25px; position: relative; }
+
+        .form-group .icon { display: inline-block; width: 25px; height: 25px; position: absolute; left: 10px; top: 8px; color: #007bff; }
+
+        .form-group input { width: 100%; height: 40px; border: none; border-bottom: 1px solid #dae1e6; padding-left: 40px; font-size: 14px; outline: none; box-sizing: border-box; }
+
+        .form-group input:focus { border-bottom-color: #007bff; }
+
+        .verification-code { display: flex; position: relative; margin-bottom: 25px; }
+
+        .verification-code input { flex: 1; height: 40px; border: none; border-bottom: 1px solid #dae1e6; padding-left: 40px; font-size: 14px; outline: none; }
+
+        .verification-code button { width: 120px; height: 36px; background: none; border: 1px solid #007bff; border-radius: 4px; color: #007bff; cursor: pointer; font-size: 12px; margin-left: 10px; transition: all 0.3s; }
+
+        .verification-code button:hover { background-color: #007bff; color: white; }
+
+        .verification-code button:disabled { border-color: #ccc; color: #ccc; cursor: not-allowed; }
+
+        .role-container { margin-bottom: 25px; }
+
+        .role-title { margin-bottom: 10px; color: #646464; font-size: 14px; }
+
+        .role-options { display: flex; justify-content: space-between; }
+
+        .role-option { flex: 1; height: 45px; border: 1px solid #dae1e6; border-radius: 5px; text-align: center; line-height: 45px; cursor: pointer; transition: all 0.3s; margin: 0 5px; }
+
+        .role-option:first-child { margin-left: 0; }
+
+        .role-option:last-child { margin-right: 0; }
+
+        .role-option.selected { border-color: #007bff; background-color: #f0f7ff; color: #007bff; }
+
+        .captcha-group { display: flex; align-items: center; margin-bottom: 25px; }
+
+        .captcha-group input { flex: 1; height: 40px; border: none; border-bottom: 1px solid #dae1e6; padding-left: 40px; font-size: 14px; outline: none; }
+
+        #canvas { width: 120px; height: 40px; border: 1px solid #e6e6e6; cursor: pointer; margin-left: 10px; }
+
+        .agreement { display: flex; align-items: center; margin-bottom: 25px; color: #9abcda; font-size: 12px; }
+
+        .agreement-checkbox { width: 16px; height: 16px; border: 1px solid #41d1d1; border-radius: 2px; margin-right: 8px; position: relative; cursor: pointer; }
+
+        .agreement-checkbox.checked::after { content: "✓"; position: absolute; top: -1px; left: 2px; color: #007bff; }
+
+        .agreement a { color: #007bff; text-decoration: none; }
+
+        .register-btn { width: 100%; height: 45px; background-color: #007bff; border-radius: 22px; color: #fff; font-size: 16px; border: none; cursor: pointer; transition: all 0.3s; margin-bottom: 20px; }
+
+        .register-btn:hover { background-color: #0069d9; }
+
+        .login-link { text-align: center; font-size: 14px; color: #646464; }
+
+        .login-link a { color: #007bff; text-decoration: none; margin-left: 5px; }
+
+        .toggle-password { position: absolute; right: 10px; top: 10px; cursor: pointer; color: #ccc; }
+
+        .toggle-password:hover { color: #007bff; }
+
+        @media screen and (max-width: 480px) { .main-body { width: 90%; } }
+
+        .main-body { position: relative; top: auto; left: auto; transform: none; width: min(430px, calc(100% - 24px)); margin: 24px auto; }
+        .register-content { padding: 24px; }
+        .register-header { font-size: clamp(19px, 5vw, 28px); }
+        .captcha-group input, .verification-code input { min-width: 0; width: 0; }
+        .icon-user:before { content: "👤"; }
+
+        .icon-lock:before { content: "🔒"; }
+
+        .icon-email:before { content: "📧"; }
+
+        .icon-location:before { content: "📍"; }
+
+        .icon-code:before { content: "🔑"; }
+
+    </style>
+
+<link rel="stylesheet" href="/css/region-location.css?v=20261019-location">
+</head>
+
+<body>
+
+<video autoplay muted loop id="background-video">
+
+    <source src="/img/9OLD.mp4" type="video/mp4">
+
+</video>
+
+<div class="main-body">
+
+    <div class="register-header">
+
+        <img src="/layuimini/images/nuanxun-logo-20261014.png" alt="暖寻灯塔 Logo" style="width:44px;height:44px;object-fit:contain;vertical-align:middle;margin-right:10px;border-radius:6px;background:#fff"><span>暖寻灯塔-用户注册</span>
+
+        <span class="bg1"></span>
+
+        <span class="bg2"></span>
+
+    </div>
+
+    <div class="register-content">
+
+        <form id="registerForm" class="layui-form">
+
+            <div class="form-group">
+
+                <span class="icon icon-user"></span>
+
+                <input type="text" name="username" placeholder="请输入用户名" maxlength="24" autocomplete="off"/>
+
+            </div>
+
+            <div class="form-group">
+
+                <span class="icon icon-lock"></span>
+
+                <input type="password" name="password" placeholder="请输入密码" maxlength="72" autocomplete="new-password"/>
+
+                <span class="toggle-password" id="togglePassword">👁</span>
+
+            </div>
+
+            <div class="form-group">
+
+                <span class="icon icon-lock"></span>
+
+                <input type="password" name="confirmPassword" placeholder="请确认密码" maxlength="72" autocomplete="new-password"/>
+
+            </div>
+
+            <div class="form-group">
+
+                <span class="icon icon-email"></span>
+
+                <input type="email" name="email" placeholder="请输入您的邮箱" maxlength="100" autocomplete="off"/>
+
+            </div>
+
+            <div class="verification-code">
+
+                <span class="icon icon-code"></span>
+
+                <input type="text" name="emailCode" placeholder="请输入邮箱验证码" maxlength="6" autocomplete="off"/>
+
+                <button type="button" id="sendCodeBtn">获取验证码</button>
+
+            </div>
+
+            <div class="role-container">
+
+                <div class="role-title">请选择您的身份:</div>
+
+                <div class="role-options">
+
+                    <div class="role-option" data-role="family">家属</div>
+
+                    <div class="role-option" data-role="rescuer">搜救志愿者</div>
+
+                </div>
+
+                <input type="hidden" name="userType" value="">
+
+            </div>
+
+            <div class="form-group" id="nameField">
+
+                <span class="icon icon-user"></span>
+
+                <input type="text" name="name" placeholder="请输入展示姓名（比赛展示请使用化名）" maxlength="20" autocomplete="off"/>
+
+            </div>
+
+            <div class="form-group" id="locationField" style="display:none;" data-region-field>
+
+                <span class="icon icon-location"></span>
+
+                <div class="region-locate-row">
+                    <input type="text" name="location" placeholder="请输入您的所在地区" maxlength="50" autocomplete="off"/>
+                    <button type="button" class="region-locate-button" data-region-locate>自动定位</button>
+                </div>
+                <p class="region-locate-status" data-region-status role="status">点击授权后由高德解析省市区，可手动修改。</p>
+
+            </div>
+
+            <div class="captcha-group">
+
+                <span class="icon icon-code"></span>
+
+                <input type="text" name="captcha" id="captcha" placeholder="请输入图形验证码" maxlength="4" autocomplete="off"/>
+
+                <canvas id="canvas" width="120" height="40"></canvas>
+
+            </div>
+
+            <div class="agreement">
+
+                <div class="agreement-checkbox" id="agreementCheckbox"></div>
+
+                <span>我已阅读并同意<a href="javascript:void(0);">用户协议</a></span>
+
+            </div>
+
+            <button class="register-btn" type="button" id="registerBtn">立即注册</button>
+
+            <div class="login-link">
+
+                <span>已有账号？</span>
+
+                <a href="/login">立即登录</a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="/layuimini/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+
+<script>
+
+layui.use(['form','jquery','layer'], function() {
+
+    var $ = layui.jquery, form = layui.form, layer = layui.layer;
+
+    var show_num = [], isAgreed = false, countdown = 60, timer = null;
+
+    $(function() { drawCaptcha(); $('.role-option[data-role="family"]').click(); });
+
+    $('#togglePassword').on('click', function() {
+
+        var inp = $('input[name="password"]');
+
+        if (inp.attr('type') === 'password') { inp.attr('type','text'); $(this).text('🔒'); }
+
+        else { inp.attr('type','password'); $(this).text('👁'); }
+
+    });
+
+    $('.role-option').on('click', function() {
+
+        $('.role-option').removeClass('selected'); $(this).addClass('selected');
+
+        var role = $(this).data('role');
+
+        $('input[name="userType"]').val(role);
+
+        if (role === 'rescuer') { $('#locationField').show(); }
+
+        else { $('#locationField').hide(); $('input[name="location"]').val(''); }
+
+    });
+
+    $('#agreementCheckbox').on('click', function() { isAgreed = !isAgreed; $(this).toggleClass('checked', isAgreed); });
+
+    $('#canvas').on('click', function() { drawCaptcha(); });
+
+    $('#sendCodeBtn').on('click', function() {
+
+        var email = $('input[name="email"]').val().trim();
+
+        if (!email) { layer.msg('请输入邮箱地址'); return; }
+
+        if (!/^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/.test(email)) { layer.msg('请输入正确的邮箱地址'); return; }
+
+        var btn = $(this);
+
+        btn.attr('disabled', true); btn.text('发送中...');
+
+        $.ajax({
+
+            url: '/api/users/sendEmailCode', type: 'POST', contentType: 'application/json',
+
+            data: JSON.stringify({ email: email }),
+
+            success: function(res) {
+
+                if (res && res.success) { layer.msg('验证码已发送至 ' + email + '，请查收'); startCountdown(btn); }
+
+                else { layer.msg(res.message || '发送失败，请稍后重试', {icon:2}); btn.removeAttr('disabled'); btn.text('获取验证码'); }
+
+            },
+
+            error: function(xhr) { layer.msg(xhr.responseJSON && xhr.responseJSON.message || '网络异常，请稍后重试', {icon:2}); btn.removeAttr('disabled'); btn.text('获取验证码'); }
+
+        });
+
+    });
+
+    function startCountdown(btn) {
+
+        if (countdown === 0) { btn.removeAttr('disabled'); btn.text('重新获取'); countdown = 60; clearTimeout(timer); }
+
+        else { btn.attr('disabled', true); btn.text('重新发送(' + countdown + ')'); countdown--; timer = setTimeout(function() { startCountdown(btn); }, 1000); }
+
+    }
+
+    $('#registerBtn').on('click', function() { collectAndValidateForm(); });
+
+    function collectAndValidateForm() {
+
+        var formData = {
+
+            username: $('input[name="username"]').val().trim(),
+
+            password: $('input[name="password"]').val(),
+
+            confirmPassword: $('input[name="confirmPassword"]').val(),
+
+            email: $('input[name="email"]').val().trim(),
+
+            emailCode: $('input[name="emailCode"]').val().trim(),
+
+            userType: $('input[name="userType"]').val(),
+
+            name: $('input[name="name"]').val().trim(),
+
+            location: $('input[name="location"]').val().trim(),
+
+            captcha: $('input[name="captcha"]').val().trim()
+
+        };
+
+        if (!formData.username) { layer.msg('请输入用户名'); return; }
+
+        if (!formData.password) { layer.msg('请输入密码'); return; }
+
+        if (formData.password.length < 8 || new TextEncoder().encode(formData.password).length > 72) { layer.msg('密码至少 8 个字符，且不超过 72 字节'); return; }
+
+        if (!formData.confirmPassword) { layer.msg('请确认密码'); return; }
+
+        if (formData.password !== formData.confirmPassword) { layer.msg('两次密码输入不一致'); return; }
+
+        if (!formData.email) { layer.msg('请输入邮箱地址'); return; }
+
+        if (!/^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/.test(formData.email)) { layer.msg('请输入正确的邮箱地址'); return; }
+
+        if (!formData.emailCode) { layer.msg('请输入邮箱验证码'); return; }
+
+        if (!formData.userType) { layer.msg('请选择用户身份'); return; }
+
+        if (!formData.name) { layer.msg('请输入展示姓名'); return; }
+
+        if (formData.userType === 'rescuer' && !formData.location) { layer.msg('请输入所在地区'); return; }
+
+        if (!formData.captcha) { layer.msg('请输入图形验证码'); return; }
+
+        if (formData.captcha.toLowerCase() !== show_num.join('')) { layer.msg('图形验证码错误'); drawCaptcha(); return; }
+
+        if (!isAgreed) { layer.msg('请阅读并同意用户协议'); return; }
+
+        submitRegistration(formData);
+
+    }
+
+    function submitRegistration(formData) {
+        if ($('#registerBtn').prop('disabled')) return;
+        $('#registerBtn').prop('disabled', true);
+
+        var loadIndex = layer.load(1, {shade:[0.1,'#fff']});
+
+        $.ajax({
+
+            url: '/api/users/register', type: 'POST', data: JSON.stringify(formData), contentType: 'application/json',
+
+            success: function(res) {
+
+                layer.close(loadIndex);
+
+                if (res && res.success) { layer.msg('注册成功', {icon:1, time:2000}, function() { window.location.href = '/'; }); }
+
+                else { layer.msg(res.message || '注册失败，请稍后重试', {icon:2}); }
+
+            },
+
+            error: function(xhr) { layer.close(loadIndex); layer.msg(xhr.responseJSON && xhr.responseJSON.message || '注册失败，请稍后重试', {icon:2}); },
+            complete: function() { $('#registerBtn').prop('disabled', false); }
+
+        });
+
+    }
+
+    function drawCaptcha() {
+
+        var canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
+
+        canvas.width = 120; canvas.height = 40;
+
+        ctx.clearRect(0,0,120,40); ctx.fillStyle='#f3f6fa'; ctx.fillRect(0,0,120,40);
+
+        for (var i=0;i<6;i++) { ctx.strokeStyle=randomColor(180,240); ctx.beginPath(); ctx.moveTo(Math.random()*120,Math.random()*40); ctx.lineTo(Math.random()*120,Math.random()*40); ctx.stroke(); }
+
+        for (var i=0;i<40;i++) { ctx.fillStyle=randomColor(150,200); ctx.beginPath(); ctx.arc(Math.random()*120,Math.random()*40,1,0,2*Math.PI); ctx.fill(); }
+
+        show_num=[];
+
+        var codes='ABCDEFGHJKLMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+
+        for (var i=0;i<4;i++) {
+
+            var ch=codes.charAt(Math.floor(Math.random()*codes.length));
+
+            show_num.push(ch.toLowerCase());
+
+            var x=20+i*25, y=25+Math.random()*8, deg=Math.random()*30*Math.PI/180;
+
+            ctx.font='bold 24px Arial'; ctx.translate(x,y); ctx.rotate(deg);
+
+            ctx.fillStyle=randomColor(50,120); ctx.fillText(ch,0,0);
+
+            ctx.rotate(-deg); ctx.translate(-x,-y);
+
+        }
+
+    }
+
+    function randomColor(min,max) { return 'rgb('+Math.floor(Math.random()*(max-min+1)+min)+','+Math.floor(Math.random()*(max-min+1)+min)+','+Math.floor(Math.random()*(max-min+1)+min)+')'; }
+
+});
+
+</script>
+
+<script src="/js/region-location.js?v=20261019-location"></script>
+</body>
+
+</html>
+

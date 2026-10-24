@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>访问受限 - 暖寻灯塔系统</title>
+    <link rel="stylesheet" href="/layuimini/lib/layui-v2.5.5/css/layui.css">
+    <style>
+        .forbidden-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 100px auto;
+            padding: 30px;
+            text-align: center;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .forbidden-icon {
+            font-size: 80px;
+            color: #FF5722;
+            margin-bottom: 20px;
+        }
+        
+        .forbidden-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .forbidden-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .action-buttons {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body class="layui-bg-gray">
+    <div class="forbidden-container">
+        <div class="forbidden-icon">
+            <i class="layui-icon layui-icon-face-surprised"></i>
+        </div>
+        <h1 class="forbidden-title">访问受限</h1>
+        <div class="forbidden-message">
+            <p>抱歉，您没有权限访问此页面。</p>
+            <p>该功能仅供救援人员使用，请确认您的账号类型或联系管理员获取帮助。</p>
+        </div>
+        <div class="action-buttons">
+            <button onclick="goToHome()" class="layui-btn">返回首页</button>
+        </div>
+    </div>
+    
+    <script src="/layuimini/lib/layui-v2.5.5/layui.js"></script>
+    <script>
+    function goToHome() {
+        // 使用top确保跳转到顶层窗口，避免嵌套
+        window.top.location.href = '/index.html';
+    }
+    </script>
+</body>
+</html>

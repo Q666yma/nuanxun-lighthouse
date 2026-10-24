@@ -1,0 +1,36 @@
+-- Application taxonomy restored from recovery/pyservice/config.py TAG_LIBRARY.
+-- Metadata only: creates no users, qualifications or rescue history. Safe to rerun.
+SET NAMES utf8mb4;
+START TRANSACTION;
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '城市导航', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '城市导航');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '水域导航', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '水域导航');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '山区熟悉', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '山区熟悉');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '丛林越野', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '丛林越野');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '医疗背景', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '医疗背景');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '心理辅导', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '心理辅导');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '语言翻译', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '语言翻译');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '急救技能', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '急救技能');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '野外急救', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '野外急救');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '攀登技能', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '攀登技能');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '搜索技能', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '搜索技能');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '沟通能力', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '沟通能力');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '团队协作', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '团队协作');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '任务分配', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '任务分配');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '高海拔耐受', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '高海拔耐受');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '野生动物识别', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '野生动物识别');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '计算机技能', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '计算机技能');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '无人机操作', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '无人机操作');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '长时间徒步', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '长时间徒步');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '高强度耐力', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '高强度耐力');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '急速奔跑', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '急速奔跑');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '热带森林熟悉', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '热带森林熟悉');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '沙漠求生', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '沙漠求生');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '极限运动', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '极限运动');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '高空作业', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '高空作业');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '紧急反应', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '紧急反应');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '食物处理', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '食物处理');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '物资管理', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '物资管理');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '水上救援', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '水上救援');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '森林跟踪', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '森林跟踪');
+INSERT INTO skill_tags (tag_name, tag_category, description) SELECT '灾后救援', '搜救技能', '原项目技能标签库' WHERE NOT EXISTS (SELECT 1 FROM skill_tags WHERE tag_name = '灾后救援');
+COMMIT;

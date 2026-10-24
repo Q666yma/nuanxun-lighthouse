@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.maka.mapper.MapMarkerMapper">
+
+    <!-- 查询，根据 taskId -->
+    <select id="selectByTaskId" resultType="com.maka.pojo.MapMarker">
+        SELECT * FROM map_markers WHERE task_id = #{taskId}
+    </select>
+
+    <!-- 查询，根据 id -->
+    <select id="selectById" resultType="com.maka.pojo.MapMarker">
+        SELECT * FROM map_markers WHERE id = #{id}
+    </select>
+
+    <!-- 插入 -->
+    <insert id="insert" parameterType="com.maka.pojo.MapMarker" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO map_markers
+        (task_id, marker_type, geometry, properties, created_by, created_at)
+        VALUES (#{taskId}, #{markerType}, #{geometry}, #{properties}, #{createdBy}, #{createdAt})
+    </insert>
+
+    <!-- 删除 -->
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM map_markers WHERE id = #{id}
+    </delete>
+
+    <select id="selectAll" resultType="com.maka.pojo.MapMarker">
+        SELECT * FROM map_markers
+    </select>
+
+</mapper>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <title>搜救队员资料</title>
+
+  <!-- 基本视口 -->
+  <meta name="renderer" content="webkit"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+
+  <!-- Layui 官方完整包（含全部模块） -->
+  <link rel="stylesheet"
+        href="/layuimini/lib/layui-v2.5.5/css/layui.css"/>
+
+  <style>
+    .tag-list{display:flex;flex-wrap:wrap;margin-bottom:15px}
+    .tag-item{background:#1E9FFF;color:#fff;padding:5px 10px;margin:5px;border-radius:3px}
+  </style>
+  <link rel="stylesheet" href="/css/region-location.css?v=20261019-location">
+</head>
+<body>
+<div class="layuimini-container">
+  <div class="layuimini-main">
+
+    <!-- 申请审核状态 -->
+    <div class="layui-collapse" style="margin-bottom:15px;">
+      <div class="layui-colla-item">
+        <h2 class="layui-colla-title">申请审核状态</h2>
+        <div class="layui-colla-content">
+          <p>资料和技能保存后由管理员审核，审核通过才开放任务执行。修改个人资料不会自行改变审核状态。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 资料卡片 -->
+    <div class="layui-card">
+      <div class="layui-card-header">搜救队员资料</div>
+      <div class="layui-card-body">
+        <form class="layui-form" action="/rescuer/profile/save" method="post">
+          <!-- 姓名 -->
+          <div class="layui-form-item">
+            <label class="layui-form-label">姓名：</label>
+            <div class="layui-input-block">
+              <input type="text" name="name"
+                     th:value="${rescuer != null ? rescuer.name : ''}"
+                     required class="layui-input"/>
+            </div>
+          </div>
+
+          <!-- 状态 -->
+          <div class="layui-form-item">
+            <label class="layui-form-label">状态：</label>
+            <div class="layui-input-block">
+              <input type="text"
+                     th:value="${rescuer == null ? '未申请' : (rescuer.status == 'available' ? '已审核通过' : (rescuer.status == 'pending' ? '待管理员审核' : (rescuer.status == 'rejected' ? '申请未通过，请完善后重新提交' : rescuer.status)))}"
+                     readonly class="layui-input"/>
+            </div>
+          </div>
+
+          <!-- 所在地区 -->
+          <div class="layui-form-item">
+            <label class="layui-form-label">所在地区：</label>
+            <div class="layui-input-block" data-region-field>
+              <div class="region-locate-row">
+                <input type="text" name="location"
+                       th:value="${rescuer != null ? rescuer.location : ''}"
+                       class="layui-input"/>
+                <button type="button" class="region-locate-button" data-region-locate>自动定位</button>
+              </div>
+              <p class="region-locate-status" data-region-status role="status">点击授权后由高德解析省市区，可手动修改。</p>
+            </div>
+          </div>
+
+          <!-- 技能描述 -->
+          <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">个人技能描述：</label>
+            <div class="layui-input-block">
+              <textarea name="skillsDescription" class="layui-textarea"
+                        th:text="${rescuer != null ? rescuer.skillsDescription : ''}"></textarea>
+            </div>
+          </div>
+
+          <!-- 技能标签 -->
+          <div class="layui-form-item">
+            <label class="layui-form-label">技能标签：</label>
+            <div class="layui-input-block">
+              <div class="tag-list"
+                   th:if="${rescuer != null && rescuer.getSkillTags != null && !rescuer.getSkillTags.isEmpty()}">
+                <div th:each="tag : ${rescuer.getSkillTags}" class="tag-item" th:text="${tag}"></div>
+              </div>
+              <div th:if="${rescuer == null || rescuer.getSkillTags == null || rescuer.getSkillTags.isEmpty()}"
+                   class="layui-form-mid layui-word-aux">
+                您还未设置技能标签，
+                <a href="/rescuer/generate-tags" class="layui-font-blue">点击设置</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="layui-form-item">
+            <div class="layui-input-block">
+              <button type="submit" class="layui-btn layui-btn-normal">保存资料</button>
+              <button type="button" id="resubmitApplication" class="layui-btn" th:if="${rescuer != null && (rescuer.status == 'rejected' || rescuer.status == 'visitor')}">重新提交审核</button>
+              <a href="/rescuer/generate-tags" class="layui-btn layui-btn-warm">编辑技能标签</a>
+              <button type="button" class="layui-btn layui-btn-primary" id="equipGenBtn">
+                <i class="fa fa-file-pdf-o"></i> 生成装备清单
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 弹窗：装备多选 -->
+    <div id="equipModal" style="display:none;padding:20px">
+      <form class="layui-form" lay-filter="equipForm">
+        <div class="layui-form-item">
+          <!-- 24 个常用随身装备 -->
+          <input type="checkbox" name="items" value="绳索"          title="绳索">
+          <input type="checkbox" name="items" value="主锁 / 快挂"  title="主锁 / 快挂">
+          <input type="checkbox" name="items" value="头灯"          title="头灯">
+          <input type="checkbox" name="items" value="备用电源"      title="备用电源">
+          <input type="checkbox" name="items" value="应急药品"      title="应急药品">
+          <input type="checkbox" name="items" value="防雨衣"        title="防雨衣">
+          <input type="checkbox" name="items" value="救援手套"      title="救援手套">
+          <input type="checkbox" name="items" value="多功能刀"      title="多功能刀">
+          <input type="checkbox" name="items" value="指南针"        title="指南针">
+          <input type="checkbox" name="items" value="水袋"          title="水袋">
+          <input type="checkbox" name="items" value="行动口粮"      title="行动口粮">
+          <input type="checkbox" name="items" value="急救毯"        title="急救毯">
+          <input type="checkbox" name="items" value="哨子"          title="哨子">
+          <input type="checkbox" name="items" value="GPS 手持机"   title="GPS 手持机">
+          <input type="checkbox" name="items" value="对讲机"        title="对讲机">
+          <input type="checkbox" name="items" value="备用电池"      title="备用电池">
+          <input type="checkbox" name="items" value="抗风打火机"    title="抗风打火机">
+          <input type="checkbox" name="items" value="防蚊喷雾"      title="防蚊喷雾">
+          <input type="checkbox" name="items" value="记号笔"        title="记号笔">
+          <input type="checkbox" name="items" value="便携坐垫"      title="便携坐垫">
+          <input type="checkbox" name="items" value="医用绷带"      title="医用绷带">
+          <input type="checkbox" name="items" value="伤口消毒液"    title="伤口消毒液">
+          <input type="checkbox" name="items" value="能量胶"        title="能量胶">
+          <input type="checkbox" name="items" value="硅胶防水袋"    title="硅胶防水袋">
+        </div>
+        <button class="layui-btn" lay-submit lay-filter="equipConfirm">生成 PDF</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========= JavaScript（严格顺序） ========= -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+<!-- Layui (包含全部模块，element 也一并解决) -->
+<script src="/layuimini/lib/layui-v2.5.5/layui.js"></script>
+
+<!-- 其它依赖 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<!-- jsPDF UMD -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>if (window.jspdf) window.jsPDF = window.jspdf.jsPDF;</script>
+
+<!-- 业务脚本 -->
+<script src="/js/equip-checklist.js?v=7"></script>
+<script src="/js/guitu-api.js?v=20260923-features"></script>
+<script>
+var resubmit=document.getElementById('resubmitApplication');if(resubmit)resubmit.addEventListener('click',async function(){var form=resubmit.closest('form');if(!form.reportValidity())return;resubmit.disabled=true;try{await GuituApi.request('/rescuer/apply',{method:'POST',body:{name:form.elements.name.value,location:form.elements.location.value,skillsDescription:form.elements.skillsDescription.value}});location.reload();}catch(error){alert(error.message);resubmit.disabled=false;}});
+</script>
+<script src="/js/region-location.js?v=20261019-location"></script>
+</body>
+</html>

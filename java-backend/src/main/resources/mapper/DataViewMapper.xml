@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.maka.mapper.DataViewMapper">
+    <!-- 获取所有救援中任务 -->
+    <select id="selectRescuingTask" resultType="com.maka.pojo.Task">
+        SELECT id
+        FROM tasks
+        WHERE status = "waiting" or status = "rescuing"
+    </select>
+    <!-- 获取所有已救援任务 -->
+    <select id="selectRescuedTask" resultType="com.maka.pojo.Task">
+        SELECT id
+        FROM tasks
+        WHERE  status = "finished"
+    </select>
+
+    <!-- 获取所有救援队员 -->
+    <select id="selectAllRescuer" resultType="com.maka.pojo.Rescuer">
+        SELECT uuid
+        FROM rescuers
+    </select>
+
+    <select id="selectTagList" resultType="com.maka.pojo.Rescuer">
+        SELECT skill_tags
+        FROM rescuers
+    </select>
+</mapper>

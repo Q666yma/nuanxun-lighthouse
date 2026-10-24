@@ -1,0 +1,43 @@
+# Local credentials and machine-specific settings
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Dependencies, compilation output and caches
+java-backend/lib/
+tools/lombok*.jar
+**/build/
+**/target/
+**/__pycache__/
+**/.venv/
+**/venv/
+**/node_modules/
+*.pyc
+.idea/
+.vscode/
+
+# Private/runtime content
+**/runtime/
+**/uploads/
+**/logs/
+**/temp/
+**/secrets/
+java-backend/src/main/resources/static/rescue_informaition/img/
+*.log
+
+# Large course media and distribution archives
+*.mp4
+*.MP4
+*.webm
+*.avi
+*.mov
+*.zip
+*.7z
+*.rar
+
+.DS_Store
+Thumbs.db

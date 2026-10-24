@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.maka.mapper.MessageMapper">
+  <resultMap id="BaseResultMap" type="com.maka.pojo.Message">
+    <id column="message_id" jdbcType="INTEGER" property="messageId" />
+    <result column="sender_id" jdbcType="INTEGER" property="senderId" />
+    <result column="message_content" jdbcType="VARCHAR" property="messageContent" />
+    <result column="message_img" jdbcType="VARCHAR" property="messageImg" />
+    <result column="message_time" jdbcType="TIMESTAMP" property="messageTime" />
+    <result column="message_type" jdbcType="BOOLEAN" property="messageType" />
+    <result column="oldMan_id" jdbcType="INTEGER" property="oldmanId" />
+  </resultMap>
+  <resultMap id="TimeLine" type="com.maka.vo.TimeLine">
+    <result property="time" column="message_time"/>
+    <result property="desc" column="message_content"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    message_id, sender_id, message_content, message_img, message_time, message_type, 
+    oldMan_id
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_message
+    where message_id = #{messageId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tb_message
+    where message_id = #{messageId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="message_id" keyProperty="messageId" parameterType="com.maka.pojo.Message" useGeneratedKeys="true">
+    insert into tb_message (sender_id, message_content, message_img, 
+      message_time, message_type, oldMan_id
+      )
+    values (#{senderId,jdbcType=INTEGER}, #{messageContent,jdbcType=VARCHAR}, #{messageImg,jdbcType=VARCHAR}, 
+      #{messageTime,jdbcType=TIMESTAMP}, #{messageType,jdbcType=BOOLEAN}, #{oldmanId,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="message_id" keyProperty="messageId" parameterType="com.maka.pojo.Message" useGeneratedKeys="true">
+    insert into tb_message
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="senderId != null">
+        sender_id,
+      </if>
+      <if test="messageContent != null">
+        message_content,
+      </if>
+      <if test="messageImg != null">
+        message_img,
+      </if>
+      <if test="messageTime != null">
+        message_time,
+      </if>
+      <if test="messageType != null">
+        message_type,
+      </if>
+      <if test="oldmanId != null">
+        oldMan_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="senderId != null">
+        #{senderId,jdbcType=INTEGER},
+      </if>
+      <if test="messageContent != null">
+        #{messageContent,jdbcType=VARCHAR},
+      </if>
+      <if test="messageImg != null">
+        #{messageImg,jdbcType=VARCHAR},
+      </if>
+      <if test="messageTime != null">
+        #{messageTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="messageType != null">
+        #{messageType,jdbcType=BOOLEAN},
+      </if>
+      <if test="oldmanId != null">
+        #{oldmanId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.maka.pojo.Message">
+    update tb_message
+    <set>
+      <if test="senderId != null">
+        sender_id = #{senderId,jdbcType=INTEGER},
+      </if>
+      <if test="messageContent != null">
+        message_content = #{messageContent,jdbcType=VARCHAR},
+      </if>
+      <if test="messageImg != null">
+        message_img = #{messageImg,jdbcType=VARCHAR},
+      </if>
+      <if test="messageTime != null">
+        message_time = #{messageTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="messageType != null">
+        message_type = #{messageType,jdbcType=BOOLEAN},
+      </if>
+      <if test="oldmanId != null">
+        oldMan_id = #{oldmanId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where message_id = #{messageId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.maka.pojo.Message">
+    update tb_message
+    set sender_id = #{senderId,jdbcType=INTEGER},
+      message_content = #{messageContent,jdbcType=VARCHAR},
+      message_img = #{messageImg,jdbcType=VARCHAR},
+      message_time = #{messageTime,jdbcType=TIMESTAMP},
+      message_type = #{messageType,jdbcType=BOOLEAN},
+      oldMan_id = #{oldmanId,jdbcType=INTEGER}
+    where message_id = #{messageId,jdbcType=INTEGER}
+  </update>
+
+  <select id="getOldManMessage" resultMap="TimeLine">
+    select message_time,message_content from tb_message where oldMan_id = #{oldManId}
+    order by message_time
+  </select>
+</mapper>

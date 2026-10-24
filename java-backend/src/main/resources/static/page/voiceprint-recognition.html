@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>声纹识别系统</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <style>
+    :root{
+      --primary:#007bff;
+      --bg-grad:linear-gradient(135deg,#e0f7fa,#80deea);
+    }
+    /* 全局 ----------------------------------------------------------- */
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{
+      font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+      background:var(--bg-grad);
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;                 /* 允许页面滚动 */
+      min-height:100vh;
+      padding:24px 8px;
+    }
+
+    /* 外层容器 ------------------------------------------------------- */
+    .container{
+      width:90%;
+      max-width:1600px;
+      background:#fff;
+      padding:40px;
+      border-radius:20px;
+      box-shadow:0 4px 12px rgba(0,0,0,.2);
+      display:flex;
+      flex-direction:column;
+      gap:30px;
+      animation:fadeIn .9s ease;
+    }
+
+    /* 主块通用 ------------------------------------------------------- */
+    .card{
+      background:#fff;
+      border-radius:20px;
+      padding:40px;
+      box-shadow:0 4px 12px rgba(0,0,0,.12);
+      transition:transform .3s ease,box-shadow .3s ease;
+      flex:1 1 0;
+    }
+    .card:hover{
+      transform:translateY(-6px);
+      box-shadow:0 8px 18px rgba(0,0,0,.18);
+    }
+
+    /* 顶 / 底区布局 --------------------------------------------------- */
+    .top-section,.bottom-section{
+      display:flex;
+      gap:30px;
+      width:100%;
+    }
+
+    /* 文本样式 ------------------------------------------------------- */
+    h1{
+      font-size:clamp(24px,2.4vw,32px);
+      color:var(--primary);
+      margin-bottom:20px;
+    }
+    h2{
+      font-size:clamp(18px,2vw,22px);
+      color:var(--primary);
+      margin-bottom:20px;
+    }
+    label{
+      display:block;
+      font-size:clamp(14px,1.4vw,18px);
+      margin-bottom:10px;
+      color:#333;
+    }
+
+    /* 输入 ----------------------------------------------------------- */
+    .input-container{margin-bottom:30px;}
+    input[type=file],input[type=text]{
+      width:100%;
+      padding:12px 16px;
+      font-size:16px;
+      border:2px solid var(--primary);
+      border-radius:10px;
+      outline:none;
+      margin-top:10px;
+    }
+
+    /* 按钮 ----------------------------------------------------------- */
+    button{
+      background:var(--primary);
+      color:#fff;
+      padding:16px 32px;
+      font-size:18px;
+      border:none;
+      border-radius:10px;
+      cursor:pointer;
+      width:100%;
+      transition:background .3s,box-shadow .3s;
+    }
+    button:hover{background:#0056b3;box-shadow:0 4px 12px rgba(0,0,0,.18);}
+    button:disabled{background:#9aa8b7;cursor:wait;box-shadow:none;}
+    .service-status{padding:14px 18px;background:#f0f7ff;border-radius:10px;line-height:1.7;}
+    #retryConfig{width:auto;padding:8px 16px;font-size:14px;margin-top:10px;display:none;}
+    .inline-status{margin-top:16px;line-height:1.7;overflow-wrap:anywhere;}
+
+    /* 结果 / 动画 ---------------------------------------------------- */
+    .loading-animation{text-align:center;display:none;margin-top:20px;}
+    .loading-animation img{width:64px;height:64px;}
+    .result{display:none;font-size:16px;color:#333;margin-top:20px;}
+
+    /* 比对卡片垂直居中小技巧 ---------------------------------------- */
+    .center-content{
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      min-height:300px;
+    }
+
+    /* 动画 ----------------------------------------------------------- */
+    @keyframes fadeIn{from{opacity:.0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+    /* ------------- 移动端适配 ------------- */
+    @media (max-width:768px){
+      .container{padding:24px 20px;}
+      .top-section,.bottom-section{flex-direction:column;}
+      .card{padding:28px;}
+      .center-content{min-height:0;}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="service-status" role="status"><p id="serviceStatus">正在读取声纹服务配置…</p><button type="button" id="retryConfig">重新连接</button></div>
+
+    <!-- ---------- 上半部分：新增 + 比对 ---------- -->
+    <div class="top-section">
+
+      <!-- 声音新增 -->
+      <div class="card">
+        <h1>任务资料范围</h1>
+        <div class="input-container"><label for="recognitionTask">本人参与的任务</label><select id="recognitionTask" required disabled style="width:100%;padding:12px;border:2px solid var(--primary);border-radius:10px;"><option value="">正在加载任务…</option></select><p id="taskScopeStatus" role="status"></p></div>
+        <p>这里只比对当前任务授权的声纹资料。家属可在自己的任务详情中录入亲属本人录音。</p>
+        <p>现场声音与亲属原始资料分开处理，比对结果需要人工核实。</p>
+
+      </div>
+
+      <!-- 数据比对 -->
+      <div class="card">
+        <h1>数据比对</h1>
+        <div class="center-content">
+          <form id="compareVoiceForm">
+            <div class="input-container">
+              <label for="compareAudioFile">上传音频文件进行比对</label>
+              <input type="file" id="compareAudioFile" name="file" accept="audio/*" required />
+            </div>
+            <button type="submit" id="compareButton" disabled>立即比对</button>
+
+            <div class="loading-animation" id="loadingAnimation">
+              <img src="/layuimini/lib/layui-v2.5.5/css/modules/layer/default/loading-1.gif" alt="正在查询" />
+              <p>正在查询...</p>
+            </div>
+            <p class="result" id="result"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- 下半部分：记录 + 帮助 ---------- -->
+    <div class="bottom-section">
+
+      <!-- 上传记录 -->
+      <div class="card upload-records">
+        <h2>本次声纹比对记录</h2>
+        <ul id="uploadList">
+          <li class="empty-record">暂无比对记录</li>
+        </ul>
+      </div>
+
+      <!-- 帮助信息 -->
+      <div class="card help">
+        <h2>帮助信息</h2>
+        <p>请确保上传的音频清晰、无噪音，这样可以提高比对的准确性。</p>
+        <p id="audioFormatHelp">支持的音频格式将在服务连接后显示。</p>
+        <p>声纹比对提供可能匹配，仍需结合照片、家属描述和身份信息人工确认。</p>
+        <p>声纹相似度分数范围为 -1～1，分数越高表示声音特征越相近，不代表身份确认的概率。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ------------------- JS ------------------- -->
+  <script src="/layuimini/lib/layui-v2.5.5/layui.js"></script>
+  <script src="/layuimini/lib/jquery-3.4.1/jquery-3.4.1.min.js"></script>
+  <script src="/js/guitu-api.js?v=20260923-features"></script>
+  <script src="/js/task-selector.js?v=20260923-features"></script>
+  <script src="/js/voiceprint.js?v=20260923-features"></script>
+</body>
+</html>

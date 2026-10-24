@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>走失人员信息发布</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" th:href="@{/layuimini/lib/layui-v2.5.5/css/layui.css}">
+  <link rel="stylesheet" th:href="@{/layuimini/css/public.css}">
+  <link rel="stylesheet" href="/css/task-family-contact.css?v=20261020-contact">
+  <style>
+    body{background:#f2f2f2;}
+    .layuimini-container{margin:20px auto;background:#fff;border-radius:8px;
+      box-shadow:0 2px 8px rgba(0,0,0,.1);padding:20px;}
+    .layui-input-inline{width:300px;}
+    .view-progress-btn{background:#1c528a;color:#fff;}
+    .view-progress-btn:hover{background:#0069d9;}
+    .upload-preview{margin-top:10px;display:flex;align-items:center;}
+    .upload-preview img{max-width:120px;max-height:120px;border:1px solid #eee;}
+    .upload-preview audio{margin-top:5px;}
+    .required:after{content:'*';color:red;margin-left:4px;}
+    .extra-info{min-height:100px;}
+    .template-btn{margin-top:8px;background:#f2f2f2;border:1px dashed #ddd;color:#666;}
+    .template-btn:hover{background:#e6e6e6;color:#333;}
+    .layui-elem-field{margin-bottom:20px;padding:15px;border:1px solid #e6e6e6;}
+    .layui-elem-field legend{font-size:16px;font-weight:bold;padding:0 10px;}
+    .info-template .layui-form-item:last-child{margin-bottom:0;}
+    .layui-scrollbar{max-height:500px;overflow-y:auto;padding-right:15px;}
+    .custom-input{margin-top:8px;display:none;}
+    .custom-input .layui-input{margin-left:5px;}
+    .checkbox-other{margin-left:5px !important;}
+    .add-custom-btn{background:#f2f2f2;border:1px dashed #ddd;font-size:12px;height:26px;line-height:26px;
+      padding:0 8px;margin-left:5px;margin-top:5px;}
+    .custom-item{background:#f0f0f0;border-radius:3px;padding:3px 6px;margin:5px 5px 0 0;display:inline-block;}
+    .custom-item i{font-size:12px;margin-left:3px;cursor:pointer;color:#999;}
+    .custom-item i:hover{color:#FF5722;}
+    .custom-items-container{margin-top:5px;}
+    
+    /* 移动端适配样式 - 改进版 */
+    @media screen and (max-width: 768px) {
+      /* 容器边距调整 */
+      .layuimini-container {
+        margin: 10px;
+        padding: 15px 10px;
+        width: auto !important;
+        min-width: auto !important;
+        box-sizing: border-box;
+      }
+      
+      .layuimini-main {
+        padding: 0;
+        width: 100% !important;
+      }
+      
+      /* 表单项布局调整 */
+      .layui-form-label {
+        width: 100% !important;
+        padding: 9px 0 5px;
+        text-align: left;
+        float: none;
+        box-sizing: border-box;
+        line-height: 20px;
+      }
+      
+      .layui-input-inline {
+        width: 100% !important;
+        margin-right: 0;
+        display: block;
+        box-sizing: border-box;
+      }
+      
+      .layui-input-block {
+        margin-left: 0 !important;
+        min-height: auto;
+        width: 100% !important;
+        box-sizing: border-box;
+      }
+      
+      /* 上传预览调整 */
+      .upload-preview {
+        flex-wrap: wrap;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      
+      .upload-preview .preview-item {
+        margin-bottom: 10px;
+        width: 48%;
+        box-sizing: border-box;
+        margin-right: 2%;
+      }
+      
+      .upload-preview img {
+        width: 100%;
+        height: auto;
+        max-width: 120px;
+        max-height: 120px;
+        object-fit: cover;
+      }
+      
+      /* 详细信息模板适配 */
+      #detailedInfoTemplate {
+        width: 100% !important;
+        box-sizing: border-box;
+      }
+      
+      #detailedInfoTemplate .layui-form-item {
+        margin-bottom: 10px;
+      }
+      
+      #detailedInfoTemplate .layui-field-box {
+        padding: 8px;
+      }
+      
+      /* 确保弹窗内容完全可见和可滚动 */
+      .layui-layer-page .layui-layer-content {
+        overflow-y: scroll !important;
+        -webkit-overflow-scrolling: touch !important;
+        position: relative;
+        padding: 0 !important;
+      }
+      
+      /* 调整滚动容器 */
+      .layui-scrollbar {
+        max-height: none !important; /* 移除固定高度限制 */
+        height: auto !important;
+        overflow-y: visible !important;
+        padding-right: 0;
+        width: 100% !important;
+        box-sizing: border-box;
+      }
+      
+      /* 调整按钮样式 */
+      .layui-form-item button {
+        margin-bottom: 10px;
+        width: 100%;
+      }
+      
+      #detailedInfoTemplate button {
+        width: 100%;
+        margin: 5px 0;
+        padding: 0 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      
+      /* 复选框样式调整 */
+      .layui-form-checkbox {
+        margin-right: 5px;
+        margin-bottom: 5px;
+      }
+      
+      .layui-form-checkbox span {
+        padding: 0 5px;
+        font-size: 12px;
+      }
+      
+      /* 自定义项输入调整 */
+      .custom-input .layui-inline {
+        width: 100%;
+        margin-right: 0;
+      }
+      
+      .custom-input .layui-input {
+        width: 80%;
+        margin: 0;
+        display: inline-block;
+      }
+      
+      .add-custom-btn {
+        width: 18%;
+        margin-left: 2%;
+        box-sizing: border-box;
+        display: inline-block;
+      }
+      
+      /* 自定义项容器 */
+      .custom-items-container {
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 5px;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      /* 字段集适配 */
+      .layui-elem-field {
+        padding: 10px 5px;
+        margin-bottom: 15px;
+      }
+      
+      .layui-elem-field legend {
+        font-size: 14px;
+        padding: 0 5px;
+      }
+      
+      /* 修复 textarea 溢出问题 */
+      textarea.layui-textarea {
+        width: 100% !important;
+        box-sizing: border-box;
+      }
+      
+      /* 弹窗底部按钮区域 */
+      #detailedInfoTemplate > div:last-child {
+        margin: 10px 0 !important;
+        padding: 10px 0 !important;
+        text-align: center;
+        width: 100% !important;
+        box-sizing: border-box;
+      }
+      
+      /* 修复性别单选框组 */
+      .layui-form-radio {
+        margin: 0 5px 5px 0;
+      }
+      
+      /* 修复模板里嵌套的表单项 */
+      #detailedInfoTemplate .layui-inline {
+        width: 100%;
+        margin: 0 0 5px 0;
+      }
+      
+      #detailedInfoTemplate .layui-input-inline {
+        margin-bottom: 5px;
+      }
+      
+      /* 海报预览调整 */
+      .poster-preview-wrapper {
+        width: 100% !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        padding: 5px !important;
+        box-sizing: border-box;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="layuimini-container">
+  <div class="layuimini-main">
+    <fieldset class="layui-elem-field layui-field-title" align="center">
+      <legend>走失人员信息发布</legend>
+    </fieldset>
+
+    <form class="layui-form" id="taskForm">
+      <fieldset class="family-contact-section" data-family-contact>
+        <legend>求助联系人</legend>
+        <p class="family-contact-note">用于搜救过程中的联系和核实，仅本账号、本任务实际参与的已审核搜救队员及管理员可见，不会出现在任务大厅或寻人海报中。<span data-contact-status role="status"></span></p>
+        <div class="layui-form-item"><label class="layui-form-label required" for="familyContactName">联系人姓名</label><div class="layui-input-inline"><input id="familyContactName" name="familyContactName" data-contact-field="name" type="text" maxlength="100" lay-verify="required" autocomplete="name" class="layui-input" placeholder="请输入本次求助联系人姓名"></div></div>
+        <div class="layui-form-item"><label class="layui-form-label required" for="familyContactRelationship">与走失人员关系</label><div class="layui-input-inline"><input id="familyContactRelationship" name="familyContactRelationship" data-contact-field="relationship" type="text" maxlength="60" lay-verify="required" class="layui-input" placeholder="例如：女儿、父亲、配偶、亲属"></div></div>
+        <div class="layui-form-item"><label class="layui-form-label" for="familyContactPhone">联系电话</label><div class="layui-input-inline"><input id="familyContactPhone" name="familyContactPhone" data-contact-field="phone" type="tel" maxlength="40" autocomplete="tel" class="layui-input" placeholder="无有效绑定邮箱时须填写"></div></div>
+        <div class="layui-form-item"><label class="layui-form-label" for="familyContactEmail">账号绑定邮箱</label><div class="layui-input-inline"><input id="familyContactEmail" data-contact-field="email" type="text" readonly aria-readonly="true" class="layui-input contact-readonly" placeholder="使用当前账号绑定邮箱"></div></div>
+        <p class="family-contact-note">已绑定有效邮箱时，联系电话可暂不填写；没有有效绑定邮箱时，请填写联系电话。这里的修改仅保存到本次求助，不修改账号基本资料。</p>
+      </fieldset>
+      <!-- 走失人员姓名 -->
+      <div class="layui-form-item">
+        <label class="layui-form-label required">人员姓名</label>
+        <div class="layui-input-inline">
+          <input type="text" name="elderName" lay-verify="required"
+                 placeholder="请输入走失人员姓名" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+
+      <div class="layui-form-item"><label class="layui-form-label">人员年龄</label><div class="layui-input-inline"><input type="number" name="elderAge" min="0" max="120" step="1" class="layui-input" placeholder="选填，0–120岁" ></div></div>
+
+      <!-- 走失时间 -->
+      <div class="layui-form-item">
+        <label class="layui-form-label required">走失时间</label>
+        <div class="layui-input-inline">
+          <input type="text" name="lostTime" id="lostTime" lay-verify="required"
+                 placeholder="请选择走失时间" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+
+      <!-- 走失地点 -->
+      <div class="layui-form-item">
+        <label class="layui-form-label required">走失地点</label>
+        <div class="layui-input-block">
+          <input type="text" name="location" lay-verify="required"
+                 placeholder="请输入详细走失地点" autocomplete="off" class="layui-input" style="width:100%; max-width:600px;">
+        </div>
+      </div>
+
+      <!-- 上传照片 -->
+      <div class="layui-form-item">
+        <label class="layui-form-label required">人员照片</label>
+        <div class="layui-input-block">
+          <button type="button" class="layui-btn view-progress-btn" id="uploadImage">上传照片</button>
+          <div class="upload-preview" id="imagePreview"></div>
+          <input type="hidden" name="photoUrl" id="photoUrl">
+        </div>
+      </div>
+
+      <!-- 上传语音 -->
+      <div class="layui-form-item">
+        <label class="layui-form-label">语音描述</label>
+        <div class="layui-input-block">
+          <button type="button" class="layui-btn view-progress-btn" id="uploadAudio">上传语音</button>
+          <div class="upload-preview" id="audioPreview"></div>
+          <input type="hidden" name="audioUrl" id="audioUrl">
+        </div>
+      </div>
+
+      <!-- 额外信息 -->
+      <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">额外信息</label>
+        <div class="layui-input-block">
+          <textarea name="extraInfo" id="extraInfo" placeholder="请输入走失人员特征、着装、身体状况等额外信息" class="layui-textarea extra-info"></textarea>
+          <button type="button" class="layui-btn layui-btn-primary template-btn" id="detailedInfoBtn">
+            <i class="layui-icon layui-icon-form"></i> 填写详细信息模板
+          </button>
+        </div>
+      </div>
+
+      <!-- 状态 - 隐藏字段，默认为"waiting" -->
+      <input type="hidden" name="status" value="waiting">
+
+      <!-- 操作按钮 -->
+      <div class="layui-form-item" style="text-align:center;margin-top:30px;">
+        <button id="submitBtn"
+          class="layui-btn layui-btn-normal"
+          lay-submit
+          lay-filter="submitTask"
+          disabled>立即发布</button>
+        <button type="button" class="layui-btn layui-btn-warm" id="generatePoster">
+          <i class="layui-icon layui-icon-picture"></i> 生成寻人海报
+        </button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+      </div>
+      
+    </form>
+    
+    <!-- 详细信息模板 - 隐藏 -->
+    <div id="detailedInfoTemplate" style="display:none;">
+      <div class="layui-scrollbar">
+        <form class="layui-form info-template" lay-filter="templateForm">
+          <!-- 基本信息 -->
+          <fieldset class="layui-elem-field">
+            <legend>基本信息</legend>
+            <div class="layui-field-box">
+              <div class="layui-form-item">
+                <label class="layui-form-label">年龄</label>
+                <div class="layui-input-inline" style="width:100px;">
+                  <input type="number" name="age" placeholder="岁" class="layui-input">
+                </div>
+              </div>
+              
+              <div class="layui-form-item">
+                <label class="layui-form-label">性别</label>
+                <div class="layui-input-block">
+                  <input type="radio" name="gender" value="男" title="男">
+                  <input type="radio" name="gender" value="女" title="女">
+                </div>
+              </div>
+              
+              <div class="layui-form-item">
+                <label class="layui-form-label">身高体重</label>
+                <div class="layui-input-inline" style="width:120px;">
+                  <input type="text" name="height" placeholder="身高(cm)" class="layui-input">
+                </div>
+                <div class="layui-input-inline" style="width:120px;">
+                  <input type="text" name="weight" placeholder="体重(kg)" class="layui-input">
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- 身体状况 -->
+          <fieldset class="layui-elem-field">
+            <legend>身体状况</legend>
+            <div class="layui-field-box">
+              <div class="layui-form-item">
+                <label class="layui-form-label">行动能力</label>
+                <div class="layui-input-block">
+                  <input type="checkbox" name="mobility" value="需要拐杖" title="需要拐杖">
+                  <input type="checkbox" name="mobility" value="轮椅" title="轮椅">
+                  <input type="checkbox" name="mobility" value="行动缓慢" title="行动缓慢">
+                  <input type="checkbox" name="mobility" value="行动正常" title="行动正常">
+                  <input type="checkbox" name="mobility" value="其他" title="其他" lay-filter="checkboxFilter" class="checkbox-other">
+                  <div class="custom-input" id="mobility-custom">
+                    <div class="layui-inline">
+                      <input type="text" class="layui-input custom-value" placeholder="请输入其他行动能力特征">
+                      <button type="button" class="layui-btn layui-btn-xs add-custom-btn" data-type="mobility">添加</button>
+                    </div>
+                    <div class="custom-items-container" id="mobility-items"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="layui-form-item">
+                <label class="layui-form-label">健康状况</label>
+                <div class="layui-input-block">
+                  <input type="checkbox" name="health" value="认知障碍" title="认知障碍">
+                  <input type="checkbox" name="health" value="糖尿病" title="糖尿病">
+                  <input type="checkbox" name="health" value="高血压" title="高血压">
+                  <input type="checkbox" name="health" value="心脏病" title="心脏病">
+                  <input type="checkbox" name="health" value="视力障碍" title="视力障碍">
+                  <input type="checkbox" name="health" value="听力障碍" title="听力障碍">
+                  <input type="checkbox" name="health" value="语言障碍" title="语言障碍">
+                  <input type="checkbox" name="health" value="其他" title="其他" lay-filter="checkboxFilter" class="checkbox-other">
+                  <div class="custom-input" id="health-custom">
+                    <div class="layui-inline">
+                      <input type="text" class="layui-input custom-value" placeholder="请输入其他健康状况">
+                      <button type="button" class="layui-btn layui-btn-xs add-custom-btn" data-type="health">添加</button>
+                    </div>
+                    <div class="custom-items-container" id="health-items"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="layui-form-item">
+                <label class="layui-form-label">用药情况</label>
+                <div class="layui-input-block">
+                  <textarea name="medication" placeholder="请描述走失人员正在服用的药物" class="layui-textarea"></textarea>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- 其他字段保持不变... -->
+          <!-- 外貌特征 -->
+          <fieldset class="layui-elem-field">
+            <legend>外貌特征</legend>
+            <div class="layui-field-box">
+              <div class="layui-form-item">
+                <label class="layui-form-label">发型发色</label>
+                <div class="layui-input-block">
+                  <input type="checkbox" name="hair" value="白发" title="白发">
+                  <input type="checkbox" name="hair" value="花白" title="花白">
+                  <input type="checkbox" name="hair" value="短发" title="短发">
+                  <input type="checkbox" name="hair" value="长发" title="长发">
+                  <input type="checkbox" name="hair" value="光头" title="光头">
+                  <input type="checkbox" name="hair" value="其他" title="其他" lay-filter="checkboxFilter" class="checkbox-other">
+                  <div class="custom-input" id="hair-custom">
+                    <div class="layui-inline">
+                      <input type="text" class="layui-input custom-value" placeholder="请输入其他发型发色特征">
+                      <button type="button" class="layui-btn layui-btn-xs add-custom-btn" data-type="hair">添加</button>
+                    </div>
+                    <div class="custom-items-container" id="hair-items"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 其他部分保持不变... -->
+            </div>
+          </fieldset>
+
+          <!-- 其余部分保持不变... -->
+        </form>
+      </div>
+      <div style="text-align:center;margin-top:20px;padding-bottom:10px;">
+        <button type="button" class="layui-btn" id="generateSummary">生成智能摘要</button>
+        <button type="button" class="layui-btn layui-btn-primary" id="manualFill">手动填写</button>
+        <button type="button" class="layui-btn layui-btn-primary" id="cancelTemplate">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script th:src="@{/layuimini/lib/layui-v2.5.5/layui.js}"></script>
+<script th:src="@{/layuimini/lib/jquery-3.4.1/jquery-3.4.1.min.js}"></script>
+<script th:src="@{/js/photo-utils.js(v='20261019-scope')}"></script>
+<script src="/js/feature-files.js?v=20260923-features"></script>
+<script src="/js/task-family-contact.js?v=20261020-contact2"></script>
+<script th:inline="javascript">
+/*<![CDATA[*/
+layui.use(['form','laydate','upload','layer'], function(){
+  var form = layui.form
+      ,laydate = layui.laydate
+      ,upload = layui.upload
+      ,layer = layui.layer;
+  var familyContactForm = GuituFamilyContact.bind(document.getElementById('taskForm'));
+  
+  // 检测设备类型
+  var isMobile = window.innerWidth <= 768;
+  
+  // 自定义项的存储
+  var customItems = {
+    mobility: [],
+    health: [],
+    hair: [],
+    marks: [],
+    bodyType: [],
+    belongings: [],
+    hobbies: [],
+    activities: [],
+    frequentPlaces: [],
+    behavior: [],
+    language: [],
+    emergency: []
+  };
+
+  // 初始化日期时间选择器
+  laydate.render({
+    elem: '#lostTime',
+    type: 'datetime',
+    format: 'yyyy-MM-dd HH:mm:ss'
+  });
+
+  var qualifiedFiles = [];      // 保存 {file,url}
+  var publishing = false;
+
+  function toggleBtn(){
+      $('#submitBtn').prop('disabled', publishing || qualifiedFiles.length === 0);
+  }
+
+  /* 多图上传 + 质检  ----------------------------------------------------*/
+  upload.render({
+    elem:'#uploadImage',
+    url :'/upload/image',      // 先把原图存到你的本地 /uploads/img 下
+    accept:'images',
+    auto:false,
+    multiple:true,
+    choose:function(obj){
+      obj.preview(async function(index,file,result){
+        // ① 本地预览一张灰色待检图片
+        var $item = $('<div class="preview-item" style="margin-right:10px">'+
+                        '<img src="'+result+'" style="width:120px;height:120px;border:1px solid #eee">'+
+                        '<p class="score" style="text-align:center;color:#666">检测中...</p>'+
+                      '</div>');
+        $('#imagePreview').append($item);
+        try { file = await GuituPhotos.prepare(file); }
+        catch(error) { $item.find('.score').text(error.message).css('color','red'); return; }
+
+        // ② 上传文件到 /upload/image
+        var fdUpload = new FormData();
+        fdUpload.append('file', file);
+        $.ajax({
+          url:'/upload/image',
+          type:'POST',
+          data:fdUpload,
+          processData:false,
+          contentType:false,
+          success:function(uRes){
+            if(!(uRes.success === true || uRes.code === 0) || !uRes.url){
+                $item.find('.score').text('上传失败').css('color','red'); 
+                return;
+            }
+            // ③ 质检
+            var fdQc = new FormData();
+            fdQc.append('file', file);
+            $.ajax({
+              url:'/face/checkQuality',
+              type:'POST',
+              data:fdQc,
+              processData:false,
+              contentType:false,
+              success:function(qRes){
+                if(qRes.qualified){
+                    $item.find('.score').text('合格').css('color','green');
+                    qualifiedFiles.push({file, url: uRes.url});
+                    if (!$('#photoUrl').val()) $('#photoUrl').val(uRes.url);
+                    toggleBtn();
+                }else{
+                    $item.find('.score').text(qRes.message || qRes.msg || '照片未通过检测，请更换清晰正面照').css('color','red');
+                }
+                toggleBtn();                 // 质检完成后刷新按钮
+              },
+              error:function(xhr){
+                var error = xhr.responseJSON || {};
+                $item.find('.score').text(error.message || error.msg || '照片检测服务暂时不可用，请稍后重试').css('color','red');
+                toggleBtn();
+              }
+            });
+          },
+          error:function(){ $item.find('.score').text('上传失败，请重新选择照片').css('color','red'); }
+        });
+      });
+    }
+  });
+
+
+  // 语音上传
+  upload.render({
+    elem:'#uploadAudio',
+    url :'/upload/audio',
+    accept:'audio', exts:'mp3|wav|m4a',
+    done:function(res){
+      if (!(res.success === true || res.code === 0) || !res.url) { layer.msg(res.msg || res.message || '语音上传失败',{icon:2}); return; }
+      $('#audioPreview').html(
+        '<div style="width:100%;"><span>已上传：' + res.url.split('/').pop() + '</span>' +
+        '<audio controls style="display:block;margin-top:5px;max-width:100%;"><source src="'+res.url+'" type="audio/mpeg"></audio></div>'
+      );
+      $('#audioUrl').val(res.url);
+    },
+    error:function(){ layer.msg('语音上传失败，请稍后重试',{icon:2}); }
+  });
+  
+  // "其他"复选框监听
+  form.on('checkbox(checkboxFilter)', function(data){
+    var type = $(this).attr('name');
+    var checked = data.elem.checked;
+    $('#'+type+'-custom').css('display', checked ? 'block' : 'none');
+  });
+  
+  // 添加自定义项按钮点击事件
+  $('.add-custom-btn').on('click', function(){
+    var type = $(this).data('type');
+    var value = $(this).prev('.custom-value').val().trim();
+    
+    if(!value) {
+      layer.msg('请输入内容', {icon: 2});
+      return;
+    }
+    
+    addCustomItem(type, value);
+    $(this).prev('.custom-value').val('');
+  });
+  
+  // 添加自定义项函数
+  function addCustomItem(type, value) {
+    if(customItems[type].indexOf(value) !== -1) {
+      layer.msg('该项已存在', {icon: 2});
+      return;
+    }
+    
+    customItems[type].push(value);
+    
+    var item = $('<span class="custom-item"></span>').attr('data-type', type).attr('data-value', value).text(value);
+    item.append('<i class="layui-icon layui-icon-close remove-item"></i>');
+    $('#'+type+'-items').append(item);
+    
+    $('.remove-item').off('click').on('click', function(){
+      var item = $(this).parent();
+      var itemType = item.data('type');
+      var itemValue = item.data('value');
+      
+      var index = customItems[itemType].indexOf(itemValue);
+      if(index !== -1) {
+        customItems[itemType].splice(index, 1);
+      }
+      
+      item.remove();
+    });
+  }
+  
+  // 详细信息模板按钮点击事件
+  $('#detailedInfoBtn').on('click', function(){
+    clearCustomItems();
+    
+    // 适配移动端的弹窗大小
+    var area = isMobile ? ['90%', '80%'] : ['800px', '600px'];
+    
+    layer.open({
+      type: 1,
+      title: '详细信息填写',
+      area: area,
+      anim: 0,
+      scrollbar: true,
+      shadeClose: false,
+      moveOut: true,
+      content: $('#detailedInfoTemplate'),
+      success: function(layero, index){
+        // 重新渲染表单
+        form.render();
+        
+        // 修复移动端弹窗内容滚动问题
+        if(isMobile) {
+          // 设置弹窗内容区域高度，确保能滚动查看全部内容
+          var windowHeight = $(window).height();
+          var titleHeight = $(layero).find('.layui-layer-title').outerHeight();
+          var btnHeight = 120; // 底部按钮区域预估高度
+          
+          // 计算内容区域最大高度
+          var contentMaxHeight = windowHeight - titleHeight - btnHeight;
+          
+          $(layero).find('.layui-layer-content').css({
+            'height': contentMaxHeight + 'px',
+            'overflow-y': 'scroll',
+            '-webkit-overflow-scrolling': 'touch'
+          });
+          
+          // 让整个模板内容可以滚动
+          $(layero).find('.layui-scrollbar').css({
+            'height': 'auto',
+            'max-height': 'none',
+            'overflow-y': 'visible'
+          });
+          
+          // 在移动端确保弹窗高度不超过屏幕
+          $(layero).css({
+            'max-height': '90vh',
+            'overflow': 'hidden'
+          });
+        }
+        
+        $('#generateSummary').off('click').on('click', function(){
+          generateAISummary(index);
+        });
+        
+        $('#manualFill').off('click').on('click', function(){
+          fillManually(index);
+        });
+        
+        $('#cancelTemplate').off('click').on('click', function(){
+          layer.close(index);
+        });
+      }
+    });
+  });
+  
+  // 清空所有自定义项
+  function clearCustomItems() {
+    for(var type in customItems) {
+      customItems[type] = [];
+      $('#'+type+'-items').empty();
+    }
+    $('.custom-input').hide();
+    $('input[lay-filter="checkboxFilter"]').each(function(){
+      $(this).prop('checked', false);
+    });
+    form.render();
+  }
+  
+  // 生成AI摘要函数
+  function generateAISummary(layerIndex) {
+    var templateData = collectTemplateData();
+    
+    if(isTemplateEmpty(templateData)) {
+      layer.msg('请至少填写一些信息', {icon: 2});
+      return;
+    }
+    
+    var loadIndex = layer.load(2, {shade: [0.3, '#000']});
+    
+    $.ajax({
+      url: '/task/generate-summary',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(templateData),
+      success: function(res){
+        layer.close(loadIndex);
+        if(res.code === 0){
+          var summary=res.data.summary || '', original=$('#extraInfo').val();
+          layer.open({type:1,title:'摘要预览',area:[Math.min(580,window.innerWidth-24)+'px','auto'],content:'<div style="padding:20px;white-space:pre-wrap">'+$('<span>').text(summary).html()+'<p>'+ $('<span>').text(res.data.message || (res.data.source==='local_fields'?'根据已填资料整理，请核对。':'请核对摘要后再使用。')).html()+'</p></div>',btn:['追加到原信息','替换原信息','取消'],yes:function(index){$('#extraInfo').val(original?(original+'\n'+summary):summary);layer.close(index);layer.close(layerIndex);},btn2:function(index){$('#extraInfo').val(summary);layer.close(index);layer.close(layerIndex);return false;}});
+        } else {
+          layer.msg(res.msg || '摘要生成失败', {icon: 2});
+        }
+      },
+      error: function(){
+        layer.close(loadIndex);
+        layer.msg('服务器错误，请稍后重试', {icon: 2});
+      }
+    });
+  }
+  
+  // 手动填写函数
+  function fillManually(layerIndex) {
+    var templateData = collectTemplateData();
+    
+    if(isTemplateEmpty(templateData)) {
+      layer.msg('请至少填写一些信息', {icon: 2});
+      return;
+    }
+    
+    var description = generateManualDescription(templateData);
+    $('#extraInfo').val(description);
+    layer.msg('信息已填写', {icon: 1});
+    layer.close(layerIndex);
+  }
+  
+  // 收集模板数据
+  function collectTemplateData() {
+    var templateData = {};
+    
+    templateData.age = $('input[name="age"]').val();
+    templateData.gender = $('input[name="gender"]:checked').val();
+    templateData.height = $('input[name="height"]').val();
+    templateData.weight = $('input[name="weight"]').val();
+    
+    function collectCheckboxValues(name) {
+      var values = [];
+      $('input[name="'+name+'"]:checked').each(function(){
+        var value = $(this).val();
+        if(value !== '其他') {
+          values.push(value);
+        }
+      });
+      
+      if(customItems[name] && customItems[name].length > 0) {
+        values = values.concat(customItems[name]);
+      }
+      
+      return values;
+    }
+    
+    templateData.mobility = collectCheckboxValues('mobility');
+    templateData.health = collectCheckboxValues('health');
+    templateData.medication = $('textarea[name="medication"]').val();
+    templateData.hair = collectCheckboxValues('hair');
+    templateData.marks = collectCheckboxValues('marks');
+    templateData.bodyType = collectCheckboxValues('bodyType');
+    templateData.topClothing = $('input[name="topClothing"]').val();
+    templateData.bottomClothing = $('input[name="bottomClothing"]').val();
+    templateData.shoes = $('input[name="shoes"]').val();
+    templateData.belongings = collectCheckboxValues('belongings');
+    templateData.hobbies = collectCheckboxValues('hobbies');
+    templateData.activities = collectCheckboxValues('activities');
+    templateData.habits = $('textarea[name="habits"]').val();
+    templateData.frequentPlaces = collectCheckboxValues('frequentPlaces');
+    templateData.behavior = collectCheckboxValues('behavior');
+    templateData.language = collectCheckboxValues('language');
+    templateData.emergency = collectCheckboxValues('emergency');
+    templateData.additionalInfo = $('textarea[name="additionalInfo"]').val();
+    
+    return templateData;
+  }
+  
+  // 检查模板是否为空
+  function isTemplateEmpty(data) {
+    for(var key in data) {
+      if(Array.isArray(data[key])) { if(data[key].length > 0) return false; continue; }
+      if(typeof data[key] === 'string' && data[key].trim() !== '') return false;
+      if(data[key] !== undefined && data[key] !== null && data[key] !== '') return false;
+    }
+    return true;
+  }
+  
+  // 生成手动描述文本
+  function generateManualDescription(data) {
+    var parts = [];
+    
+    var basicInfo = [];
+    if(data.age) basicInfo.push(data.age + "岁");
+    if(data.gender) basicInfo.push(data.gender + "性");
+    if(data.height) basicInfo.push("身高约" + data.height + "cm");
+    if(data.weight) basicInfo.push("体重约" + data.weight + "kg");
+    
+    if(basicInfo.length > 0) {
+      parts.push("基本特征：" + basicInfo.join("、") + "。");
+    }
+    
+    var healthInfo = [];
+    if(data.health && data.health.length > 0) {
+      healthInfo.push("健康状况：" + data.health.join("、"));
+    }
+    if(data.mobility && data.mobility.length > 0) {
+      healthInfo.push("行动能力：" + data.mobility.join("、"));
+    }
+    if(data.medication) {
+      healthInfo.push("用药情况：" + data.medication);
+    }
+    
+    if(healthInfo.length > 0) {
+      parts.push("身体状况：" + healthInfo.join("。") + "。");
+    }
+    
+    var appearanceInfo = [];
+    
+    if(data.bodyType && data.bodyType.length > 0) {
+      appearanceInfo.push("体型：" + data.bodyType.join("、"));
+    }
+    if(data.hair && data.hair.length > 0) {
+      appearanceInfo.push("头发：" + data.hair.join("、"));
+    }
+    if(data.marks && data.marks.length > 0) {
+      appearanceInfo.push("特征：" + data.marks.join("、"));
+    }
+    
+    var clothingInfo = [];
+    if(data.topClothing) clothingInfo.push("上衣：" + data.topClothing);
+    if(data.bottomClothing) clothingInfo.push("下装：" + data.bottomClothing);
+    if(data.shoes) clothingInfo.push("鞋子：" + data.shoes);
+    
+    if(clothingInfo.length > 0) {
+      appearanceInfo.push("着装：" + clothingInfo.join("，"));
+    }
+    
+    if(data.belongings && data.belongings.length > 0) {
+      appearanceInfo.push("随身物品：" + data.belongings.join("、"));
+    }
+    
+    if(appearanceInfo.length > 0) {
+      parts.push("外貌与着装：" + appearanceInfo.join("。") + "。");
+    }
+    
+    var hobbyInfo = [];
+    
+    if(data.hobbies && data.hobbies.length > 0) {
+      hobbyInfo.push("爱好：" + data.hobbies.join("、"));
+    }
+    if(data.activities && data.activities.length > 0) {
+      hobbyInfo.push("日常活动：" + data.activities.join("、"));
+    }
+    if(data.habits) {
+      hobbyInfo.push("生活习惯：" + data.habits);
+    }
+    
+    if(hobbyInfo.length > 0) {
+      parts.push("爱好与习惯：" + hobbyInfo.join("。") + "。");
+    }
+    
+    var behaviorInfo = [];
+    
+    if(data.behavior && data.behavior.length > 0) {
+      behaviorInfo.push("行为特点：" + data.behavior.join("、"));
+    }
+    if(data.language && data.language.length > 0) {
+      behaviorInfo.push("语言能力：" + data.language.join("、"));
+    }
+    if(data.frequentPlaces && data.frequentPlaces.length > 0) {
+      behaviorInfo.push("可能去往：" + data.frequentPlaces.join("、"));
+    }
+    
+    if(behaviorInfo.length > 0) {
+      parts.push("行为特点：" + behaviorInfo.join("。") + "。");
+    }
+    
+    if(data.emergency && data.emergency.length > 0) {
+      parts.push("紧急注意事项：" + data.emergency.join("、") + "。");
+    }
+    
+    if(data.additionalInfo) {
+      parts.push("其他信息：" + data.additionalInfo);
+    }
+    
+    return parts.join("\n\n");
+  }
+
+  function checkSubmitBtn(){
+      $('#submitBtn').prop('disabled', qualifiedFiles.length === 0);
+  }
+
+  // 表单提交
+  form.on('submit(submitTask)', function(data){
+    if (publishing) return false;
+    var contactError = familyContactForm.validate();
+    if (contactError) { layer.msg(contactError, {icon:2}); return false; }
+    if(qualifiedFiles.length===0){
+        layer.msg('请至少上传一张合格照片',{icon:2});
+        return false;
+    }
+    var mainPhoto = $('#photoUrl').val();
+    // 1) 先创建任务
+    var dto = {
+        elderName: data.field.elderName,
+      elderAge: data.field.elderAge === '' ? null : Number(data.field.elderAge),
+        lostTime : data.field.lostTime,
+        location : data.field.location,
+        photoUrl  : $('#photoUrl').val(), 
+        photoUrls: qualifiedFiles.map(f=>f.url),
+        audioUrl: $('#audioUrl').val(),
+        extraInfo: $('#extraInfo').val(),
+        familyContact: familyContactForm.read(),
+        status   : 'waiting'
+    };
+    publishing = true;
+    toggleBtn();
+    $('#submitBtn').text('发布中…');
+    $.ajax({
+        url:'/task/create',
+        type:'POST',
+        contentType:'application/json',
+        data:JSON.stringify(dto),
+        success:function(res){
+            if(res.code===0){
+                var taskId = res.data.taskId;
+                // Keep files until enrollment completes so a provider failure can be retried without creating another task.
+                async function registerFaces(photos) {
+                    var failed = [];
+                    for (var p of photos) {
+                        var fd = new FormData(); fd.append('file', p.file);
+                        var ok = await new Promise(function(resolve){
+                            $.ajax({url:'/face/addFace?userId='+taskId+'&userName='+encodeURIComponent(dto.elderName),
+                                type:'POST', data:fd, processData:false, contentType:false, timeout:60000,
+                                success:function(result){ resolve(result.success === true); },
+                                error:function(){ resolve(false); }});
+                        });
+                        if (!ok) failed.push(p);
+                    }
+                    if (failed.length) {
+                        layer.confirm('任务已发布，还有 ' + failed.length + ' 张照片未能登记到人脸库。可以重试登记，不会重复创建任务。',
+                            {icon:0, title:'人脸登记未完成', btn:['重试登记','前往任务管理']},
+                            function(index){ layer.close(index); registerFaces(failed); },
+                            function(){ location.href='/task/task-manage'; });
+                    } else {
+                        layer.msg('任务发布成功',{icon:1,time:1200},function(){ location.href='/task/task-manage'; });
+                    }
+                }
+                registerFaces(qualifiedFiles);
+            }else{
+                layer.msg(res.msg||'发布失败',{icon:2});
+                publishing = false; toggleBtn(); $('#submitBtn').text('发布任务');
+            }
+        },
+        error:function(xhr){ var error = xhr.responseJSON || {}; layer.msg(error.msg || error.message || '发布失败，请稍后重试',{icon:2}); publishing = false; toggleBtn(); $('#submitBtn').text('发布任务'); }
+    });
+    return false;  // 阻止表单跳转
+  });
+
+  // 生成寻人海报按钮点击事件
+  $('#generatePoster').on('click', function() {
+    // 检查是否上传了照片
+    if(!$('#photoUrl').val()) {
+      layer.msg('请先上传走失人员照片，这对海报生成至关重要', {icon: 2});
+      return;
+    }
+    
+    // 收集表单数据
+    var elderName = $('input[name="elderName"]').val();
+    var lostTime = $('input[name="lostTime"]').val();
+    var location = $('input[name="location"]').val();
+    var photoUrl = $('#photoUrl').val();
+    var extraInfo = $('#extraInfo').val();
+    
+    // 基本验证
+    if(!elderName || !lostTime || !location) {
+      layer.msg('请填写走失人员姓名、走失时间和地点', {icon: 2});
+      return;
+    }
+    
+    // 收集详细信息模板数据
+    var templateData = collectTemplateData();
+    
+    // 构建请求数据
+    var requestData = {
+      elderName: elderName,
+      lostTime: lostTime,
+      location: location,
+      photoUrl: photoUrl,
+      extraInfo: extraInfo,
+      templateData: templateData,
+      contactPhone: ''
+    };
+    
+    // 显示加载层
+    var loadIndex = layer.load(2, {shade: [0.3, '#000']});
+    
+    // 发送请求生成海报
+    $.ajax({
+      url: '/task/generate-poster',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(requestData),
+      success: function(res) {
+        layer.close(loadIndex);
+        
+        if(res.code === 0) {
+          // 显示海报预览弹窗 - 移动端适配
+          var area = isMobile ? ['90%', '80%'] : ['650px', '90%'];
+          showPosterPreview(res.data.posterHtml, res.data.posterCss, area);
+        } else {
+          layer.msg(res.msg || '海报生成失败', {icon: 2});
+        }
+      },
+      error: function() {
+        layer.close(loadIndex);
+        layer.msg('服务器错误，请稍后重试', {icon: 2});
+      }
+    });
+  });
+
+  function showPosterPreview(posterHtml, posterCss) { GuituFiles.poster(posterHtml, posterCss); }
+
+  // 监听窗口大小变化，更新移动设备状态
+  $(window).resize(function() {
+    isMobile = window.innerWidth <= 768;
+  });
+});
+/*]]>*/
+</script>
+</body>
+</html>

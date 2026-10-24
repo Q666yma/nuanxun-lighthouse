@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" th:href="@{/css/another.css}">
+    <!-- 引入技能图表的CSS -->
+    <link th:href="@{/css/show-skill.css(v='20261019-counts')}" rel="stylesheet">
+    <!-- 引入地图的CSS -->
+    <link th:href="@{/css/show-map.css(v='20260924-heatmap')}" rel="stylesheet">
+    <link th:href="@{/css/show-num.css}" rel="stylesheet">
+    <title>暖寻灯塔数据可视化中心</title>
+    <link rel="icon" type="image/png" href="/layuimini/images/nuanxun-logo-20261014.png">
+    <script th:src="@{/js/jquery-2.2.1.min.js}"></script>
+    <script th:src="@{/js/rem.js}"></script>
+    <script th:src="@{/js/echarts.min.js}"></script>
+    <script th:src="@{/js/guangxi.js}"></script>
+    <script src="/js/dashboard-stats.js?v=20260923-features"></script>
+    
+    <!-- 引入高德地图API -->
+    <script type="text/javascript">
+    window._AMapSecurityConfig = {
+        securityJsCode: "YOUR_AMAP_SECURITY_JS_CODE",
+    };
+    </script>
+    <script src="https://webapi.amap.com/maps?v=2.0&key=YOUR_AMAP_WEB_KEY&plugin=AMap.Geocoder"></script>
+</head>
+<body>
+<div class="t_container">
+    <header class="t_header">
+        <span>暖寻灯塔数据可视化中心</span>
+    </header>
+    <main class="t_main">
+        <div class="t_left_box">
+            <img class="t_l_line" th:src="@{/img/left_line.png}" alt="">
+                <div class="rescue-stats-integrated">
+                    <div th:replace="~{show/show-num :: rescue-stats}"></div>
+                </div>
+            <img class="t_r_line" th:src="@{/img/right_line.png}" alt="">
+        </div>
+        <div class="t_right_box">
+            <img class="t_l_line" th:src="@{/img/left_line.png}" alt="">
+                <!-- 引入技能分布图表片段，并添加适配样式 -->
+                <div class="skill-chart-integrated">
+                    <div th:replace="~{show/show-skill :: skill-distribution-chart}"></div>
+                </div>
+            <img class="t_r_line" th:src="@{/img/right_line.png}" alt="">
+        </div>
+        <div class="t_center_box">
+            <img class="t_l_line" th:src="@{/img/left_line.png}" alt="">
+            <div id="oldAnalysis" class="echart" style="width: 100%; height: 3.6rem;"></div>
+            <img class="t_r_line" th:src="@{/img/right_line.png}" alt="">
+        </div>
+        
+        <!-- 在左下角位置插入技能分布图表 -->
+        <div class="b_left_box">
+            <img class="t_l_line" th:src="@{/img/left_line.png}" alt="">
+            <!-- 引入地图片段，并添加适配样式 -->
+            <div class="rescue-map-integrated">
+                <div th:replace="~{show/show-map :: mapfrag}"></div>
+            </div>
+            <img class="t_r_line" th:src="@{/img/right_line.png}" alt="">
+        </div>
+        
+<!--        <div class="b_center_box">-->
+<!--        </div>-->
+<!--        <div class="b_right_box">-->
+<!--            <img class="t_l_line" th:src="@{/img/left_line.png}" alt="">-->
+<!--            <h1 class="t_title">实时救援请求</h1>-->
+<!--            <div class="t_table" style="height: 3.4rem">-->
+<!--                <div class=""></div>-->
+<!--                <div class="wrap">-->
+<!--                    <ul>-->
+<!--                        <li>-->
+<!--                            <p>谢雨晴加入了救援队伍</p>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <p>陈翠英在无锡市滨湖区海岸城附近走失</p>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <p>王建国在无锡市滨湖区星光广场附近走失</p>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <p>谢雨晴在星光广场附近没有发现走失人员</p>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <p>谢雨晴在健康街道附近没有发现走失人员</p>-->
+<!--                        </li>-->
+<!--                        <li>-->
+<!--                            <p>谢雨晴在融创茂附近发现疑似走失人员</p>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+<!--                </div>-->
+<!--                <img class="t_r_line" th:src="@{/img/right_line.png}" alt="">-->
+<!--            </div>-->
+<!--        </div>-->
+    </main>
+</div>
+
+<!-- 引入技能图表的JavaScript -->
+<script th:src="@{/js/show-skill.js(v='20261019-counts')}"></script>
+<!-- 引入地图的JavaScript -->
+<script th:src="@{/js/show-map.js(v='20260924-heatmap')}"></script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,404 @@
+{
+  "homeInfo": {
+    "title": "首页",
+    "href": "page/welcome.html?v=20260923-features"
+  },
+  "logoInfo": {
+    "title": "暖寻灯塔",
+    "image": "/layuimini/images/nuanxun-logo-20261014.png",
+    "href": ""
+  },
+  "navigationRules": [
+    {
+      "href": "task/task-management",
+      "roles": [
+        "rescuer"
+      ],
+      "requiresApproval": true
+    },
+    {
+      "href": "task/task-edit",
+      "prefix": true,
+      "roles": [
+        "family"
+      ]
+    },
+    {
+      "href": "task/task-detail",
+      "prefix": true,
+      "roles": [
+        "family",
+        "rescuer",
+        "admin"
+      ],
+      "requiresApproval": true
+    },
+    {
+      "href": "task/task-map",
+      "prefix": true,
+      "roles": [
+        "family",
+        "rescuer",
+        "admin"
+      ],
+      "requiresApproval": true
+    },
+    {
+      "href": "rescuer/profile",
+      "roles": [
+        "rescuer"
+      ],
+      "allowPending": true
+    },
+    {
+      "href": "rescuer/generate-tags",
+      "roles": [
+        "rescuer"
+      ],
+      "allowPending": true
+    },
+    {
+      "href": "rescuer/list",
+      "roles": [
+        "rescuer"
+      ],
+      "requiresApproval": true
+    },
+    {
+      "href": "page/user-setting.html",
+      "roles": [
+        "family",
+        "rescuer",
+        "admin"
+      ],
+      "allowPending": true
+    },
+    {
+      "href": "page/user-password.html",
+      "roles": [
+        "family",
+        "rescuer",
+        "admin"
+      ],
+      "allowPending": true
+    },
+    {
+      "href": "page/welcome.html",
+      "roles": [
+        "family",
+        "rescuer"
+      ],
+      "allowPending": true
+    },
+    {
+      "href": "page/family-notification.html",
+      "roles": [
+        "rescuer"
+      ],
+      "requiresApproval": true
+    },
+    {
+      "href": "page/emergency-notice.html",
+      "roles": [
+        "family",
+        "rescuer"
+      ],
+      "requiresApproval": true
+    },
+    {
+      "href": "show",
+      "prefix": true,
+      "roles": [
+        "family",
+        "rescuer",
+        "admin"
+      ],
+      "requiresApproval": true
+    }
+  ],
+  "menuInfo": [
+    {
+      "title": "常规管理",
+      "icon": "fa fa-address-book",
+      "href": "",
+      "target": "_self",
+      "child": [
+        {
+          "title": "任务中心",
+          "icon": "fa fa-tasks",
+          "href": "",
+          "target": "_self",
+          "child": [
+            {
+              "title": "发布求助",
+              "href": "task/task-publish",
+              "roles": [
+                "family"
+              ],
+              "icon": "fa fa-upload",
+              "target": "_self"
+            },
+            {
+              "title": "我的求助",
+              "href": "task/task-manage",
+              "roles": [
+                "family"
+              ],
+              "icon": "fa fa-list-alt",
+              "target": "_self"
+            },
+            {
+              "title": "任务大厅",
+              "href": "task/task-receive",
+              "roles": [
+                "rescuer"
+              ],
+              "icon": "fa fa-download",
+              "target": "_self",
+              "requiresApproval": true
+            },
+            {
+              "title": "我的搜救",
+              "href": "task/task-track",
+              "roles": [
+                "rescuer"
+              ],
+              "icon": "fa fa-location-arrow",
+              "target": "_self",
+              "requiresApproval": true
+            }
+          ]
+        },
+        {
+          "title": "平台搜救情况概览",
+          "href": "show/show-dummy",
+          "roles": [
+            "family",
+            "rescuer"
+          ],
+          "requiresApproval": true,
+          "icon": "fa fa-bar-chart",
+          "target": "_self"
+        },
+        {
+          "title": "申请状态与资料",
+          "href": "rescuer/apply",
+          "roles": [
+            "rescuer"
+          ],
+          "icon": "fa fa-file-text-o",
+          "target": "_self",
+          "allowPending": true,
+          "approvedTitle": "我的队员资料"
+        },
+        {
+          "title": "相关队员",
+          "href": "page/rescuer_list.html",
+          "roles": [
+            "rescuer"
+          ],
+          "icon": "fa fa-group",
+          "target": "_self",
+          "requiresApproval": true
+        },
+        {
+          "title": "识别工具",
+          "icon": "fa fa-group",
+          "href": "",
+          "target": "_self",
+          "child": [
+            {
+              "title": "图片比对",
+              "href": "page/face_comparison.html?v=20260923-features",
+              "roles": [
+                "rescuer",
+                "admin"
+              ],
+              "icon": "fa fa-id-badge",
+              "target": "_self",
+              "requiresApproval": true
+            },
+            {
+              "title": "视频比对",
+              "href": "page/face_comparison_video.html?v=20260923-features",
+              "roles": [
+                "rescuer",
+                "admin"
+              ],
+              "icon": "fa fa-id-badge",
+              "target": "_self",
+              "requiresApproval": true
+            },
+            {
+              "title": "声纹比对",
+              "href": "page/voiceprint-recognition.html?v=20260923-features",
+              "roles": [
+                "rescuer",
+                "admin"
+              ],
+              "icon": "fa fa-bell",
+              "target": "_self",
+              "requiresApproval": true
+            }
+          ]
+        },
+        {
+          "title": "消息通知",
+          "href": "page/messages.html?v=20260923-features",
+          "roles": [
+            "family",
+            "rescuer"
+          ],
+          "icon": "fa fa-commenting-o",
+          "target": "_self",
+          "allowPending": true
+        },
+        {
+          "title": "使用说明",
+          "href": "page/user-guide.html",
+          "roles": [
+            "family",
+            "rescuer"
+          ],
+          "icon": "fa fa-book",
+          "target": "_self",
+          "allowPending": true
+        },
+        {
+          "title": "心理关怀 GPT",
+          "href": "rescuer/psych_care_chat",
+          "roles": [
+            "family",
+            "rescuer"
+          ],
+          "icon": "fa fa-heart",
+          "target": "_self"
+        },
+        {
+          "title": "微课程中心",
+          "href": "rescuer/course_center",
+          "roles": [
+            "family",
+            "rescuer"
+          ],
+          "icon": "fa fa-play-circle",
+          "target": "_self",
+          "allowPending": true
+        },
+        {
+          "title": "场景演练训练室",
+          "href": "rescuer/scene_train",
+          "roles": [
+            "rescuer"
+          ],
+          "icon": "fa fa-gamepad",
+          "target": "_self",
+          "allowPending": true
+        },
+        {
+          "title": "感谢墙",
+          "href": "rescuer/thanks_wall",
+          "roles": [
+            "family",
+            "rescuer"
+          ],
+          "icon": "fa fa-heart",
+          "target": "_self"
+        }
+      ],
+      "roles": [
+        "family",
+        "rescuer"
+      ]
+    },
+    {
+      "title": "平台管理",
+      "icon": "fa fa-gears",
+      "href": "",
+      "roles": [
+        "admin"
+      ],
+      "target": "_self",
+      "child": [
+        {
+          "title": "管理首页",
+          "href": "page/admin.html?v=20260923-features&view=overview",
+          "roles": [
+            "admin"
+          ],
+          "icon": "fa fa-home",
+          "target": "_self"
+        },
+        {
+          "title": "任务协调",
+          "href": "page/admin.html?v=20260923-features&view=tasks",
+          "roles": [
+            "admin"
+          ],
+          "icon": "fa fa-tasks",
+          "target": "_self"
+        },
+        {
+          "title": "队员审核与管理",
+          "href": "page/admin.html?v=20260923-features&view=rescuers",
+          "roles": [
+            "admin"
+          ],
+          "icon": "fa fa-group",
+          "target": "_self"
+        },
+        {
+          "title": "用户管理",
+          "href": "page/admin.html?v=20260923-features&view=users",
+          "roles": [
+            "admin"
+          ],
+          "icon": "fa fa-user",
+          "target": "_self"
+        },
+        {
+          "title": "通知与加急处理",
+          "href": "page/admin.html?v=20260923-features&view=notifications",
+          "roles": [
+            "admin"
+          ],
+          "icon": "fa fa-bell",
+          "target": "_self"
+        },
+        {
+          "title": "内容管理",
+          "href": "page/admin.html?v=20260923-features&view=content",
+          "roles": [
+            "admin"
+          ],
+          "icon": "fa fa-book",
+          "target": "_self"
+        },
+        {
+          "title": "统计",
+          "href": "page/admin.html?v=20260923-features&view=statistics",
+          "roles": [
+            "admin"
+          ],
+          "icon": "fa fa-bar-chart",
+          "target": "_self"
+        },
+        {
+          "title": "系统与操作记录",
+          "href": "page/admin.html?v=20260923-features&view=system",
+          "roles": [
+            "admin"
+          ],
+          "icon": "fa fa-gears",
+          "target": "_self"
+        }
+      ]
+    }
+  ],
+  "roleHomeInfo": {
+    "admin": {
+      "title": "管理首页",
+      "href": "page/admin.html?v=20260923-features&view=overview"
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "code": 200,
+  "msg": "",
+  "count": 6,
+  "data": [
+    {
+      "id": 1,
+      "userId": 2018112000,
+      "name": "示例队员01",
+      "gender": "男",
+      "age": 19,
+      "phone": "示例号码01（不可拨打）",
+      "lastLoginPlace": "无锡市滨湖区江南大学",
+      "password": "EXAMPLE_PASSWORD_NOT_A_CREDENTIAL",
+      "rescueNum": 6,
+      "status": 1
+    },
+    {
+      "id": 1,
+      "userId": 2018112001,
+      "name": "示例队员02",
+      "gender": "男",
+      "age": 20,
+      "phone": "示例号码02（不可拨打）",
+      "lastLoginPlace": "无锡市滨湖区江南大学",
+      "password": "EXAMPLE_PASSWORD_NOT_A_CREDENTIAL",
+      "rescueNum": 6,
+      "status": 0
+    },
+    {
+      "id": 1,
+      "userId": 2018112050,
+      "name": "示例队员03",
+      "gender": "女",
+      "age": 18,
+      "phone": "示例号码03（不可拨打）",
+      "lastLoginPlace": "无锡市滨湖区融创茂",
+      "password": "EXAMPLE_PASSWORD_NOT_A_CREDENTIAL",
+      "rescueNum": 6,
+      "status": 1
+    },
+    {
+      "id": 1,
+      "userId": 2018112008,
+      "name": "示例队员04",
+      "gender": "男",
+      "age": 20,
+      "phone": "示例号码04（不可拨打）",
+      "lastLoginPlace": "无锡市滨湖区市民中心",
+      "password": "EXAMPLE_PASSWORD_NOT_A_CREDENTIAL",
+      "rescueNum": 6,
+      "status": 0
+    },
+    {
+      "id": 1,
+      "userId": 2018112025,
+      "name": "示例队员05",
+      "gender": "男",
+      "age": 28,
+      "phone": "示例号码05（不可拨打）",
+      "lastLoginPlace": "无锡市滨湖区星光广场173栋",
+      "password": "EXAMPLE_PASSWORD_NOT_A_CREDENTIAL",
+      "rescueNum": 8,
+      "status": 2
+    }
+  ]
+}

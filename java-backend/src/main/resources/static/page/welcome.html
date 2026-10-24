@@ -1,0 +1,381 @@
+<!--首页-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>首页</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../layuimini/lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../layuimini/lib/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../layuimini/css/public.css" media="all">
+    <style>
+        .layui-card {border:1px solid #f2f2f2;border-radius:5px;}
+        .icon {margin-right:10px;color:#1aa094;}
+        .icon-cray {color:#ffb800!important;}
+        .icon-blue {color:#1e9fff!important;}
+        .icon-tip {color:#ff5722!important;}
+        .layuimini-qiuck-module {text-align:center;margin-top: 10px}
+        .layuimini-qiuck-module a i {display:inline-block;width:100%;height:60px;line-height:60px;text-align:center;border-radius:2px;font-size:30px;background-color:#F8F8F8;color:#333;transition:all .3s;-webkit-transition:all .3s;}
+        .layuimini-qiuck-module a cite {position:relative;top:2px;display:block;color:#666;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;font-size:14px;}
+        .welcome-module {width:100%;height:210px;}
+        .panel {background-color:#fff;border:1px solid transparent;border-radius:3px;-webkit-box-shadow:0 1px 1px rgba(0,0,0,.05);box-shadow:0 1px 1px rgba(0,0,0,.05)}
+        .panel-body {padding:10px}
+        .panel-title {margin-top:0;margin-bottom:0;font-size:12px;color:inherit}
+        .label {display:inline;padding:.2em .6em .3em;font-size:75%;font-weight:700;line-height:1;color:#fff;text-align:center;white-space:nowrap;vertical-align:baseline;border-radius:.25em;margin-top: .3em;}
+        .layui-red {color:red}
+        .main_btn > p {height:40px;}
+        .layui-bg-number {background-color:#F8F8F8;}
+        .layuimini-notice:hover {background:#f6f6f6;}
+        .layuimini-notice {padding:7px 16px;clear:both;font-size:12px !important;cursor:pointer;position:relative;transition:background 0.2s ease-in-out;}
+        .layuimini-notice-title,.layuimini-notice-label {
+            padding-right: 70px !important;text-overflow:ellipsis!important;overflow:hidden!important;white-space:nowrap!important;}
+        .layuimini-notice-title {line-height:28px;font-size:14px;}
+        .layuimini-notice-extra {position:absolute;top:50%;margin-top:-8px;right:16px;display:inline-block;height:16px;color:#999;}
+        /* 设置视频墙的布局，左右分栏 */
+        .video-wall {
+            display: flex;
+            justify-content: space-between;
+            height: 100vh;
+            margin-top: 54px;
+        }
+
+        /* 左侧和右侧的视频容器样式 */
+        .video-container {
+            width: 49%; /* 左右平分 */
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            margin-top: -425px; /* 向上移动视频 */
+        }
+    </style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md8">
+                <div class="layui-row layui-col-space15">
+                    <div class="layui-col-md6">
+                        <div class="layui-card">
+                            <div class="layui-card-header"><i class="fa fa-warning icon"></i>数据统计</div>
+                            <div class="layui-card-body">
+                                <div class="welcome-module">
+                                    <div class="layui-row layui-col-space10">
+                                        <div class="layui-col-xs6">
+                                            <div class="panel layui-bg-number">
+                                                <div class="panel-body">
+                                                    <div class="panel-title">
+                                                        <span class="label pull-right layui-bg-blue">实时</span>
+                                                        <h5>队员数量统计</h5>
+                                                    </div>
+                                                    <div class="panel-content">
+                                                        <h1 class="no-margins" id = "total_people">加载中...</h1>
+                                                        <small>当前分类总记录数</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="layui-col-xs6">
+                                            <div class="panel layui-bg-number">
+                                                <div class="panel-body">
+                                                    <div class="panel-title">
+                                                        <span class="label pull-right layui-bg-cyan">实时</span>
+                                                        <h5>救援行动数量统计</h5>
+                                                    </div>
+                                                    <div class="panel-content">
+                                                        <h1 class="no-margins" id = "rescuing">加载中...</h1>
+                                                        <small>正在进行的总记录数</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="layui-col-xs6">
+                                            <div class="panel layui-bg-number">
+                                                <div class="panel-body">
+                                                    <div class="panel-title">
+                                                        <span class="label pull-right layui-bg-orange">实时</span>
+                                                        <h5>已完成救援数量统计</h5>
+                                                    </div>
+                                                    <div class="panel-content">
+                                                        <h1 class="no-margins" id = "rescued">加载中...</h1>
+                                                        <small>当前分类总记录数</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="layui-col-xs6">
+                                            <div class="panel layui-bg-number">
+                                                <div class="panel-body">
+                                                    <div class="panel-title">
+                                                        <span class="label pull-right layui-bg-green">实时</span>
+                                                        <h5>救援行动成功率</h5>
+                                                    </div>
+                                                    <div class="panel-content">
+                                                        <h1 class="no-margins" id="success_rate">加载中...</h1>
+                                                        <small>目前所有救援行动总记录数</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-md6">
+                        <div class="layui-card">
+                            <div class="layui-card-header"><i class="fa fa-credit-card icon icon-blue"></i>快捷入口</div>
+                            <div class="layui-card-body">
+                                <div class="welcome-module">
+                                    <div class="layui-row layui-col-space10 layuimini-qiuck" style="visibility:hidden" aria-busy="true">
+                                        <!-- 救援申请 -->
+                                        <div class="layui-col-xs3 layuimini-qiuck-module">
+                                            <a href="javascript:;" layuimini-content-href="/task/task-publish" data-title="救援申请" data-icon="fa fa-pencil-square-o">
+                                                <i class="fa fa-pencil-square-o"></i>
+                                                <cite>救援申请</cite>
+                                            </a>
+                                        </div>
+                                        <div class="layui-col-xs3 layuimini-qiuck-module">
+                                            <a href="javascript:;" layuimini-content-href="/task/task-track" data-title="救援行动" data-icon="fa fa-wheelchair">
+                                                <i class="fa fa-wheelchair"></i>
+                                                <cite>救援行动</cite>
+                                            </a>
+                                        </div>
+                                        <div class="layui-col-xs3 layuimini-qiuck-module">
+                                            <a href="javascript:;" layuimini-content-href="/page/rescuer_list.html" data-title="队员信息" data-icon="fa fa-file-text-o">
+                                                <i class="fa fa-file-text-o"></i>
+                                                <cite>队员信息</cite>
+                                            </a>
+                                        </div>
+                                        <div class="layui-col-xs3 layuimini-qiuck-module">
+                                            <a href="javascript:;" layuimini-content-href="/page/emergency-notice.html" data-title="紧急通知" data-icon="fa fa-file-text">
+                                                <i class="fa fa-file-text"></i>
+                                                <cite>紧急通知</cite>
+                                            </a>
+                                        </div>
+                                        <div class="layui-col-xs3 layuimini-qiuck-module">
+                                            <a href="javascript:;" layuimini-content-href="/task/task-receive" data-title="任务接收" data-icon="fa fa-paper-plane">
+                                                <i class="fa fa-paper-plane"></i>
+                                                <cite>任务接收</cite>
+                                            </a>
+                                        </div>
+                                        <div class="layui-col-xs3 layuimini-qiuck-module">
+                                            <a href="javascript:;" layuimini-content-href="/page/family-notification.html" data-title="通知家属" data-icon="fa fa-bell">
+                                                <i class="fa fa-bell"></i>
+                                                <cite>通知家属</cite>
+                                            </a>
+                                        </div>
+                                        <div class="layui-col-xs3 layuimini-qiuck-module">
+                                                <a href="javascript:;" layuimini-content-href="/page/face_comparison.html" data-title="人脸比对" data-icon="fa fa-bell">
+                                                <i class="fa fa-id-card"></i>
+                                                <cite>人脸比对</cite>
+                                            </a>
+                                        </div>
+                                        <div class="layui-col-xs3 layuimini-qiuck-module">
+                                            <a href="javascript:;" layuimini-content-href="/page/face_comparison_video.html" data-title="视频人脸比对" data-icon="fa fa-bell">
+                                                <i class="fa fa-video-camera"></i>
+                                                <cite>视频人脸比对</cite>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="layui-col-md4">
+                <div class="layui-card">
+                    <div class="layui-card-header"><i class="fa fa-calendar icon"></i>消息与公告</div>
+                    <div class="layui-card-body">
+                        <div id="tag-container" style="padding: 5px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 视频墙部分 -->
+        <div class="video-wall">
+            <div class="video-container">
+                <video preload="none" muted controls width="1920" height="1080"></video>
+            </div>
+            <div class="video-container">
+                <video preload="none" muted controls width="1280" height="720"></video>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/role-navigation.js?v=20261020-overview"></script>
+<script src="../layuimini/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="../layuimini/js/lay-config.js?v=20260923-features" charset="utf-8"></script>
+<script>
+    document.querySelectorAll('.video-wall video').forEach(function (video, index) {
+        var playlist = index === 0 ? ['/video/1.MP4', '/video/2.MP4'] : ['/video/3.MP4', '/video/4.MP4', '/video/5.MP4'];
+        var current = 0;
+        video.loop = false;
+        video.playsInline = true;
+        video.controls = true;
+        // Keep the original video area, but reserve bandwidth until the user presses Play.
+        video.src = playlist[current];
+        var visible = false;
+        function updatePlayback() {
+            if (!visible || document.hidden) video.pause();
+        }
+        video.addEventListener('ended', function () {
+            current = (current + 1) % playlist.length;
+            video.src = playlist[current];
+            if (visible && !document.hidden) {
+                var attempt = video.play();
+                if (attempt) attempt.catch(function () {});
+            }
+        });
+        document.addEventListener('visibilitychange', updatePlayback);
+        if ('IntersectionObserver' in window) {
+            var observer = new IntersectionObserver(function (entries) {
+                visible = entries[0].isIntersecting;
+                updatePlayback();
+            });
+            observer.observe(video);
+        } else {
+            function checkVisibility() {
+                var rect = video.getBoundingClientRect();
+                visible = rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.right > 0
+                    && rect.top < window.innerHeight && rect.left < window.innerWidth;
+                updatePlayback();
+            }
+            window.addEventListener('scroll', checkVisibility, {passive: true});
+            window.addEventListener('resize', checkVisibility);
+            checkVisibility();
+        }
+    });
+</script>
+</body>
+</html>
+
+<script>
+    layui.use(['layer', 'miniTab'], function () {
+        var $ = layui.jquery,
+            layer = layui.layer,
+            miniTab = layui.miniTab;
+            
+
+        miniTab.listen();
+        var $quick = $('.layuimini-qiuck');
+        var $quickStatus = $('<p role="status"></p>').hide().insertAfter($quick);
+        function loadQuickEntries() {
+            $quick.css('visibility', 'hidden').attr('aria-busy', 'true');
+            $quickStatus.hide().empty();
+            $.when(
+                $.getJSON('/api/users/getCurrentUser'),
+                $.getJSON('/layuimini/api/init.json?v=20261020-overview')
+            ).done(function (userResult, menuResult) {
+                var user = userResult[0], menu = menuResult[0];
+                if (!user || !user.uuid || ['family', 'rescuer', 'admin'].indexOf(user.userType) < 0 || !menu || !Array.isArray(menu.menuInfo) || !window.GuituRoleNavigation) {
+                    showQuickError(); return;
+                }
+                var filtered = GuituRoleNavigation.filterMenu(user, menu), entries = [];
+                function collect(items) { items.forEach(function(item){if(item.child) collect(item.child);else if(item.href)entries.push(item);}); }
+                collect(filtered.menuInfo);
+                $quick.find('[layuimini-content-href]').each(function (index) {
+                    var entry = entries[index], $link = $(this);
+                    $link.closest('.layuimini-qiuck-module').toggle(!!entry);
+                    if (entry) {
+                        $link.attr({'layuimini-content-href':'/'+entry.href, 'data-title':entry.title, 'data-icon':entry.icon});
+                        $link.find('cite').text(entry.title);$link.find('i').attr('class',entry.icon);
+                    }
+                });
+                loadPersonalSummary(user);
+                $quick.css('visibility', 'visible').attr('aria-busy', 'false');
+            }).fail(function (xhr) {
+                if (xhr.status === 401) { window.location.replace('/login'); return; }
+                showQuickError();
+            });
+        }
+        function showQuickError() {
+            $quick.attr('aria-busy', 'false');
+            $quickStatus.empty().append(document.createTextNode('快捷入口暂时无法加载 '))
+                .append($('<button type="button" class="layui-btn layui-btn-primary layui-btn-sm">重试</button>').on('click', loadQuickEntries)).show();
+        }
+        loadQuickEntries();
+
+        function summaryValue(id,label,value) {
+            var $value=$('#'+id);$value.text(value);$value.closest('.panel-body').find('h5').text(label);
+            $value.siblings('small').text('当前账号的真实记录');
+        }
+        function loadPersonalSummary(user) {
+            $('#tag-container').empty();
+            $.getJSON('/api/notifications?unread=true&page=1&limit=1').done(function(res){if(res.success&&Number.isFinite(res.count))$('<a class="layui-badge layui-bg-green"></a>').attr('href','/page/messages.html?v=20260923-features').text('未读消息 '+res.count).appendTo('#tag-container');});
+            $.getJSON('/api/content?kind=announcement&page=1&limit=5').done(function(res){
+                if(!res.success||!Array.isArray(res.data))return;
+                res.data.forEach(function(record){var notice=$('<div class="layuimini-notice" role="button" tabindex="0"></div>');$('<div class="layuimini-notice-title"></div>').text(record.title).appendTo(notice);$('<div class="layuimini-notice-extra"></div>').text(String(record.createdAt||'').slice(0,10)).appendTo(notice);$('<div class="layuimini-notice-content" hidden></div>').text(record.body).appendTo(notice);notice.on('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();$(this).click();}});notice.appendTo('#tag-container');});
+            });
+            if(user.userType==='rescuer' && user.rescuerStatus!=='available') {
+                summaryValue('total_people','申请状态',({visitor:'未申请',pending:'待审核',rejected:'未通过',disabled:'已停用'})[user.rescuerStatus]||'待确认');
+                summaryValue('rescuing','任务执行','审核后开放');summaryValue('rescued','当前可用','资料与培训');summaryValue('success_rate','下一步','查看申请状态');return;
+            }
+            if(user.userType==='admin') {
+                $.getJSON('/api/admin/summary').done(function(res){var d=res.data||{};summaryValue('total_people','待审核队员',d.pendingRescuers);summaryValue('rescuing','进行中任务',d.activeTasks);summaryValue('rescued','待处理加急',d.pendingUrgent);summaryValue('success_rate','平台账号',d.users);}).fail(summaryError);return;
+            }
+            var family=user.userType==='family', page=1, rows=[];
+            function next() {
+                $.getJSON((family?'/task/list':'/task/my-list-data')+'?page='+page+'&limit=100').done(function(res){
+                    var batch=family?res.data&&res.data.records:res.data, count=family?res.data&&res.data.total:res.count;
+                    if(res.code!==0||!Array.isArray(batch)){summaryError();return;}
+                    rows=rows.concat(batch);if(batch.length&&rows.length<count){page++;next();return;}
+                    summaryValue('total_people',family?'我的求助':'我的搜救',rows.length);
+                    summaryValue('rescuing','进行中',rows.filter(function(t){return t.status==='waiting'||t.status==='rescuing';}).length);
+                    summaryValue('rescued','已确认完成',rows.filter(function(t){return t.status==='finished';}).length);
+                    summaryValue('success_rate','待家属确认',rows.filter(function(t){return t.status==='confirming';}).length);
+                }).fail(summaryError);
+            }
+            next();
+        }
+        function summaryError(){ $('#total_people,#rescuing,#rescued,#success_rate').text('暂不可用'); }
+        $('body').on('click', '.layuimini-notice', function () {
+            var title = $('<span>').text($(this).children('.layuimini-notice-title').text()).html(),
+                noticeTime = $('<span>').text($(this).children('.layuimini-notice-extra').text()).html(),
+                content = $(this).find('.layuimini-notice-content').html(); // 改为使用 find 获取内容
+
+            var html = '<div style="padding:15px 20px; text-align:justify; line-height: 22px;border-bottom:1px solid #e2e2e2;background-color: #2f4056;color: #ffffff">\n' +
+                '<div style="text-align: center;margin-bottom: 20px;font-weight: bold;border-bottom:1px solid #718fb5;padding-bottom: 5px"><h4 class="text-danger">' + title + '</h4></div>\n' +
+                '<div style="font-size: 12px">' + content + '</div>\n' +
+                '</div>\n';
+            (parent.layer || layer).open({
+                type: 1,
+                title: '系统公告'+'<span style="float: right;right: 1px;font-size: 12px;color: #b1b3b9;margin-top: 1px">'+noticeTime+'</span>',
+                area: '300px;',
+                shade: 0.8,
+                id: 'layuimini-notice',
+                btn: ['取消'],
+                btnAlign: 'c',
+                moveType: 1,
+                content:html,
+                success: function (layero) {
+                    var btn = layero.find('.layui-layer-btn');
+                    btn.find('.layui-layer-btn0').attr({
+                        target: '_blank'
+                    });
+                }
+            });
+        });
+        if(typeof echartsRecords !== "undefined") echartsRecords.setOption(optionRecords);
+
+        // echarts 窗口缩放自适应
+        window.onresize = function(){
+            if(typeof echartsRecords !== "undefined") echartsRecords.resize();
+        }
+
+    });
+
+</script>
+</body>
+</html>

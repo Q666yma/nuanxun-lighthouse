@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- 技能分布图表片段 -->
+    <div th:fragment="skill-distribution-chart">
+        <div class="skill-chart-container layui-card">
+            <div class="layui-card-header chart-header">
+                <h3 id="skill-chartTitle" class="layui-elip">搜救队员技能分布</h3>
+            </div>
+            <div class="layui-card-body">
+                <div id="skillChart" class="chart-box"></div>
+                <!-- 统一使用一个容器，通过类名区分状态 -->
+                <div id="skill-centerLogoContainer" class="center-logo-container" style="display:none">
+                    <img th:src="@{/layuimini/images/nuanxun-logo-20261014.png}" alt="暖寻灯塔 Logo" class="center-logo" id="skill-centerLogo">
+                </div>
+                <div class="chart-info">
+                    <p>当前相关队员：<span id="skill-totalRescuers" class="layui-badge layui-bg-blue">—</span> 人</p>
+                    <p id="skill-chartNote" class="skill-chart-note"></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 引入独立的CSS和JS文件 -->
+        <link th:href="@{/css/show-skill.css(v='20261019-counts')}" rel="stylesheet">
+        
+    </div>
+<script src="/js/echarts.min.js"></script>
+<script src="/js/show-skill.js?v=20261019-counts"></script>
+</body>
+</html>

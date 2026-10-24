@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.maka.mapper.UserMapper">
+    <!-- 检查用户名是否存在 -->
+    <select id="checkUsernameExists" resultType="int">
+        SELECT COUNT(*) FROM users WHERE username = #{username}
+    </select>
+    
+    <!-- 检查手机号是否存在 -->
+    <select id="checkPhoneExists" resultType="int">
+        SELECT COUNT(*) FROM users WHERE phone = #{phone}
+    </select>
+    
+    <!-- 插入新用户 -->
+    <insert id="insertUser" parameterType="com.maka.pojo.User">
+        INSERT INTO users (uuid, username, password, phone, gender, user_type)
+        VALUES (#{uuid}, #{username}, #{password}, #{phone}, #{gender}, #{userType})
+    </insert>
+    
+    <!-- 插入搜救志愿者 -->
+    <insert id="insertRescuer" parameterType="com.maka.pojo.Rescuer">
+        INSERT INTO rescuers (uuid, name, status, location, task_ids)
+        VALUES (#{uuid}, #{name}, #{status}, #{location}, JSON_ARRAY())
+    </insert>
+    
+    <!-- 插入家属 -->
+    <insert id="insertFamily" parameterType="com.maka.pojo.Family">
+        INSERT INTO families (uuid, name, task_ids)
+        VALUES (#{uuid}, #{name}, JSON_ARRAY())
+    </insert>
+    
+    <!-- 根据用户名查询用户 -->
+    <select id="getUserByUsername" resultType="com.maka.pojo.User">
+        SELECT * FROM users WHERE username = #{username}
+    </select>
+    
+    <!-- 根据手机号查询用户 -->
+    <select id="getUserByPhone" resultType="com.maka.pojo.User">
+        SELECT * FROM users WHERE phone = #{phone}
+    </select>
+    
+    <!-- 根据UUID查询用户 -->
+    <select id="getUserByUuid" resultType="com.maka.pojo.User">
+        SELECT * FROM users WHERE uuid = #{uuid}
+    </select>
+    
+    <!-- 根据UUID查询志愿者 -->
+    <select id="getRescuerByUuid" resultType="com.maka.pojo.Rescuer">
+        SELECT * FROM rescuers WHERE uuid = #{uuid}
+    </select>
+    
+    <!-- 根据UUID查询家属 -->
+    <select id="getFamilyByUuid" resultType="com.maka.pojo.Family">
+        SELECT * FROM families WHERE uuid = #{uuid}
+    </select>
+    
+    <!-- 更新用户状态 -->
+    <update id="updateUserStatus">
+        UPDATE users 
+        SET status = #{status} 
+        WHERE uuid = #{uuid}
+    </update>
+    
+    <!-- 更新志愿者状态 -->
+    <update id="updateRescuerStatus">
+        UPDATE rescuers 
+        SET status = #{status} 
+        WHERE uuid = #{uuid}
+    </update>
+</mapper>

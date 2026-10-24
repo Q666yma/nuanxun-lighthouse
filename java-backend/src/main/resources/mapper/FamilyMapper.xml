@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.maka.mapper.FamilyMapper">
+
+    <!-- resultMap 映射 -->
+    <resultMap id="FamilyResultMap" type="com.maka.pojo.Family">
+        <id property="uuid" column="uuid"/>
+        <result property="name" column="name"/>
+        <result property="taskIds" column="task_ids" typeHandler="com.maka.typehandler.JsonIntegerListTypeHandler"/>
+    </resultMap>
+
+    <!-- 插入新家庭成员 -->
+    <insert id="insert" parameterType="com.maka.pojo.Family">
+        INSERT INTO families (uuid, name, task_ids)
+        VALUES (#{uuid}, #{name}, #{taskIds, typeHandler=com.maka.typehandler.JsonIntegerListTypeHandler})
+    </insert>
+
+    <!-- 更新家庭成员信息 -->
+    <update id="update" parameterType="com.maka.pojo.Family">
+        UPDATE families
+        SET name = #{name},
+            task_ids = #{taskIds, typeHandler=com.maka.typehandler.JsonIntegerListTypeHandler}
+        WHERE uuid = #{uuid}
+    </update>
+
+    <!-- 根据UUID查询家庭成员 -->
+    <select id="selectByUuid" parameterType="String" resultMap="FamilyResultMap">
+        SELECT uuid, name, task_ids
+        FROM families
+        WHERE uuid = #{uuid}
+    </select>
+
+    <!-- 获取所有家庭成员 -->
+    <select id="selectAll" resultMap="FamilyResultMap">
+        SELECT uuid, name, task_ids
+        FROM families
+    </select>
+
+    <!-- 为家庭成员添加任务ID -->
+    <update id="addTaskId">
+        UPDATE families
+        SET task_ids = JSON_ARRAY_APPEND(IFNULL(task_ids, '[]'), '$', #{taskId})
+        WHERE uuid = #{uuid}
+    </update>
+
+    <!-- 删除家庭成员 -->
+    <delete id="deleteByUuid" parameterType="String">
+        DELETE FROM families  WHERE uuid = #{uuid}
+    </delete>
+
+    <update id="deleteTaskId">
+        UPDATE families
+        SET task_ids = (
+            SELECT IF(COUNT(*) = 0, JSON_ARRAY(), JSON_ARRAYAGG(item))
+            FROM JSON_TABLE(
+                task_ids, 
+                '$[*]' COLUMNS(item INT PATH '$')
+            ) AS jt
+            WHERE item != #{taskId}
+        )
+        WHERE uuid = #{uuid}
+    </update>
+
+</mapper>

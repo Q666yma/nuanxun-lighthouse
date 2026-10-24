@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>任务详情</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" th:href="@{/layuimini/lib/layui-v2.5.5/css/layui.css}">
+  <link rel="stylesheet" th:href="@{/layuimini/css/public.css}">
+  <style>
+    body{background:#f2f2f2;}
+    .layuimini-container{margin:20px auto;background:#fff;border-radius:8px;
+      box-shadow:0 2px 8px rgba(0,0,0,.1);padding:20px;}
+    .task-photo{max-width:300px;max-height:300px;border-radius:5px;}
+    .task-header{display:flex;margin-bottom:30px;}
+    .task-info{margin-left:30px;flex:1;}
+    .task-title{font-size:20px;font-weight:bold;margin-bottom:15px;}
+    .task-meta{color:#666;margin-bottom:5px;}
+    .task-status-waiting{color:#FF5722;font-weight:bold;}
+    .task-status-rescuing{color:#1E9FFF;font-weight:bold;}
+    .task-status-finished{color:#5FB878;font-weight:bold;}
+    .task-extra{margin-top:20px;padding:15px;background:#f9f9f9;border-radius:5px;}
+    .task-audio{margin-top:20px;}
+    .task-buttons{margin-top:30px;text-align:center;}
+    .task-buttons .layui-btn{margin:0 10px;}
+    .recommendation-report {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #e6e6e6;
+      border-radius: 5px;
+      display: none;
+    }
+    .recommendation-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .rescuer-card {
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #eee;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+    .rescuer-name {
+      font-weight: bold;
+      color: #1E9FFF;
+    }
+    .report-loading {
+      text-align: center;
+      margin: 20px 0;
+      display: none;
+    }
+    .download-buttons {
+      margin-top: 15px;
+      text-align: center;
+      display: none; /* 默认隐藏 */
+    }
+    .btn-download-report {
+      margin: 0 5px;
+    }
+  </style>
+</head>
+<body>
+<div class="layuimini-container">
+  <div class="layuimini-main">
+    <div class="layui-breadcrumb" style="margin-bottom:20px;">
+      <a th:href="${userType == 'rescuer' ? '/task/task-management' : '/task/task-manage'}">
+        <span th:text="${userType == 'rescuer' ? '任务接收' : '任务管理'}"></span>
+      </a>
+      <a><cite>任务详情</cite></a>
+    </div>
+    
+    <!-- 任务不存在的提示 -->
+    <div class="layui-card" th:if="${errorMsg != null}">
+      <div class="layui-card-header">提示</div>
+      <div class="layui-card-body" th:text="${errorMsg}">
+        任务不存在或您没有权限查看
+      </div>
+      <div class="layui-card-body">
+        <a href="/task/task-manage" class="layui-btn layui-btn-primary layui-btn-sm">返回任务列表</a>
+      </div>
+    </div>
+    
+    <div class="task-container" th:if="${task != null}">
+      <div class="task-header">
+        <div class="task-photo-container">
+          <img th:src="${task.photoUrl}" alt="走失人员照片" class="task-photo">
+        </div>
+        <div class="task-info">
+          <div class="task-title" th:text="${task.elderName} + ' - 走失任务'"></div>
+          
+          <div class="task-meta">
+            <span>任务ID：</span>
+            <span th:text="${task.id}"></span>
+          </div>
+          
+          <div class="task-meta">
+            <span>状态：</span>
+            <span th:class="${'task-status-' + task.status}">
+              <span th:if="${task.status == 'waiting'}">等待救援</span>
+              <span th:if="${task.status == 'rescuing'}">救援中</span>
+              <span th:if="${task.status == 'finished'}">已完成</span>
+            </span>
+          </div>
+          
+          <div class="task-meta">
+            <span>走失时间：</span>
+            <span th:text="${#dates.format(task.lostTime, 'yyyy-MM-dd HH:mm:ss')}"></span>
+          </div>
+          
+          <div class="task-meta">
+            <span>走失地点：</span>
+            <span th:text="${task.location}"></span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 语音部分 -->
+      <div class="task-audio" th:if="${task.audioUrl != null && task.audioUrl != ''}">
+        <div class="layui-card">
+          <div class="layui-card-header">语音描述</div>
+          <div class="layui-card-body">
+            <audio controls style="width:100%;">
+              <source th:src="${task.audioUrl}" type="audio/mpeg">
+              您的浏览器不支持音频播放
+            </audio>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 额外信息部分 -->
+      <div class="task-extra" th:if="${task.extraInfo != null && task.extraInfo != ''}">
+        <div class="layui-card">
+          <div class="layui-card-header">额外信息</div>
+          <div class="layui-card-body" th:text="${task.extraInfo}"></div>
+        </div>
+      </div>
+      
+      <!-- 推荐救援人员报告 -->
+      <div class="recommendation-report" id="recommendationReport">
+        <div class="recommendation-title">智能救援人员推荐报告</div>
+        <div class="report-content" id="reportContent">
+          <!-- 报告内容将通过AJAX加载 -->
+        </div>
+      </div>
+      
+      <!-- 下载按钮 - 初始隐藏 -->
+      <div class="download-buttons" id="downloadButtons">
+        <button class="layui-btn layui-btn-normal btn-download-report" id="downloadTxtReport">
+          <i class="layui-icon layui-icon-download-circle"></i> 下载文本报告
+        </button>
+        <a class="layui-btn layui-btn-normal btn-download-report" id="downloadDocxReport" target="_blank">
+          <i class="layui-icon layui-icon-file"></i> 下载Word报告
+        </a>
+      </div>
+      
+      <!-- 加载中提示 -->
+      <div class="report-loading" id="reportLoading">
+        <i class="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop" style="font-size: 30px;"></i>
+        <p>正在智能匹配救援人员，请稍候...</p>
+      </div>
+
+      <div id="taskChat" style="max-width:600px;margin:20px auto;">
+        <!DOCTYPE html>
+          <html xmlns:th="http://www.thymeleaf.org">
+          <head>
+            <meta charset="utf-8">
+            <title>任务聊天</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+            <link rel="stylesheet" th:href="@{/layuimini/lib/layui-v2.5.5/css/layui.css}">
+            <link rel="stylesheet" th:href="@{/layuimini/css/public.css}">
+            <style>
+              .chat-container {
+                height: 400px;
+                overflow-y: auto;
+                background: #f9f9f9;
+                border-radius: 5px;
+                padding: 10px;
+                margin-bottom: 15px;
+              }
+              .message-item {
+                margin-bottom: 15px;
+                clear: both;
+              }
+              .message-bubble {
+                max-width: 70%;
+                padding: 10px 15px;
+                border-radius: 15px;
+                position: relative;
+                display: inline-block;
+              }
+              .message-sender {
+                font-size: 12px;
+                color: #999;
+                margin-bottom: 3px;
+              }
+              .message-time {
+                font-size: 11px;
+                color: #aaa;
+                margin-top: 5px;
+                display: inline-block;
+              }
+              .message-sent {
+                float: right;
+              }
+              .message-sent .message-bubble {
+                background-color: #d9f4fe;
+                border-top-right-radius: 5px;
+                text-align: left;
+              }
+              .message-received {
+                float: left;
+              }
+              .message-received .message-bubble {
+                background-color: #f0f0f0;
+                border-top-left-radius: 5px;
+                text-align: left;
+              }
+              .message-image {
+                max-width: 100%;
+                max-height: 200px;
+                border-radius: 5px;
+                cursor: pointer;
+              }
+              .message-audio {
+                width: 100%;
+                max-width: 300px;
+              }
+              .message-system {
+                text-align: center;
+                margin: 15px 0;
+              }
+              .message-system .message-bubble {
+                background-color: #f5f5f5;
+                color: #888;
+                padding: 5px 15px;
+                border-radius: 15px;
+                max-width: 80%;
+                display: inline-block;
+                float: none;
+              }
+              .badge-rescuer {
+                background-color: #1E9FFF;
+                color: #fff;
+                font-size: 12px;
+                padding: 2px 5px;
+                border-radius: 3px;
+                margin-right: 5px;
+              }
+              .badge-family {
+                background-color: #FF5722;
+                color: #fff;
+                font-size: 12px;
+                padding: 2px 5px;
+                border-radius: 3px;
+                margin-right: 5px;
+              }
+            </style>
+          </head>
+          <body>
+            <!-- 聊天组件 -->
+            <div th:fragment="taskChat(task, userType, userId, userName)">
+              <div class="task-chat" th:if="${task.status == 'rescuing' || task.status == 'finished'}">
+                <div class="layui-card">
+                  <div class="layui-card-header">
+                    <span>救援实时通讯</span>
+                    <span class="layui-badge layui-bg-green" style="margin-left: 10px;">实时</span>
+                  </div>
+                  <div class="layui-card-body">
+                    <!-- 聊天消息区域 -->
+                    <div id="chatContainer" class="chat-container">
+                      <div class="layui-text" style="text-align: center; color: #999; padding: 20px 0;">
+                        <i class="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop"></i> 加载消息历史...
+                      </div>
+                    </div>
+                    
+                    <!-- 输入区域 - 仅在救援中状态下可发送消息 -->
+                    <div th:if="${task.status == 'rescuing'}" class="chat-input-area">
+                      <div class="layui-form">
+                        <!-- 工具栏 -->
+                        <div class="chat-toolbar" style="margin-bottom: 10px;">
+                          <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" id="uploadImage">
+                            <i class="layui-icon">&#xe67c;</i> 图片
+                          </button>
+                          <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" id="uploadAudio">
+                            <i class="layui-icon">&#xe652;</i> 语音
+                          </button>
+                          <!-- 隐藏的文件输入框 -->
+                          <input type="file" id="hiddenImageInput" accept="image/*" style="display: none;">
+                          <input type="file" id="hiddenAudioInput" accept="audio/*" style="display: none;">
+                        </div>
+                        
+                        <!-- 消息输入框 -->
+                        <div class="layui-input-block" style="margin-left: 0;">
+                          <textarea id="messageInput" name="message" placeholder="输入消息..." class="layui-textarea" style="min-height: 80px; resize: none;"></textarea>
+                        </div>
+                        
+                        <!-- 预览区域 -->
+                        <div id="mediaPreview" style="display: none; margin: 10px 0; position: relative;">
+                          <!-- 图片预览 -->
+                          <img id="previewImage" style="max-width: 100%; max-height: 150px; border-radius: 4px; display: none;">
+                          
+                          <!-- 音频预览 -->
+                          <div id="audioPreview" style="display: none; padding: 10px; background: #f0f0f0; border-radius: 4px;">
+                            <i class="layui-icon">&#xe652;</i> 
+                            <span id="audioFileName">语音文件</span>
+                            <audio id="previewAudio" controls style="vertical-align: middle; margin-left: 10px; max-width: calc(100% - 100px);"></audio>
+                          </div>
+                          
+                          <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" id="clearMedia" style="position: absolute; top: 5px; right: 5px;">
+                            <i class="layui-icon">&#xe640;</i>
+                          </button>
+                        </div>
+                        
+                        <!-- 发送按钮 -->
+                        <div style="text-align: right; margin-top: 10px;">
+                          <button type="button" class="layui-btn" id="sendMessage">发送</button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- 已完成任务提示 -->
+                    <div th:if="${task.status == 'finished'}" class="layui-text" style="text-align: center; color: #999; padding: 10px; background: #f0f0f0; border-radius: 5px;">
+                      <i class="layui-icon layui-icon-ok-circle"></i> 该任务已完成，无法继续发送消息
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <script>
+                  /**
+               * 任务聊天组件
+               * @param {Object} config 配置信息
+               *   - taskId: 任务ID
+               *   - userId: 当前用户ID
+               *   - userType: 用户类型（rescuer或family）
+               *   - userName: 用户名称
+               *   - taskStatus: 任务状态
+               */
+              function initTaskChat(config) {
+                var taskId = config.taskId;
+                var userId = config.userId;
+                var userType = config.userType;
+                var userName = config.userName;
+                var taskStatus = config.taskStatus;
+                
+                // 全局变量，用于存储媒体信息
+                window.mediaType = null;  // 'image' 或 'audio'
+                window.mediaData = null;  // 媒体URL
+                
+                var lastMessageId = 0;
+                var isFirstLoad = true;
+                var isLoading = false;
+                var autoRefreshTimer = null;
+                
+                // 初始加载消息
+                loadMessages();
+                
+                // 设置自动刷新 (如果任务状态是救援中)
+                if(taskStatus === 'rescuing') {
+                  autoRefreshTimer = setInterval(function() {
+                    refreshNewMessages();
+                  }, 5000); // 每5秒刷新一次
+                }
+                
+                // 页面关闭时清除定时器
+                $(window).on('beforeunload', function() {
+                  if(autoRefreshTimer) {
+                    clearInterval(autoRefreshTimer);
+                  }
+                });
+                
+                // 加载历史消息
+                function loadMessages() {
+                  if(isLoading) return;
+                  isLoading = true;
+                  
+                  $('#chatContainer').html('<div class="layui-text" style="text-align: center; color: #999; padding: 20px 0;"><i class="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop"></i> 加载消息历史...</div>');
+                  
+                  $.ajax({
+                    url: '/task/messages/' + taskId,
+                    type: 'GET',
+                    data: {
+                      before: lastMessageId > 0 ? lastMessageId : null,
+                      limit: 50
+                    },
+                    success: function(res) {
+                      isLoading = false;
+                      
+                      if(res.code === 0) {
+                        var messages = res.data.messages;
+                        $('#chatContainer').empty();
+                        
+                        if(messages.length === 0) {
+                          $('#chatContainer').html('<div class="message-system"><div class="message-bubble">暂无消息记录</div></div>');
+                          return;
+                        }
+                        
+                        // 添加系统消息
+                        $('#chatContainer').append('<div class="message-system"><div class="message-bubble">任务通讯已开始</div></div>');
+                        
+                        // 渲染消息
+                        messages.forEach(function(msg) {
+                          appendMessage(msg, false);
+                        });
+                        
+                        // 更新最后消息ID
+                        if(messages.length > 0) {
+                          lastMessageId = messages[0].id;
+                        }
+                        
+                        // 第一次加载时滚动到底部
+                        if(isFirstLoad) {
+                          scrollToBottom();
+                          isFirstLoad = false;
+                        }
+                      } else {
+                        $('#chatContainer').html('<div class="message-system"><div class="message-bubble">加载消息失败: ' + 
+                                                (res.msg || '未知错误') + '</div></div>');
+                      }
+                    },
+                    error: function() {
+                      isLoading = false;
+                      $('#chatContainer').html('<div class="message-system"><div class="message-bubble">加载消息失败，请刷新页面重试</div></div>');
+                    }
+                  });
+                }
+                
+                // 刷新新消息
+                function refreshNewMessages() {
+                  if(isLoading) return;
+                  
+                  $.ajax({
+                    url: '/task/messages/' + taskId,
+                    type: 'GET',
+                    data: {
+                      after: lastMessageId,
+                      limit: 20
+                    },
+                    success: function(res) {
+                      if(res.code === 0) {
+                        var messages = res.data.messages;
+                        
+                        if(messages.length > 0) {
+                          // 渲染新消息
+                          messages.reverse().forEach(function(msg) {
+                            appendMessage(msg, true);
+                          });
+                          
+                          // 更新最后消息ID
+                          lastMessageId = messages[messages.length - 1].id;
+                          
+                          // 如果用户当前在底部，则自动滚动
+                          if(isUserAtBottom()) {
+                            scrollToBottom();
+                          } else {
+                            // 显示新消息提示
+                            showNewMessageAlert();
+                          }
+                        }
+                      }
+                    }
+                  });
+                }
+                
+                // 添加消息到聊天窗口
+                function appendMessage(message, isNew) {
+                  var msgData = JSON.parse(message.messageData);
+                  var isSelf = msgData.sender.id === userId;
+                  var msgClass = isSelf ? 'message-sent' : 'message-received';
+                  var msgTime = formatTime(new Date(msgData.timestamp));
+                  var badgeClass = msgData.sender.type === 'rescuer' ? 'badge-rescuer' : 'badge-family';
+                  var badgeText = msgData.sender.type === 'rescuer' ? '救援者' : '家属';
+                  
+                  var html = '<div class="message-item ' + msgClass + '" data-id="' + message.id + '">';
+                  
+                  if(!isSelf) {
+                    html += '<div class="message-sender">' +
+                            '<span class="' + badgeClass + '">' + badgeText + '</span>' +
+                            msgData.sender.name +
+                            '</div>';
+                  }
+                  
+                  html += '<div class="message-bubble">';
+                  
+                  // 根据消息类型渲染不同内容
+                  if(msgData.type === 'text') {
+                    html += '<div class="message-text">' + escapeHtml(msgData.content) + '</div>';
+                  } else if(msgData.type === 'image' && msgData.media && msgData.media.url) {
+                    html += '<div class="message-image-container">' +
+                            '<img src="' + msgData.media.url + '" class="message-image" onclick="previewImage(this.src)">' +
+                            '</div>';
+                    if(msgData.content) {
+                      html += '<div class="message-text" style="margin-top: 5px;">' + escapeHtml(msgData.content) + '</div>';
+                    }
+                  } else if(msgData.type === 'audio' && msgData.media && msgData.media.url) {
+                    html += '<div class="message-audio-container">' +
+                            '<audio controls class="message-audio" src="' + msgData.media.url + '"></audio>' +
+                            '</div>';
+                    if(msgData.content) {
+                      html += '<div class="message-text" style="margin-top: 5px;">' + escapeHtml(msgData.content) + '</div>';
+                    }
+                  }
+                  
+                  html += '<div class="message-time">' + msgTime + '</div>';
+                  html += '</div></div>';
+                  
+                  if(isNew) {
+                    $('#chatContainer').append(html);
+                  } else {
+                    $('#chatContainer').prepend(html);
+                  }
+                }
+                
+                // 发送消息
+                $('#sendMessage').on('click', function() {
+                  var content = $('#messageInput').val().trim();
+                  
+                  if(!content && !window.mediaData) {
+                    layer.msg('请输入消息内容或添加媒体', {icon: 2});
+                    return;
+                  }
+                  
+                  // 构建消息数据
+                  var msgData = {
+                    sender: {
+                      id: userId,
+                      type: userType,
+                      name: userName
+                    },
+                    content: content,
+                    type: window.mediaType || 'text',
+                    timestamp: new Date().getTime()
+                  };
+                  
+                  if(window.mediaData) {
+                    msgData.media = {
+                      url: window.mediaData
+                    };
+                  }
+                  
+                  // 发送请求
+                  $.ajax({
+                    url: '/task/send-message',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                      taskId: taskId,
+                      messageData: JSON.stringify(msgData)
+                    }),
+                    beforeSend: function() {
+                      $('#sendMessage').prop('disabled', true).text('发送中...');
+                    },
+                    success: function(res) {
+                      $('#sendMessage').prop('disabled', false).text('发送');
+                      
+                      if(res.code === 0) {
+                        // 清空输入
+                        $('#messageInput').val('');
+                        clearMedia();
+                        
+                        // 预先显示消息
+                        var tempMessage = {
+                          id: 'temp-' + new Date().getTime(),
+                          messageData: JSON.stringify(msgData)
+                        };
+                        appendMessage(tempMessage, true);
+                        scrollToBottom();
+                        
+                        // 更新消息ID
+                        if(res.data && res.data.messageId) {
+                          lastMessageId = res.data.messageId;
+                        }
+                      } else {
+                        layer.msg(res.msg || '发送失败', {icon: 2});
+                      }
+                    },
+                    error: function() {
+                      $('#sendMessage').prop('disabled', false).text('发送');
+                      layer.msg('发送失败，请稍后重试', {icon: 2});
+                    }
+                  });
+                });
+                
+                // 清除媒体按钮事件
+                $('#clearMedia').on('click', function() {
+                  clearMedia();
+                });
+                
+                // 清除媒体辅助函数
+                function clearMedia() {
+                  window.mediaType = null;
+                  window.mediaData = null;
+                  $('#mediaPreview').hide();
+                  $('#previewImage').attr('src', '').hide();
+                  $('#audioPreview').hide();
+                  $('#previewAudio').attr('src', '');
+                }
+                
+                // 滚动到底部
+                function scrollToBottom() {
+                  var container = document.getElementById('chatContainer');
+                  container.scrollTop = container.scrollHeight;
+                }
+                
+                // 检查用户是否在底部
+                function isUserAtBottom() {
+                  var container = document.getElementById('chatContainer');
+                  return (container.scrollHeight - container.scrollTop - container.clientHeight) < 50;
+                }
+                
+                // 显示新消息提示
+                function showNewMessageAlert() {
+                  if($('#newMessageAlert').length === 0) {
+                    $('<div id="newMessageAlert" class="new-message-alert">' +
+                      '<button class="layui-btn layui-btn-sm layui-btn-normal">' +
+                      '<i class="layui-icon">&#xe601;</i> 新消息</button></div>')
+                      .appendTo('#chatContainer')
+                      .css({
+                        'position': 'absolute',
+                        'bottom': '10px',
+                        'left': '50%',
+                        'transform': 'translateX(-50%)',
+                        'z-index': '100',
+                        'text-align': 'center'
+                      })
+                      .on('click', function() {
+                        scrollToBottom();
+                        $(this).remove();
+                      });
+                  }
+                }
+                
+                // 格式化时间
+                function formatTime(date) {
+                  var today = new Date();
+                  var isToday = date.getDate() === today.getDate() && 
+                              date.getMonth() === today.getMonth() && 
+                              date.getFullYear() === today.getFullYear();
+                  
+                  var hours = date.getHours().toString().padStart(2, '0');
+                  var minutes = date.getMinutes().toString().padStart(2, '0');
+                  
+                  if(isToday) {
+                    return hours + ':' + minutes;
+                  } else {
+                    var month = (date.getMonth() + 1).toString().padStart(2, '0');
+                    var day = date.getDate().toString().padStart(2, '0');
+                    return month + '-' + day + ' ' + hours + ':' + minutes;
+                  }
+                }
+                
+                // HTML转义
+                function escapeHtml(text) {
+                  if (!text) return '';
+                  var map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                  };
+                  return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+                }
+              }
+
+              // 全局函数 - 图片预览
+              function previewImage(src) {
+                layui.layer.photos({
+                  photos: {
+                    "data": [{
+                      "src": src
+                    }]
+                  },
+                  anim: 5
+                });
+              }
+            </script>
+          </body>
+          </html>
+      </div>
+      
+      <!-- 操作按钮 -->
+      <div class="task-buttons">
+        <!-- 根据用户类型显示不同的返回链接 -->
+        <a th:href="${userType == 'rescuer' ? '/task/task-track' : '/task/task-manage'}" class="layui-btn layui-btn-primary">返回列表</a>
+        
+        <!-- 仅家属可以编辑和取消任务 -->
+        <a th:if="${userType == 'family'}" th:href="@{'/task/task-edit/' + ${task.id}}" class="layui-btn">编辑任务</a>
+        <!-- 只有等待救援状态才显示智能推荐按钮，且只有家属可见 -->
+        <button th:if="${task.status == 'waiting' && userType == 'family'}" class="layui-btn layui-btn-warm" id="recommendRescuers">
+          <i class="layui-icon layui-icon-group"></i> 智能推荐救援人员
+        </button>
+        <button th:if="${task.status == 'waiting' && userType == 'family'}" class="layui-btn layui-btn-danger" id="cancelTask">取消任务</button>
+        
+        <!-- 只有救援者在救援中状态才显示完成任务按钮 -->
+        <button th:if="${task.status == 'rescuing' && userType == 'rescuer'}" class="layui-btn layui-btn-normal" id="finishTask">
+          <i class="layui-icon layui-icon-ok"></i> 完成任务
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script th:src="@{/layuimini/lib/layui-v2.5.5/layui.js}"></script>
+<script th:src="@{/layuimini/lib/jquery-3.4.1/jquery-3.4.1.min.js}"></script>
+<script th:inline="javascript">
+/*<![CDATA[*/
+layui.use(['layer', 'upload'], function(){
+  var layer = layui.layer;
+  var upload = layui.upload;
+  var taskId = [[${task?.id}]];
+
+  if(taskId && ([[${task?.status}]] === 'rescuing' || [[${task?.status}]] === 'finished')) {
+    initTaskChat({
+      taskId: taskId,
+      userId: [[${session.userId}]],
+      userType: [[${userType}]],
+      userName: [[${userName}]],
+      taskStatus: [[${task?.status}]]
+    });
+  }
+  
+  // 修复上传功能 - 图片上传
+  $('#uploadImage').on('click', function() {
+    $('#hiddenImageInput').click();
+  });
+  
+  // 修复上传功能 - 音频上传
+  $('#uploadAudio').on('click', function() {
+    $('#hiddenAudioInput').click();
+  });
+  
+  // 处理图片文件选择
+  $('#hiddenImageInput').on('change', function(e) {
+    if (this.files && this.files.length > 0) {
+      var file = this.files[0];
+      
+      // 创建FormData对象
+      var formData = new FormData();
+      formData.append('file', file);
+      
+      // 显示加载提示
+      layer.load(2);
+      
+      // 发送上传请求
+      $.ajax({
+        url: '/upload/image',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(res) {
+          layer.closeAll('loading');
+          
+          if (res.code === 0) {
+            // 更新全局媒体变量
+            window.mediaType = 'image';
+            window.mediaData = res.url;
+            
+            // 显示预览
+            $('#previewImage').attr('src', res.url).show();
+            $('#audioPreview').hide();
+            $('#mediaPreview').show();
+            
+            layer.msg('图片上传成功', {icon: 1});
+          } else {
+            layer.msg(res.msg || '上传失败', {icon: 2});
+          }
+        },
+        error: function() {
+          layer.closeAll('loading');
+          layer.msg('上传出错，请稍后重试', {icon: 2});
+        }
+      });
+    }
+  });
+  
+  // 处理音频文件选择
+  $('#hiddenAudioInput').on('change', function(e) {
+    if (this.files && this.files.length > 0) {
+      var file = this.files[0];
+      
+      // 创建FormData对象
+      var formData = new FormData();
+      formData.append('file', file);
+      
+      // 显示加载提示
+      layer.load(2);
+      
+      // 发送上传请求
+      $.ajax({
+        url: '/upload/audio',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(res) {
+          layer.closeAll('loading');
+          
+          if (res.code === 0) {
+            // 更新全局媒体变量
+            window.mediaType = 'audio';
+            window.mediaData = res.url;
+            
+            // 显示预览
+            $('#previewAudio').attr('src', res.url);
+            $('#audioFileName').text(file.name || '语音文件');
+            $('#audioPreview').show();
+            $('#previewImage').hide();
+            $('#mediaPreview').show();
+            
+            layer.msg('音频上传成功', {icon: 1});
+          } else {
+            layer.msg(res.msg || '上传失败', {icon: 2});
+          }
+        },
+        error: function() {
+          layer.closeAll('loading');
+          layer.msg('上传出错，请稍后重试', {icon: 2});
+        }
+      });
+    }
+  });
+  
+  // 完成任务（仅救援者可见）
+  $('#finishTask').on('click', function(){
+    layer.confirm('确认将此任务标记为已完成吗？', function(index){
+      // 发送请求完成任务
+      $.ajax({
+        url: '/task/finish/' + taskId,
+        type: 'POST',
+        success: function(res){
+          if(res.code === 0){
+            layer.msg('任务已完成', {icon: 1, time: 1500}, function(){
+              // 跳转回任务列表
+              window.location.href = '/task/task-track';
+            });
+          } else {
+            layer.msg(res.msg || '操作失败', {icon: 2});
+          }
+          layer.close(index);
+        },
+        error: function(){
+          layer.msg('服务器错误，请稍后重试', {icon: 2});
+          layer.close(index);
+        }
+      });
+    });
+  });
+  
+  // 取消任务
+  $('#cancelTask').on('click', function(){
+    layer.confirm('确定要取消该任务吗？', function(index){
+      // 发送请求取消任务
+      $.ajax({
+        url: '/task/cancel/' + taskId,
+        type: 'POST',
+        success: function(res){
+          if(res.code === 0){
+            layer.msg('任务已取消', {icon: 1, time: 1500}, function(){
+              // 跳转回任务列表
+              window.location.href = '/task/task-manage';
+            });
+          } else {
+            layer.msg(res.msg || '操作失败', {icon: 2});
+          }
+          layer.close(index);
+        },
+        error: function(){
+          layer.msg('服务器错误，请稍后重试', {icon: 2});
+          layer.close(index);
+        }
+      });
+    });
+  });
+  
+  // 智能推荐救援人员
+  $('#recommendRescuers').on('click', function(){
+    // 显示加载提示，隐藏报告和下载按钮
+    $('#reportLoading').show();
+    $('#recommendationReport').hide();
+    $('#downloadButtons').hide();
+    
+    // 发送请求获取推荐
+    $.ajax({
+      url: '/task/recommend-rescuers/' + taskId,
+      type: 'GET',
+      success: function(res){
+        // 隐藏加载提示
+        $('#reportLoading').hide();
+        
+        console.log("收到API响应:", res); // 打印完整响应
+        
+        if(res.code === 0){
+          console.log("API返回数据:", res.data); // 打印数据部分
+          
+          // 显示推荐报告
+          $('#reportContent').html(res.data.report_html || res.data.reportHtml);
+          $('#recommendationReport').show();
+          
+          // 存储报告原始文本用于下载
+          window.recommendationReportText = res.data.report_text || res.data.reportText;
+          
+          // 检查docx_url字段
+          console.log("docx_url:", res.data.docx_url);
+          
+          // 更新docx下载按钮链接
+          if(res.data.docx_url) {
+            console.log("设置Word下载链接:", res.data.docx_url);
+            $('#downloadDocxReport').attr('href', res.data.docx_url);
+            $('#downloadDocxReport').css('display', 'inline-block'); // 强制显示
+            $('#downloadButtons').show();
+            
+            // 检查按钮是否可见
+            console.log("下载按钮可见性:", $('#downloadButtons').is(':visible'));
+            console.log("Word下载按钮可见性:", $('#downloadDocxReport').is(':visible'));
+          } else {
+            console.warn("未收到Word文档URL");
+            $('#downloadDocxReport').hide();
+            // 仍然显示文本下载按钮
+            $('#downloadButtons').show();
+          }
+        } else {
+          layer.msg(res.msg || '获取推荐失败', {icon: 2});
+        }
+      },
+      error: function(xhr, status, error){
+        $('#reportLoading').hide();
+        console.error("AJAX错误:", error, xhr.responseText);
+        layer.msg('服务器错误，请稍后重试', {icon: 2});
+      }
+    });
+  });
+  
+  // 下载文本报告
+  $('#downloadTxtReport').on('click', function(){
+    if(window.recommendationReportText){
+      // 创建Blob对象
+      var blob = new Blob([window.recommendationReportText], {type: 'text/plain'});
+      
+      // 创建下载链接
+      var a = document.createElement('a');
+      a.download = '救援人员推荐报告_任务' + taskId + '.txt';
+      a.href = window.URL.createObjectURL(blob);
+      a.click();
+    } else {
+      layer.msg('报告内容不存在，请先生成推荐', {icon: 2});
+    }
+  });
+});
+/*]]>*/
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+[data-region-field] {
+  min-width: 0;
+}
+
+.region-locate-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.region-locate-row input[name="location"] {
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.region-locate-button {
+  flex: 0 0 auto;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid #1c528a;
+  border-radius: 2px;
+  background: #1c528a;
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 36px;
+  white-space: nowrap;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.region-locate-button:hover {
+  background: #174674;
+  border-color: #174674;
+}
+
+.region-locate-button:focus-visible {
+  outline: 2px solid #1c528a;
+  outline-offset: 3px;
+}
+
+.region-locate-button:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+
+.region-locate-status {
+  margin: 6px 0 0;
+  color: #777;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.form-group .region-locate-button {
+  height: 40px;
+  line-height: 38px;
+}

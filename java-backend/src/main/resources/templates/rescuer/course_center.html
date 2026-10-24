@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>志愿者微课程中心</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <link rel="stylesheet" href="/layuimini/lib/layui-v2.5.5/css/layui.css">
+  <style>
+    body{margin:0;background:#f6f7f9;font-family:system-ui,Arial}
+    #wrap{width:92%;max-width:900px;margin:40px auto}
+    .layui-card{margin-bottom:14px}
+    
+    /* 移动端整体适配 */
+    @media screen and (max-width: 768px) {
+      #wrap {
+        width: 98%;
+        margin: 10px auto;
+      }
+      
+      /* 表格整体移动端优化 */
+      .layui-table {
+        font-size: 12px;
+      }
+      
+      .layui-table th, .layui-table td {
+        padding: 5px 3px;
+      }
+      
+      /* 视频预览按钮优化 */
+      .layui-btn {
+        padding: 0 8px;
+        height: 32px;
+        line-height: 32px;
+        font-size: 12px;
+      }
+      
+      /* 表格容器滚动 */
+      .layui-table-box {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+
+    /* 移动端视频弹窗专门优化 */
+   /* 在你的style标签中添加 */
+@media screen and (max-width: 768px) {
+  /* 强制覆盖Layer弹窗样式 */
+  .layui-layer-page {
+    width: 85vw !important;
+    max-width: 320px !important;
+    height: auto !important;
+    max-height: 250px !important;
+    left: 50% !important;
+    top: 25% !important;
+    margin-left: -42.5vw !important;
+    margin-top: 0 !important;
+  }
+  
+  .layui-layer-page .layui-layer-content {
+    height: auto !important;
+    max-height: 200px !important;
+    overflow: hidden !important;
+    padding: 5px !important;
+  }
+  
+  .layui-layer-page video {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 160px !important;
+  }
+  
+  /* 确保优先级最高 */
+  body .layui-layer-page {
+    width: 85vw !important;
+    max-width: 320px !important;
+  }
+}
+  </style>
+</head>
+<body>
+<div id="wrap">
+  <div class="layui-card">
+    <div class="layui-card-header">微课程列表</div>
+    <div class="layui-card-body">
+      <table class="layui-hide" id="courseTable" lay-filter="courseTable"></table>
+    </div>
+  </div>
+</div>
+
+<script src="/layuimini/lib/jquery-3.4.1/jquery-3.4.1.min.js"></script>
+<script src="/layuimini/lib/layui-v2.5.5/layui.js"></script>
+<script src="/js/guitu-api.js?v=20260923-features"></script>
+<script src="/js/course-center.js?v=20260923-features"></script>
+<script>
+// 检测移动设备
+var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
+// 优化后的视频播放函数
+
+function playVideo(videoUrl, title) {
+  var index = layer.open({
+    type: 1,
+    title: title || '视频播放',
+    area: isMobile ? ['90%', 'auto'] : ['800px', '600px'],
+    shadeClose: true,
+    maxmin: !isMobile,
+    content: `
+      <div style="padding: 5px;">
+        <video controls preload="metadata" 
+               style="width: 100%; height: auto; max-height: ${isMobile ? '180px' : 'none'};"
+               ${isMobile ? 'playsinline webkit-playsinline' : ''}>
+          <source src="${videoUrl}" type="video/mp4">
+          您的浏览器不支持视频播放
+        </video>
+      </div>
+    `,
+    success: function(layero, index) {
+      if(isMobile) {
+        // 强制重写弹窗样式 - 在Layer渲染完成后立即执行
+        setTimeout(function() {
+          var $layer = $(layero);
+          var windowWidth = $(window).width();
+          var windowHeight = $(window).height();
+          
+          // 计算合适的尺寸
+          var layerWidth = Math.min(windowWidth * 0.85, 320);
+          var layerHeight = Math.min(windowHeight * 0.4, 250);
+          
+          // 强制设置样式，使用!important
+          $layer.css({
+            'width': layerWidth + 'px !important',
+            'height': layerHeight + 'px !important',
+            'left': '50%',
+            'top': '25%',
+            'margin-left': -(layerWidth/2) + 'px',
+            'margin-top': '0',
+            'max-width': '320px',
+            'max-height': '250px'
+          });
+          
+          // 调整内容区域
+          $layer.find('.layui-layer-content').css({
+            'height': (layerHeight - 42) + 'px', // 减去标题栏高度
+            'overflow': 'hidden',
+            'padding': '5px'
+          });
+          
+          // 调整视频尺寸
+          $layer.find('video').css({
+            'width': '100%',
+            'height': 'auto',
+            'max-height': (layerHeight - 60) + 'px'
+          });
+          
+        }, 50); // 50ms延迟确保Layer完全渲染
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>

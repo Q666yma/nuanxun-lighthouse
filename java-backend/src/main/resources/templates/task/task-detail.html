@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>任务详情</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" th:href="@{/layuimini/lib/layui-v2.5.5/css/layui.css}">
+  <link rel="stylesheet" th:href="@{/layuimini/css/public.css}">
+  <link rel="stylesheet" th:href="@{/css/task-chat.css}">
+  <link rel="stylesheet" href="/css/task-family-contact.css?v=20261020-contact">
+  <style>
+    body{background:#f2f2f2;}
+    .layuimini-container{margin:20px auto;background:#fff;border-radius:8px;
+      box-shadow:0 2px 8px rgba(0,0,0,.1);padding:20px;}
+    .task-photo{max-width:300px;max-height:300px;border-radius:5px;}
+    .task-header{display:flex;margin-bottom:30px;}
+    .task-info{margin-left:30px;flex:1;}
+    .task-title{font-size:20px;font-weight:bold;margin-bottom:15px;}
+    .task-meta{color:#666;margin-bottom:5px;}
+    .task-status-waiting{color:#FF5722;font-weight:bold;}
+    .task-status-rescuing{color:#1E9FFF;font-weight:bold;}
+    .task-status-finished{color:#5FB878;font-weight:bold;}
+    .task-extra{margin-top:20px;padding:15px;background:#f9f9f9;border-radius:5px;}
+    .task-audio{margin-top:20px;}
+    .task-buttons{margin-top:30px;text-align:center;}
+    .task-buttons .layui-btn{margin:0 10px;}
+    .recommendation-report {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #e6e6e6;
+      border-radius: 5px;
+      display: none;
+    }
+    .recommendation-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .rescuer-card {
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #eee;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+    .rescuer-name {
+      font-weight: bold;
+      color: #1E9FFF;
+    }
+    .report-loading {
+      text-align: center;
+      margin: 20px 0;
+      display: none;
+    }
+    .download-buttons {
+      margin-top: 15px;
+      text-align: center;
+      display: none; /* 默认隐藏 */
+    }
+    .btn-download-report {
+      margin: 0 5px;
+    }
+  </style>
+</head>
+<body>
+<div class="layuimini-container">
+  <div class="layuimini-main">
+    <div class="layui-breadcrumb" style="margin-bottom:20px;">
+      <a th:href="${userType == 'admin' ? '/page/admin.html?v=20260923-features&view=tasks' : (userType == 'rescuer' ? '/task/task-track' : '/task/task-manage')}">
+        <span th:text="${userType == 'admin' ? '任务协调' : (userType == 'rescuer' ? '我的搜救' : '我的求助')}"></span>
+      </a>
+      <a><cite>任务详情</cite></a>
+    </div>
+    
+    <!-- 任务不存在的提示 -->
+    <div class="layui-card" th:if="${errorMsg != null}">
+      <div class="layui-card-header">提示</div>
+      <div class="layui-card-body" th:text="${errorMsg}">
+        任务不存在或您没有权限查看
+      </div>
+      <div class="layui-card-body">
+        <a href="/task/task-manage" class="layui-btn layui-btn-primary layui-btn-sm">返回任务列表</a>
+      </div>
+    </div>
+    
+    <div class="task-container" th:if="${task != null}">
+      <div class="task-header">
+        <div class="task-photo-container">
+          <img th:src="${task.photoUrl}" alt="走失人员照片" class="task-photo">
+        </div>
+        <div class="task-info">
+          <div class="task-title" th:text="${task.elderName} + ' - 走失任务'"></div>
+          <div class="task-meta" th:if="${elderAge != null}"><span>年龄：</span><span th:text="${elderAge} + '岁'"></span></div>
+          
+          <div class="task-meta">
+            <span>任务ID：</span>
+            <span th:text="${task.id}"></span>
+          </div>
+          
+          <div class="task-meta">
+            <span>状态：</span>
+            <span th:class="${'task-status-' + task.status}">
+              <span th:if="${task.status == 'waiting'}">等待救援</span>
+              <span th:if="${task.status == 'rescuing'}">救援中</span>
+              <span th:if="${task.status == 'finished'}">已完成</span>
+              <span th:if="${task.status == 'confirming'}">待家属确认</span>
+              <span th:if="${task.status == 'cancelled'}">已撤回</span>
+            </span>
+          </div>
+          
+          <div class="task-meta">
+            <span>走失时间：</span>
+            <span th:text="${#dates.format(task.lostTime, 'yyyy-MM-dd HH:mm:ss')}"></span>
+          </div>
+          
+          <div class="task-meta">
+            <span>走失地点：</span>
+            <span th:text="${task.location}"></span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="layui-card family-contact-card">
+        <div class="layui-card-header">求助联系人</div>
+        <div class="layui-card-body" th:if="${familyContact != null}">
+          <dl>
+            <div class="family-contact-row"><dt>联系人姓名</dt><dd th:text="${familyContact.name}"></dd></div>
+            <div class="family-contact-row"><dt>与走失人员关系</dt><dd th:text="${familyContact.relationship}"></dd></div>
+            <div class="family-contact-row"><dt>联系电话</dt><dd th:text="${familyContact.phone != null && familyContact.phone != '' ? familyContact.phone : '未填写，可通过任务内沟通联系'}"></dd></div>
+            <div class="family-contact-row"><dt>账号绑定邮箱</dt><dd th:text="${familyContact.email != null && familyContact.email != '' ? familyContact.email : '暂无绑定邮箱，可通过任务内沟通联系'}"></dd></div>
+          </dl>
+          <p class="contact-privacy">仅供本任务搜救联络及核实使用，请勿转发或公开。联系人资料不会显示在任务大厅和寻人海报中。</p>
+        </div>
+        <div class="layui-card-body" th:if="${familyContact == null}">
+          <p>本任务尚未补充求助联系人资料，可先通过任务内沟通联系家属。</p>
+          <p th:if="${userType == 'family' && (task.status == 'waiting' || task.status == 'rescuing' || task.status == 'confirming')}" style="margin-top:10px;"><a class="layui-btn layui-btn-primary layui-btn-sm" th:href="@{'/task/task-edit/' + ${task.id}}">补充联系人资料</a></p>
+        </div>
+      </div>
+
+      <!-- 语音部分 -->
+      <div class="task-audio" th:if="${task.audioUrl != null && task.audioUrl != ''}">
+        <div class="layui-card">
+          <div class="layui-card-header">语音描述</div>
+          <div class="layui-card-body">
+            <audio controls style="width:100%;">
+              <source th:src="${task.audioUrl}" type="audio/mpeg">
+              您的浏览器不支持音频播放
+            </audio>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 额外信息部分 -->
+      <div class="task-extra" th:if="${task.extraInfo != null && task.extraInfo != ''}">
+        <div class="layui-card">
+          <div class="layui-card-header">额外信息</div>
+          <div class="layui-card-body" th:text="${task.extraInfo}"></div>
+        </div>
+      </div>
+      
+      <!-- 推荐救援人员报告 -->
+      <div class="recommendation-report" id="recommendationReport">
+        <div class="recommendation-title">智能救援人员推荐报告</div>
+        <div class="report-content" id="reportContent">
+          <!-- 报告内容将通过AJAX加载 -->
+        </div>
+      </div>
+      
+      <!-- 下载按钮 - 初始隐藏 -->
+      <div class="download-buttons" id="downloadButtons">
+        <button class="layui-btn layui-btn-normal btn-download-report" id="downloadTxtReport">
+          <i class="layui-icon layui-icon-download-circle"></i> 下载文本报告
+        </button>
+        <a class="layui-btn layui-btn-normal btn-download-report" id="downloadDocxReport" target="_blank">
+          <i class="layui-icon layui-icon-file"></i> 下载Word报告
+        </a>
+        <button class="layui-btn layui-btn-primary btn-download-report" id="downloadMarkdownReport">下载Markdown报告</button>
+      </div>
+      
+      <!-- 加载中提示 -->
+      <div class="report-loading" id="reportLoading">
+        <i class="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop" style="font-size: 30px;"></i>
+        <p>正在智能匹配救援人员，请稍候...</p>
+      </div>
+      
+      <!-- 操作按钮 -->
+      <div class="task-buttons" th:if="${userType == 'family' || userType == 'admin'}"><button class="layui-btn layui-btn-primary" id="detailPoster">生成本任务寻人海报</button></div>
+      <div class="task-buttons">
+        <!-- 根据用户类型显示不同的返回链接 -->
+        <a th:href="${userType == 'admin' ? '/page/admin.html?v=20260923-features&view=tasks' : (userType == 'rescuer' ? '/task/task-track' : '/task/task-manage')}" class="layui-btn layui-btn-primary">返回列表</a>
+        
+        <!-- 仅家属可以编辑和取消任务 -->
+        <a th:if="${userType == 'family' && (task.status == 'waiting' || task.status == 'rescuing' || task.status == 'confirming')}" th:href="@{'/task/task-edit/' + ${task.id}}" class="layui-btn">编辑任务</a>
+        
+        <a th:href="@{'/task/task-map/' + ${task.id}}" class="layui-btn layui-btn-normal">
+          <i class="layui-icon layui-icon-location"></i> 救援地图 / 热力图
+        </a>
+        <!-- 只有等待救援状态才显示智能推荐按钮，且只有家属可见 -->
+        <button th:if="${(userType == 'family' || userType == 'admin') && (task.status == 'waiting' || task.status == 'rescuing' || task.status == 'confirming')}" class="layui-btn layui-btn-warm" id="recommendRescuers">
+          <i class="layui-icon layui-icon-group"></i> 智能推荐救援人员
+        </button>
+        <button th:if="${userType == 'family' && (task.status == 'waiting' || task.status == 'rescuing' || task.status == 'confirming')}" class="layui-btn layui-btn-danger" id="cancelTask">撤回求助</button>
+        
+        <!-- 只有救援者在救援中状态才显示完成任务按钮 -->
+        <button th:if="${task.status == 'rescuing' && userType == 'rescuer'}" class="layui-btn layui-btn-normal" id="finishTask">
+          <i class="layui-icon layui-icon-ok"></i> 提交行动结果
+        </button>
+        <button th:if="${userType == 'family' && (task.status == 'waiting' || task.status == 'rescuing' || task.status == 'confirming')}" class="layui-btn layui-btn-normal" id="confirmFound">确认已找到</button>
+        <button th:if="${userType == 'family' && task.status == 'confirming'}" class="layui-btn layui-btn-primary" id="continueTask">线索不符，继续寻找</button>
+      </div>
+      <div class="layui-card" th:if="${(userType == 'family' || userType == 'rescuer') && (task.status == 'waiting' || task.status == 'rescuing' || task.status == 'confirming')}">
+        <div class="layui-card-header" th:text="${userType == 'family' ? '申请加急与最新线索' : '现场紧急情况与家属通知'}"></div>
+        <div class="layui-card-body">
+          <form id="taskUrgentForm" class="layui-form"><label for="taskUrgentMessage">说明紧急情况或最新线索</label><textarea id="taskUrgentMessage" required maxlength="2000" class="layui-textarea"></textarea><button type="submit" class="layui-btn layui-btn-warm" th:text="${userType == 'family' ? '申请加急' : '紧急上报'}"></button><p id="taskUrgentResult" role="status"></p></form>
+          <div id="taskUrgentHistory"></div>
+          <form id="taskNotifyForm" class="layui-form" th:if="${userType == 'rescuer'}"><label for="taskNotifyMessage">向本任务绑定家属说明疑似线索</label><textarea id="taskNotifyMessage" required maxlength="2000" class="layui-textarea" placeholder="说明发现地点、时间和需要核实的信息。识别相似度不能直接确认身份。"></textarea><label><input type="checkbox" id="taskNotifyEmail" lay-skin="primary" title="同时尝试发送到任务家属绑定邮箱"></label><button type="submit" class="layui-btn">通知任务家属</button><p id="taskNotifyResult" role="status"></p></form>
+        </div>
+      </div>
+      <div class="layui-card" th:if="${userType == 'family' && (task.status == 'waiting' || task.status == 'rescuing' || task.status == 'confirming')}">
+        <div class="layui-card-header">补充亲属声纹资料</div><div class="layui-card-body"><form id="taskVoiceForm"><label for="taskVoiceFile">亲属本人清晰讲话录音（不超过20MB）</label><input id="taskVoiceFile" type="file" accept="audio/*" required><button type="submit" class="layui-btn">保存到本任务</button><p id="taskVoiceResult" role="status"></p></form></div>
+      </div>
+      <div class="task-buttons" th:if="${(userType == 'rescuer' || userType == 'admin') && (task.status == 'rescuing' || task.status == 'confirming')}">
+        <a th:href="@{/page/face_comparison.html(taskId=${task.id},v='20260923-features')}" class="layui-btn layui-btn-primary">本任务图片比对</a><a th:href="@{/page/face_comparison_video.html(taskId=${task.id},v='20260923-features')}" class="layui-btn layui-btn-primary">本任务视频比对</a><a th:href="@{/page/voiceprint-recognition.html(taskId=${task.id},v='20260923-features')}" class="layui-btn layui-btn-primary">本任务声纹比对</a>
+      </div>
+      
+      <div th:if="${task != null}" th:replace="task/task-chat :: taskChat(${task}, ${userType}, ${session.userId}, ${userName})"></div>
+
+    </div>
+  </div>
+</div>
+
+<script th:src="@{/layuimini/lib/layui-v2.5.5/layui.js}"></script>
+<script th:src="@{/layuimini/lib/jquery-3.4.1/jquery-3.4.1.min.js}"></script>
+<script th:src="@{/js/task-chat.js}"></script>
+<script src="/js/guitu-api.js?v=20260923-features"></script>
+<script src="/js/task-actions.js?v=20260923-features"></script>
+<script src="/js/feature-files.js?v=20260923-features"></script>
+<script src="/js/task-reports.js?v=20261020-contact-private"></script>
+<script th:inline="javascript">
+/*<![CDATA[*/
+layui.use(['layer','form'], function(){
+  var layer = layui.layer;
+  var taskId = [[${task?.id}]];
+  GuituTaskActions.bind(taskId);layui.form.render();
+
+  // 搜救者提交行动结果，由家属核实后确认结束。
+  $('#finishTask').on('click', function(){
+    layer.prompt({title:'说明行动结果或疑似找到的线索',formType:2}, function(message,index){
+      // 发送请求完成任务
+      $.ajax({
+        url: '/task/finish/' + taskId,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({message:message}),
+        beforeSend:function(){$('#finishTask').prop('disabled',true);},
+        complete:function(){$('#finishTask').prop('disabled',false);},
+        success: function(res){
+          if(res.code === 0){
+            layer.msg('行动结果已提交，等待家属核实确认', {icon: 1, time: 1500}, function(){
+              // 跳转回任务列表
+              window.location.href = '/task/task-track';
+            });
+          } else {
+            layer.msg(res.msg || '操作失败', {icon: 2});
+          }
+          layer.close(index);
+        },
+        error: function(){
+          layer.msg('服务器错误，请稍后重试', {icon: 2});
+          layer.close(index);
+        }
+      });
+    });
+  });
+  // 取消任务
+  $('#cancelTask').on('click', function(){
+    layer.confirm('确定要取消该任务吗？', function(index){
+      // 发送请求取消任务
+      $.ajax({
+        url: '/task/cancel/' + taskId,
+        type: 'POST',
+        success: function(res){
+          if(res.code === 0){
+            layer.msg('任务已取消', {icon: 1, time: 1500}, function(){
+              // 跳转回任务列表
+              window.location.href = '/task/task-manage';
+            });
+          } else {
+            layer.msg(res.msg || '操作失败', {icon: 2});
+          }
+          layer.close(index);
+        },
+        error: function(){
+          layer.msg('服务器错误，请稍后重试', {icon: 2});
+          layer.close(index);
+        }
+      });
+    });
+  });
+  
+  GuituTaskReports.bind(taskId);
+
+});
+/*]]>*/
+</script>
+</body>
+</html>

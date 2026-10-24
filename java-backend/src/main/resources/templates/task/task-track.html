@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>我的接单任务</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <link rel="stylesheet" th:href="@{/layuimini/lib/layui-v2.5.5/css/layui.css}">
+  <link rel="stylesheet" th:href="@{/layuimini/css/public.css}">
+  <style>
+    body{background:#f2f2f2;}
+    .layuimini-container{margin:20px auto;background:#fff;border-radius:8px;
+      box-shadow:0 2px 8px rgba(0,0,0,.1);padding:20px;}
+    .task-status-rescuing{color:#1E9FFF;}
+    .task-status-finished{color:#5FB878;}
+    .elder-photo{width:80px;height:80px;object-fit:cover;border-radius:4px;}
+  </style>
+</head>
+<body>
+<div class="layuimini-container">
+  <div class="layuimini-main">
+    <fieldset class="layui-elem-field layui-field-title" align="center">
+      <legend>我接受的任务</legend>
+    </fieldset>
+
+    <table id="myTaskTable" lay-filter="myTaskTable"></table>
+
+    <!-- 操作栏模板 -->
+    <script type="text/html" id="myTaskActions">
+      <a class="layui-btn layui-btn-xs" lay-event="detail">详情</a>
+      <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="map">地图 / 热力图</a>
+      {{# if(d.status === 'rescuing'){ }}
+      <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="finish">提交结果</a>
+      {{# } }}
+    </script>
+
+    <!-- 状态模板 -->
+    <script type="text/html" id="myStatusTpl">
+      {{# if(d.status === 'rescuing'){ }}
+      <span class="task-status-rescuing">救援中</span>
+      {{# } else if(d.status === 'finished'){ }}
+      <span class="task-status-finished">已完成</span>
+      {{# } else if(d.status === 'confirming'){ }}
+      <span>待家属确认</span>
+      {{# } else if(d.status === 'cancelled'){ }}
+      <span>已撤回</span>
+      {{# } else { }}
+      <span>{{ d.status }}</span>
+      {{# } }}
+    </script>
+
+    <!-- 照片模板 -->
+    <script type="text/html" id="myPhotoTpl">
+      <img src="{{ d.photoUrl }}" alt="{{ d.elderName }}" class="elder-photo">
+    </script>
+
+  </div>
+</div>
+
+<script th:src="@{/layuimini/lib/layui-v2.5.5/layui.js}"></script>
+<script th:src="@{/layuimini/lib/jquery-3.4.1/jquery-3.4.1.min.js}"></script>
+<script th:inline="none">
+/*<![CDATA[*/
+
+layui.use(['table','layer','util'], function(){
+  const table = layui.table,
+        layer = layui.layer,
+        util  = layui.util;
+
+  /* ===== 1. 渲染表格 ===== */
+  table.render({
+    elem: '#myTaskTable',
+    url : '/task/my-list-data',
+    page: true,
+    limit: 10,
+    cols: [ [
+      {field:'id', title:'ID', width:80, sort:true, fixed:'left'},
+      {field:'photoUrl', title:'人员照片', width:120, templet:'#myPhotoTpl'},
+      {field:'elderName', title:'人员姓名', width:120},
+      {field:'lostTime', title:'走失时间', width:180, templet:d=> util.toDateString(d.lostTime, "yyyy-MM-dd HH:mm:ss")},
+      {field:'location', title:'走失地点', width:250},
+      {field:'status', title:'状态', width:120, templet:'#myStatusTpl'},
+      {fixed:'right', title:'操作', width:240, align:'center', toolbar:'#myTaskActions'}
+    ] ],
+    done: function(res, curr, count) {
+        // 分页显示修正
+        setTimeout(function(){
+        // 强制把分页底部的“共 xx 条”改成 count
+        var countElems = document.querySelectorAll('.layui-laypage-count');
+        countElems.forEach(function(elem) {
+            elem.textContent = '共 ' + count + ' 条';
+        });
+        }, 100);
+    }
+  });
+
+  /* ===== 2. 监听工具条 ===== */
+  table.on('tool(myTaskTable)', function(obj){
+    const data = obj.data;
+    if(obj.event === 'detail'){
+      window.location.href = '/task/task-detail/' + data.id;
+    } else if(obj.event === 'map'){
+      window.location.href = '/task/task-map/' + data.id;
+    } else if(obj.event === 'finish'){
+      layer.confirm('确认提交任务 '+data.id+' 的行动结果并等待家属核实？', {icon:3,title:'提示'}, function(idx){
+        $.post('/task/finish/'+data.id)
+          .done(res=>{
+            if(res.code===0){
+              layer.msg('已提交，待家属确认',{icon:1});
+              table.reload('myTaskTable');
+            }else{
+              layer.msg(res.msg||'操作失败',{icon:2});
+            }
+          })
+          .fail(()=>layer.msg('服务器错误',{icon:2}));
+        layer.close(idx);
+      });
+    }
+  });
+});
+/*]]>*/
+</script>
+</body>
+</html>

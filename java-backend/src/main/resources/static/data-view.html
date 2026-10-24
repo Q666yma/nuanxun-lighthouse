@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/index.css">
+    <title>暖寻灯塔数据可视化中心</title>
+    <link rel="icon" type="image/png" href="/layuimini/images/nuanxun-logo-20261014.png">
+    <script src="js/jquery-2.2.1.min.js"></script>
+    <script src="js/rem.js"></script>
+    <script src="js/echarts.min.js"></script>
+    <script src="js/guangxi.js"></script>
+    <script src="js/index.js?v=20261019-scope"></script>
+</head>
+<body>
+<div class="t_container">
+    <header class="t_header">
+        <span>暖寻灯塔数据可视化中心</span>
+    </header>
+    <main class="t_main">
+        <div class="t_left_box">
+            <img class="t_l_line" src="img/left_line.png" alt="">
+            <div class="t_mbox t_gbox">
+                <i></i>
+                <span>正在进行的救援</span>
+                <h2 id="rescuing">-1</h2>
+            </div>
+            <div class="t_mbox t_ybox">
+                <i></i>
+                <span>已完成的救援</span>
+                <h2 id="rescued">-1</h2>
+            </div>
+            <img class="t_r_line" src="img/right_line.png" alt="">
+        </div>
+        <div class="t_center_box">
+            <div class="t_top_box">
+                <img class="t_l_line" src="img/left_line.png" alt="">
+                <ul class="t_nav">
+                    <li>
+                        <span>救援队总人数</span>
+                        <h1 id="total_people">-1</h1>
+                        <i></i>
+                    </li>
+                </ul>
+                <img class="t_r_line" src="img/right_line.png" alt="">
+            </div>
+            <div class="t_bottom_box">
+                <img class="t_l_line" src="img/left_line.png" alt="">
+                <div id="chart_3" class="echart" style="width: 100%; height: 3.6rem;"></div>
+                <img class="t_r_line" src="img/right_line.png" alt="">
+            </div>
+        </div>
+        <div class="t_right_box">
+            <img class="t_l_line" src="img/left_line.png" alt="">
+            <h1 class="t_title" >人口走失原因分析</h1>
+            <div id="reason" class="echart" style="top:10%; width: 90%; height: 4.0rem; position: absolute;"></div>
+            <header style="height: 0;" class="t_b_h">
+                <span style="top: 11px; font-size: larger; margin-left: -20px;">救援总次数</span> <!-- 向左移动 -->
+                <img src="img/test.png" alt="">
+                <h3 style="display: inline-block;">
+                    <span id="total_rescue" style="color: #e62626; font-size: larger; margin-left: -80px;">-1</span> <!-- 数字的样式 -->
+                    <span style="color: #ffffff; font-size: larger; vertical-align: baseline;">次</span> <!-- 次的样式 -->
+                </h3>
+            </header>
+            <img class="t_r_line" src="img/right_line.png" alt="">
+        </div>
+        <div class="b_left_box">
+            <img class="t_l_line" src="img/left_line.png" alt="">
+            <div id="chart_2" class="echart" style="width: 100%; height: 3.6rem;"></div>
+            <img class="t_r_line" src="img/right_line.png" alt="">
+        </div>
+        <div class="b_center_box">
+            <img class="t_l_line" src="img/left_line.png" alt="">
+            <div id="oldAnalysis" class="echart" style="width: 100%; height: 3.6rem;"></div>
+            <img class="t_r_line" src="img/right_line.png" alt="">
+        </div>
+        <div class="b_right_box">
+            <img class="t_l_line" src="img/left_line.png" alt="">
+            <h1 class="t_title">实时救援请求</h1>
+            <div class="t_table" style="height: 3.4rem">
+                <div class=""></div>
+                <div class="wrap">
+                    <ul>
+                        <li>
+                            <p>谢雨晴加入了救援队伍</p>
+                        </li>
+                        <li>
+                            <p>陈翠英在无锡市滨湖区海岸城附近走失</p>
+                        </li>
+                        <li>
+                            <p>王建国在无锡市滨湖区星光广场附近走失 </p>
+                        </li>
+                        <li>
+                            <p>谢雨晴在星光广场附近没有发现走失人员</p>
+                        </li>
+                        <li>
+                            <p>谢雨晴在健康街道附近没有发现走失人员</p>
+                        </li>
+                        <li>
+                            <p>谢雨晴在融创茂附近发现疑似走失人员</p>
+                        </li>
+                    </ul>
+                </div>
+
+                <img class="t_r_line" src="img/right_line.png" alt="">
+            </div>
+    </main>
+</div>
+<script>
+    $(function(){
+        // 页面加载后，立刻发 AJAX 请求拿到后端返回的统计数据
+        $.getJSON('/data_view/data_visualizer', function(data){
+            $('#rescuing').text(data.RescuingCount);
+            $('#rescued').text(data.RescuedCount);
+
+            $('#total_people').text(data.TotalPeopleNum);
+
+            $('#total_rescue').text(data.TotalTaskNum);
+        })
+            .fail(function(jqXHR, textStatus, errorThrown){
+                console.error('请求 /data_view/data_visualizer 失败：', textStatus, errorThrown);
+            });
+    });
+</script>
+</body>
+</html>

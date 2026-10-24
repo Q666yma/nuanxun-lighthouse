@@ -1,0 +1,60 @@
+:root{--guitu-ink:#193e45;--guitu-muted:#63787b;--guitu-accent:#177c71;--guitu-line:#dce7e5;--guitu-bg:#f4f7f5}
+.guitu-ux{font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--guitu-ink);line-height:1.65;background:var(--guitu-bg)}
+.guitu-ux *, .guitu-ux *::before,.guitu-ux *::after{box-sizing:border-box}
+.guitu-ux a:focus-visible,.guitu-ux button:focus-visible,.guitu-ux input:focus-visible,.guitu-ux textarea:focus-visible,.guitu-ux select:focus-visible,.guitu-ux summary:focus-visible{outline:3px solid #c68430;outline-offset:3px}
+.guitu-ux .layui-btn{border-radius:8px;font-weight:600;transition:background-color .15s,color .15s}
+.guitu-ux .layui-btn:disabled{cursor:wait;opacity:.65}
+.guitu-ux .layui-btn:not(.layui-btn-primary):not(.layui-btn-danger):not(.layui-btn-warm):not(.layui-btn-disabled){background-color:var(--guitu-accent)}
+.guitu-ux .layui-input,.guitu-ux .layui-textarea,.guitu-ux .layui-select{border-color:var(--guitu-line);border-radius:8px;color:var(--guitu-ink)}
+.guitu-ux .layui-input:focus,.guitu-ux .layui-textarea:focus{border-color:var(--guitu-accent)!important;box-shadow:0 0 0 3px #177c7114}
+.guitu-ux .layui-word-aux{color:#63787b!important}
+.guitu-ux .layui-card{border:1px solid var(--guitu-line);border-radius:12px;overflow:hidden;box-shadow:0 3px 14px #193e4505}
+.guitu-ux .layui-card-header{font-weight:650;color:var(--guitu-ink)}
+.guitu-ux .layui-layer{max-width:calc(100vw - 24px);border-radius:12px;overflow:hidden}
+.guitu-ux .layui-layer-title{background:#f3f7f5;color:var(--guitu-ink)}
+.guitu-ux .layui-layer-btn a{border-radius:6px}
+.guitu-network{position:fixed;top:12px;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100% - 24px);z-index:2147483000;border:1px solid #e0bd79;background:#fff8e9;color:#694710;border-radius:10px;padding:10px 16px;box-shadow:0 4px 20px #193e4515;font-size:14px}
+.guitu-network a{color:inherit;text-decoration:underline;margin-left:10px;white-space:nowrap}
+.guitu-page-home{display:inline-block;margin:12px 20px 0;color:#177c71;font-size:14px}
+.guitu-shell .layui-layout-admin .layui-header{background:#fff!important;border-bottom:1px solid var(--guitu-line);box-shadow:0 2px 12px #193e4505}
+.guitu-shell .layui-layout-admin .layuimini-logo{background:#193e45!important;line-height:60px}
+.guitu-shell .layui-layout-admin .layuimini-logo img{height:32px;width:32px}
+.guitu-shell .layui-layout-admin .layuimini-logo h1{font-size:19px;letter-spacing:1px}
+.guitu-shell .layui-side.layui-bg-black{background:#193e45!important}
+.guitu-shell .layuimini-menu-left .layui-nav .layui-nav-item a{color:#e1efeb;font-size:14px;min-height:44px;height:auto}
+.guitu-shell .layuimini-menu-left .layui-nav .layui-nav-item a:hover{background:#ffffff10!important}
+.guitu-shell .layui-layout-admin .layui-nav-tree .layui-this,.guitu-shell .layui-layout-admin .layui-nav-tree .layui-this>a,.guitu-shell .layui-layout-admin .layui-nav-tree .layui-nav-child dd.layui-this,.guitu-shell .layui-layout-admin .layui-nav-tree .layui-nav-child dd.layui-this a{background:#28746c!important}
+.guitu-shell .layui-header .layui-nav-item>a,.guitu-shell .layuimini-tool i{color:var(--guitu-ink)!important}
+.guitu-shell .layuimini-tool i:hover{background:#eaf2ef!important}
+.guitu-shell .layui-tab-title{background:#fff}
+.guitu-shell .layui-tab-title li{color:var(--guitu-muted)}
+.guitu-shell #loginUserDisplay{max-width:215px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.guitu-shell .layui-nav-child{border-radius:10px;border-color:var(--guitu-line)}
+.guitu-shell .layui-nav-child a{color:var(--guitu-ink)!important}
+.guitu-launch{position:absolute;left:290px;top:0;height:36px;margin:12px 0 12px 10px;border:1px solid var(--guitu-line);border-radius:8px;background:#f4f7f5;color:var(--guitu-muted);padding:0 12px;cursor:pointer;font:inherit;line-height:34px}
+.guitu-shell.layuimini-mini .guitu-launch{left:140px}
+.guitu-launch kbd{font:11px system-ui;border:1px solid #dce7e5;border-radius:4px;padding:1px 4px;margin-left:24px;background:#fff}
+.guitu-search{border:1px solid var(--guitu-line);border-radius:18px;padding:24px;width:min(540px,calc(100vw - 28px));max-height:80vh;color:var(--guitu-ink);box-shadow:0 25px 90px #12383b35;margin:auto}
+.guitu-search::backdrop{background:#12383b65;backdrop-filter:blur(3px)}
+.guitu-search-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.guitu-search h2{font-size:20px;font-weight:650}
+.guitu-search-close{border:0;background:#f0f5f3;border-radius:8px;width:36px;height:36px;cursor:pointer;color:var(--guitu-ink);font-size:22px}
+.guitu-search label{display:block;font-size:13px;color:var(--guitu-muted);margin-bottom:8px}
+.guitu-search input{width:100%;height:46px;padding:0 14px;border:1px solid var(--guitu-line);border-radius:8px;font:inherit;background:#f8faf9}
+.guitu-search ul{list-style:none;margin:12px 0 0;padding:0;max-height:45vh;overflow:auto}
+.guitu-search li a{display:block;padding:11px 12px;border-radius:8px;color:var(--guitu-ink);text-decoration:none;min-height:44px}
+.guitu-search li a:hover{background:#eaf4f0;color:#126459}
+.guitu-search-empty{padding:20px 0;text-align:center;color:var(--guitu-muted)}
+@media(max-width:1024px){.guitu-shell .guitu-launch,.guitu-shell.layuimini-mini .guitu-launch{left:56px}.guitu-shell .layuimini-site-mobile{border-radius:50%;background:#177c71;box-shadow:0 3px 12px #193e4530}}
+@media(max-width:767px){
+ .guitu-ux .layui-input,.guitu-ux .layui-textarea,.guitu-ux select{font-size:16px}
+ .guitu-ux .layui-btn:not(.layui-btn-xs):not(.layui-btn-sm){min-height:44px;height:auto;line-height:24px;padding:10px 16px}
+ .guitu-shell .guitu-launch{width:40px;padding:0;font-size:18px;margin-left:4px}
+ .guitu-launch .guitu-launch-label,.guitu-launch kbd{display:none}
+ .guitu-shell #loginUserDisplay{max-width:160px;font-size:13px;padding:0 18px 0 6px}
+ .guitu-shell .layui-header .layui-layout-right{right:4px}
+ .guitu-shell .guitu-desktop-tool{display:none!important}
+ .guitu-search{padding:18px}
+ .guitu-ux .layui-layer-btn{padding:8px 12px 14px}
+}
+@media(prefers-reduced-motion:reduce){.guitu-ux *,.guitu-ux *::before,.guitu-ux *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}

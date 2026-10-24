@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.maka.mapper.TaskMessageMapper">
+    <resultMap id="TaskMessageResultMap" type="com.maka.pojo.TaskMessage">
+        <id property="id" column="id"/>
+        <result property="taskId" column="task_id"/>
+        <result property="messageData" column="message_data"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <!-- 插入新消息 -->
+    <insert id="insert" parameterType="com.maka.pojo.TaskMessage" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO task_messages (task_id, message_data)
+        VALUES (#{taskId}, #{messageData})
+    </insert>
+    
+    <!-- 获取指定任务的最新消息 -->
+    <select id="selectByTaskId" resultMap="TaskMessageResultMap">
+        SELECT id, task_id, message_data, created_at
+        FROM task_messages
+        WHERE task_id = #{taskId}
+        ORDER BY id DESC
+        LIMIT #{limit}
+    </select>
+    
+    <!-- 获取指定ID之前的消息 -->
+    <select id="selectBeforeId" resultMap="TaskMessageResultMap">
+        SELECT id, task_id, message_data, created_at
+        FROM task_messages
+        WHERE task_id = #{taskId} AND id &lt; #{messageId}
+        ORDER BY id DESC
+        LIMIT #{limit}
+    </select>
+    
+    <!-- 获取指定ID之后的消息 -->
+    <select id="selectAfterId" resultMap="TaskMessageResultMap">
+        SELECT id, task_id, message_data, created_at
+        FROM task_messages
+        WHERE task_id = #{taskId} AND id > #{messageId}
+        ORDER BY id ASC
+        LIMIT #{limit}
+    </select>
+    
+    <!-- 获取任务的最新消息ID -->
+    <select id="selectLatestId" resultType="java.lang.Integer">
+        SELECT MAX(id)
+        FROM task_messages
+        WHERE task_id = #{taskId}
+    </select>
+</mapper>

@@ -1,0 +1,14 @@
+.family-contact-section{margin:22px 0;padding:18px 0 4px;border:1px solid #e6e6e6;}
+.family-contact-section legend{padding:0 10px;font-size:16px;font-weight:bold;}
+.family-contact-section .layui-form-label{width:110px;}
+.family-contact-section .layui-input-block{margin-left:140px;}
+.family-contact-section .contact-readonly{background:#f7f8fa;color:#666;}
+.family-contact-note{margin:0 18px 16px;color:#777;line-height:1.8;font-size:13px;}
+.family-contact-note [data-contact-status]{display:block;}
+.family-contact-card{margin:20px 0;border:1px solid #e6e6e6;border-radius:5px;}
+.family-contact-card .layui-card-body{line-height:1.9;overflow-wrap:anywhere;}
+.family-contact-row{display:flex;flex-wrap:wrap;gap:6px 12px;margin:4px 0;}
+.family-contact-row dt{width:125px;color:#666;}
+.family-contact-row dd{margin:0;}
+.family-contact-card .contact-privacy{margin-top:12px;color:#777;font-size:13px;}
+@media(max-width:768px){.family-contact-section .layui-form-label{width:100%;text-align:left;float:none;padding-left:0;box-sizing:border-box;}.family-contact-section .layui-input-inline{width:100%;margin:0;}.family-contact-section .layui-input-block{margin-left:0;}.family-contact-section .layui-form-item{margin:0 12px 15px;}.family-contact-row dt{width:100%;}}

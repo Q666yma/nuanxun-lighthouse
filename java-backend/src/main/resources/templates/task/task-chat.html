@@ -1,0 +1,59 @@
+<!-- /templates/fragments/chat-fragment.html -->
+<div th:fragment="taskChat(task, userType, userId, userName)">
+  <div class="task-chat" id="taskChat"
+    th:if="${task != null and (task.status == 'rescuing' or task.status == 'confirming' or task.status == 'finished' or task.status == 'cancelled')}"
+    th:data-task-id="${task.id}"
+    th:data-user-id="${userId}"
+    th:data-user-type="${userType}"
+    th:data-user-name="${userName}"
+    th:data-task-status="${task.status}">
+
+    <div class="layui-card">
+      <div class="layui-card-header">
+        <span>救援实时通讯</span>
+        <span class="layui-badge layui-bg-green" style="margin-left: 10px;">实时</span>
+      </div>
+      <div class="layui-card-body">
+        <div class="chat-container">
+          <div class="layui-text" style="text-align: center; color: #999; padding: 20px 0;">
+            <i class="layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop"></i> 加载消息历史...
+          </div>
+        </div>
+        <div th:if="${task.status == 'rescuing' or task.status == 'confirming'}" class="chat-input-area">
+          <div class="layui-form">
+            <div class="chat-toolbar" style="margin-bottom: 10px;">
+              <button type="button" class="layui-btn layui-btn-primary layui-btn-sm upload-image-btn">
+                <i class="layui-icon">&#xe67c;</i> 图片
+              </button>
+              <button type="button" class="layui-btn layui-btn-primary layui-btn-sm upload-audio-btn">
+                <i class="layui-icon">&#xe652;</i> 语音
+              </button>
+              <input type="file" class="hidden-image-input" accept="image/*" style="display: none;">
+              <input type="file" class="hidden-audio-input" accept="audio/*" style="display: none;">
+            </div>
+            <div class="layui-input-block" style="margin-left: 0;">
+              <textarea class="message-input" name="message" placeholder="输入消息..." style="min-height: 80px; resize: none;"></textarea>
+            </div>
+            <div class="media-preview" style="display: none; margin: 10px 0; position: relative;">
+              <img class="preview-image" style="max-width: 100%; max-height: 150px; border-radius: 4px; display: none;">
+              <div class="audio-preview" style="display: none; padding: 10px; background: #f0f0f0; border-radius: 4px;">
+                <i class="layui-icon">&#xe652;</i>
+                <span class="audio-file-name">语音文件</span>
+                <audio class="preview-audio" controls style="vertical-align: middle; margin-left: 10px; max-width: calc(100% - 100px);"></audio>
+              </div>
+              <button type="button" class="layui-btn layui-btn-sm layui-btn-danger clear-media-btn" style="position: absolute; top: 5px; right: 5px;">
+                <i class="layui-icon">&#xe640;</i>
+              </button>
+            </div>
+            <div style="text-align: right; margin-top: 10px;">
+              <button type="button" class="layui-btn send-message-btn">发送</button>
+            </div>
+          </div>
+        </div>
+        <div th:if="${task.status == 'finished' or task.status == 'cancelled'}" class="layui-text" style="text-align: center; color: #999; padding: 10px; background: #f0f0f0; border-radius: 5px;">
+          <i class="layui-icon layui-icon-ok-circle"></i> 该任务已完成，无法继续发送消息
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

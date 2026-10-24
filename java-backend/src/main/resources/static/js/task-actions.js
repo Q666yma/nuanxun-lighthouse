@@ -1,0 +1,17 @@
+(function(window){
+  'use strict';
+  function bind(taskId){
+    if(!taskId)return;
+    var api=GuituApi;
+    function action(id,path,message){var button=document.getElementById(id);if(!button)return;button.addEventListener('click',async function(){if(!confirm(message))return;button.disabled=true;try{await api.request(path+taskId,{method:'POST',body:{message:message}});location.reload();}catch(error){alert(error.message);button.disabled=false;}});}
+    action('confirmFound','/task/confirm-found/','确认已经通过本人或可靠身份信息核实找到亲属，并结束本次求助？');
+    action('continueTask','/task/continue/','确认当前线索不符，继续寻找亲属？');
+    function messageForm(id,inputId,resultId,path){var form=document.getElementById(id);if(!form)return;var requestId=api.id(),lastMessage='';form.addEventListener('submit',async function(event){event.preventDefault();var button=form.querySelector('button[type=submit]'),result=document.getElementById(resultId),message=document.getElementById(inputId).value.trim();if(button.disabled||!message)return;var emailBox=document.getElementById('taskNotifyEmail'),email=path==='/notify-family'&&emailBox&&emailBox.checked;var submission=message+'|'+!!email;if(submission!==lastMessage){requestId=api.id();lastMessage=submission;}button.disabled=true;result.textContent='正在提交…';try{var response=await api.request('/api/tasks/'+taskId+path,{method:'POST',body:{message:message,requestId:requestId,email:!!email}});result.textContent=response.message||(path==='/urgent'?'已提交，等待处理；尚不代表已安排搜救。':'已创建任务家属的站内通知，可在消息中心查看。');if(path==='/notify-family'&&email){var rows=Array.isArray(response.data)?response.data:[];var states=rows.map(function(r){return r.emailStatus;});result.textContent+=' 邮件结果：'+(states.indexOf('sent')>=0?'邮件服务已接受，不代表家属已读。':states.indexOf('failed')>=0?'发送失败，站内通知仍可查看。':'未确认投递状态，请到消息记录查看。');}loadUrgent();}catch(error){result.textContent=error.message;}finally{button.disabled=false;}});}
+    messageForm('taskUrgentForm','taskUrgentMessage','taskUrgentResult','/urgent');
+    messageForm('taskNotifyForm','taskNotifyMessage','taskNotifyResult','/notify-family');
+    async function loadUrgent(){var holder=document.getElementById('taskUrgentHistory');if(!holder)return;try{var response=await api.request('/api/tasks/'+taskId+'/urgent');holder.replaceChildren();(response.data||[]).forEach(function(record){var item=document.createElement('p');item.textContent=(({submitted:'已提交',pending:'已提交',processing:'处理中',resolved:'已处理'})[record.status]||record.status)+' · '+record.message+(record.reply?' · 处理回复：'+record.reply:'');holder.append(item);});}catch(error){holder.textContent='处理记录暂时无法加载：'+error.message;}}
+    var voice=document.getElementById('taskVoiceForm');if(voice)voice.addEventListener('submit',async function(event){event.preventDefault();var file=document.getElementById('taskVoiceFile').files[0],button=voice.querySelector('button'),result=document.getElementById('taskVoiceResult');if(!file||button.disabled)return;if(file.size>20*1024*1024){result.textContent='音频不得超过20MB';return;}var data=new FormData();data.append('taskId',taskId);data.append('audioFile',file);button.disabled=true;result.textContent='正在登记本任务声纹资料…';try{var response=await api.request('/createFeature',{method:'POST',body:data,timeout:120000});result.textContent=response.message||'声纹资料已保存到本任务';}catch(error){result.textContent=error.message;}finally{button.disabled=false;}});
+    loadUrgent();
+  }
+  window.GuituTaskActions={bind:bind};
+})(window);

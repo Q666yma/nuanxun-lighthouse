@@ -1,0 +1,91 @@
+file:
+  upload-dir: ${UPLOAD_DIR:./runtime/uploads}
+  access-prefix: /uploads/
+  report-dir: ${REPORT_DIR:./runtime/reports}
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    check-template-location: true
+    cache: true
+    suffix: .html
+    encoding: UTF-8
+    mode: HTML
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      static-locations: classpath:/static/
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_JDBC_URL:jdbc:mysql://127.0.0.1:3306/web?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
+    password: ${DB_PASSWORD}
+    username: ${DB_USER:nuanxun}
+    hikari:
+      maximum-pool-size: 4
+      max-lifetime: 240000
+      idle-timeout: 60000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+      minimum-idle: 1
+  redis:
+    database: 0
+    host: 127.0.0.1
+    password: ''
+    port: 6379
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: ${SPRING_MAIL_USERNAME:}
+    password: ${SPRING_MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            enable: true
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 100MB
+xfyun:
+  requestUrl: ${XFYUN_URL:https://api.xf-yun.com/v1/private/s1aa729d0}
+  appId: ${XFYUN_APP_ID:}
+  apiKey: ${XFYUN_API_KEY:}
+  apiSecret: ${XFYUN_API_SECRET:}
+mybatis:
+  type-handlers-package: com.maka.typehandler
+  mapper-locations: classpath*:mapper/*Mapper.xml
+  type-aliases-package: com.maka.pojo
+  configuration:
+    map-underscore-to-camel-case: true
+logging:
+  level:
+    root: INFO
+    com.maka.mapper: WARN
+    org.mybatis: WARN
+server:
+  port: 8080
+  address: 127.0.0.1
+  forward-headers-strategy: framework
+  tomcat:
+    threads:
+      max: 20
+      min-spare: 2
+    max-connections: 100
+amap.key: ${AMAP_KEY:}
+flask:
+  public-base-url: ${FLASK_PUBLIC_BASE_URL:}
+  api:
+    url: http://127.0.0.1:5000/api/extract_tags
+  recommendation:
+    url: http://127.0.0.1:5000/api/recommend-rescuers
+  summary:
+    url: http://127.0.0.1:5000/api/generate-summary
+ai:
+  poster:
+    url: http://127.0.0.1:5000/api/generate-html-poster
+  heatmap:
+    url: http://127.0.0.1:5000/api/mapheat

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>心理关怀 GPT</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+body{font-family:system-ui,Arial;background:#f4f6f8;margin:0}
+#chat{width:90%;max-width:820px;margin:40px auto;background:#fff;
+      border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.08);padding:24px}
+h2{text-align:center;margin-top:0}
+#messages{max-height:60vh;overflow-y:auto;padding-right:4px}
+.message{margin:12px 0;display:flex}
+.message.user{justify-content:flex-end}
+.bubble{max-width:70%;padding:10px 14px;border-radius:18px;line-height:1.55}
+.user .bubble{background:#0b65ff;color:#fff;border-bottom-right-radius:2px}
+.bot  .bubble{background:#e6e8eb;color:#000;border-bottom-left-radius:2px}
+#inputBar{display:flex;margin-top:18px}
+#textInput{flex:1;height:60px;resize:none;padding:12px;border:1px solid #ccc;
+           border-radius:8px;font-size:15px}
+#sendBtn{width:100px;margin-left:10px;border:none;border-radius:8px;
+         background:#28a745;color:#fff;font-size:15px;cursor:pointer}
+#sendBtn:disabled{background:#aaa;cursor:not-allowed}
+</style>
+</head>
+<body>
+<div id="chat">
+  <h2>心理关怀&nbsp;GPT</h2>
+  <button id="newConversation" type="button">开始新的对话</button><p id="chatStatus" role="status">当前对话仅用于本人心理关怀，可随时开始新的对话。</p>
+  <div id="messages" aria-live="polite"></div>
+
+  <div id="inputBar">
+    <textarea id="textInput" placeholder="有什么想和我聊聊的吗？"></textarea>
+    <button id="sendBtn">发送</button>
+  </div>
+</div>
+
+<script>
+const API = "/api/psych-care/chat";
+let sessionId = crypto.randomUUID();
+
+const $msg = document.getElementById("messages");
+const $input = document.getElementById("textInput");
+const $btn = document.getElementById("sendBtn");
+document.getElementById('newConversation').onclick=function(){if($btn.disabled)return;if($msg.children.length&&!confirm('开始新对话会清除本页显示的内容，确认继续？'))return;sessionId=crypto.randomUUID();$msg.replaceChildren();$input.value='';};
+
+function addMsg(text, role){
+  const wrap = document.createElement("div");
+  wrap.className = "message " + role;
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.textContent = text;
+  wrap.appendChild(bubble);
+  $msg.appendChild(wrap);
+  $msg.scrollTop = $msg.scrollHeight;
+}
+
+async function send(){
+  if($btn.disabled) return;
+  const text = $input.value.trim();
+  if(!text) return;
+  addMsg(text, "user");
+  $input.value="";
+  $btn.disabled=true;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 90000);
+  try{
+    const res = await fetch(API,{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({ session_id:sessionId, message:text }),
+      signal:controller.signal
+    });
+    const data = await res.json().catch(() => ({}));
+    if(!res.ok || data.error || !data.reply) throw new Error(data.message || data.error || '心理关怀服务暂时不可用，请稍后重试');
+    addMsg(data.reply, "bot");
+  }catch(e){
+    addMsg(e.name === 'AbortError' ? '响应超时，请稍后重试。' : e.message || '网络连接失败，请稍后重试。', "bot");
+    if(!$input.value) $input.value=text;
+  }finally{
+    clearTimeout(timeout);
+    $btn.disabled=false;
+  }
+}
+$btn.onclick = send;
+$input.onkeydown = e => { if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send(); } };
+</script>
+</body>
+</html>

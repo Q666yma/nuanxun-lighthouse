@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../layuimini/lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../layuimini/css/public.css" media="all">
+	<style>
+		/* 修改按钮背景颜色 */
+		#sub {
+			background-color: #1c528a !important;
+		}
+		.view-progress-btn {
+			background-color: #1c528a;
+			color: white; /* 按钮文字颜色 */
+		}
+
+		/* 悬停时按钮颜色变化 */
+		.view-progress-btn:hover {
+			background-color: #0069d9; /* 悬停时的颜色 */
+		}
+	</style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+		<!-- 在表格示例界面中包括级别、姓名、年龄、地区、联系人手机号、审核状态 暂不需考虑是否要更改评级标准 -->
+        <fieldset class="layui-elem-field layui-field-title" align="center" style="margin-top: 20px;">
+            <legend>救援申请表单</legend>
+        </fieldset>
+
+        <form class="layui-form" action="">
+\
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">姓名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="username" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+			<div class="layui-form-item">
+			    <label class="layui-form-label">性别</label>
+			    <div class="layui-input-block">
+			        <input type="radio" name="sex" value="男" title="男" checked="">
+			        <input type="radio" name="sex" value="女" title="女">
+			    </div>
+			</div>
+
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">走失时间</label>
+					<div class="layui-input-block">
+			        <input type="text" name="date" id="date1" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+			     <div class="layui-inline">
+			         <label class="layui-form-label">联系方式</label>
+			         <div class="layui-input-inline">
+			             <input type="tel" name="phone" lay-verify="required|phone" autocomplete="off" class="layui-input">
+			         </div>
+				 </div>
+			</div>
+
+
+			<div class="layui-form">
+				<div class="layui-form-item" id="area-picker">
+					<div class="layui-form-label">选择地区</div>
+					<div class="layui-input-inline" style="width: 200px;">
+						<select name="province" class="province-selector" data-value="广东省" lay-filter="province-1">
+							<option value="">请选择省</option>
+						</select>
+					</div>
+					<div class="layui-input-inline" style="width: 200px;">
+						<select name="city" class="city-selector" data-value="深圳市" lay-filter="city-1">
+							<option value="">请选择市</option>
+						</select>
+					</div>
+					<div class="layui-input-inline" style="width: 200px;">
+						<select name="county" class="county-selector" data-value="龙岗区" lay-filter="county-1">
+							<option value="">请选择区</option>
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">走失地点</label>
+				<div class="layui-input-inline">
+					<input type="text" name="username" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+
+
+			<div class="layui-upload">
+				<button type="button" class="layui-btn view-progress-btn" id="test1">上传图片</button>
+				<div class="layui-upload-list">
+					<img class="layui-upload-img" id="demo1">
+					<p id="demoText"></p>
+				</div>
+			</div>
+
+			<!--			<div class="layui-form-item">-->
+<!--			    <label class="layui-form-label">审核状态</label>-->
+<!--			    <div class="layui-input-block">-->
+<!--			        <input type="radio" name="check" value="待审核" title="待审核">-->
+<!--			        <input type="radio" name="check" value="审核中" title="审核中">-->
+<!--					<input type="radio" name="check" value="审核通过" title="审核通过">-->
+<!--			    </div>-->
+<!--			</div>-->
+			<div class="layui-form-item">
+			    <div class="layui-input-block" style="text-align: center;">
+			        <button id="sub" class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+			        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+			    </div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="../layuimini/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="../layuimini/lib/jquery-3.4.1/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="../assets/data.js"></script>
+<script>
+
+</script>
+<script type="text/javascript" src="../assets/province.js"></script>
+ <script type="text/javascript">
+        var defaults = {
+            s1: 'provid',
+            s2: 'cityid',
+            s3: 'areaid',
+            v1: null,
+            v2: null,
+            v3: null
+        };
+    </script>
+
+<script>
+	//配置插件目录
+	layui.config({
+		base: '../mods/'
+		, version: '1.0'
+	});
+	//一般直接写在一个js文件中
+	layui.use(['layer', 'form', 'layarea'], function () {
+		var layer = layui.layer
+				, form = layui.form
+				, layarea = layui.layarea;
+
+		layarea.render({
+			elem: '#area-picker',
+			change: function (res) {
+				//选择结果
+				console.log(res);
+			}
+		});
+	});
+    layui.use(['form', 'layedit', 'laydate'], function () {
+        var form = layui.form
+            , layer = layui.layer
+            , layedit = layui.layedit
+            , laydate = layui.laydate;
+
+        //日期
+        laydate.render({
+            elem: '#date'
+        });
+        laydate.render({
+            elem: '#date1'
+        });
+
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+
+
+
+        //监听提交
+        form.on('submit(demo1)', function (data) {
+			layer.alert('提交成功');
+			return false;
+
+        });
+
+    });
+	layui.use('upload', function() {
+		var $ = layui.jquery
+				, upload = layui.upload;
+
+		//普通图片上传
+		var uploadInst = upload.render({
+			elem: '#test1'
+			, url: 'https://httpbin.org/post' //改成您自己的上传接口
+			, before: function (obj) {
+				//预读本地文件示例，不支持ie8
+				obj.preview(function (index, file, result) {
+					$('#demo1').attr('src', result); //图片链接（base64）
+				});
+			}
+			, done: function (res) {
+				//如果上传失败
+				if (res.code > 0) {
+					return layer.msg('上传失败');
+				}
+				//上传成功
+			}
+			, error: function () {
+				//演示失败状态，并实现重传
+				var demoText = $('#demoText');
+				demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+				demoText.find('.demo-reload').on('click', function () {
+					uploadInst.upload();
+				});
+			}
+		});
+	});
+
+	// $('#sub').on('click', function() {
+	//
+	// });
+</script>
+
+</body>
+</html>

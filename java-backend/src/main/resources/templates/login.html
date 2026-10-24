@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>暖寻灯塔后台管理-登陆</title>
+    <link rel="icon" type="image/png" href="/layuimini/images/nuanxun-logo-20261014.png">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="/layuimini/lib/layui-v2.5.5/css/layui.css" media="all">
+    <style>
+        /* ————— 布局与视觉，保持不变 ————— */
+        .main-body{top:50%;left:50%;position:absolute;-webkit-transform:translate(-50%,-50%);-moz-transform:translate(-50%,-50%);-ms-transform:translate(-50%,-50%);-o-transform:translate(-50%,-50%);transform:translate(-50%,-50%);overflow:hidden;}
+        .login-main .login-bottom .center .item input{display:inline-block;width:227px;height:22px;padding:0;position:absolute;border:0;outline:0;font-size:14px;letter-spacing:0;}
+        .login-main .login-bottom .center .item .icon-1{background:url(/layuimini/images/icon-login.png) no-repeat 1px 0;}
+        .login-main .login-bottom .center .item .icon-2{background:url(/layuimini/images/icon-login.png) no-repeat -54px 0;}
+        .login-main .login-bottom .center .item .icon-3{background:url(/layuimini/images/icon-login.png) no-repeat -106px 0;}
+        .login-main .login-bottom .center .item .icon-4{background:url(/layuimini/images/icon-login.png) no-repeat 0 -43px;position:absolute;right:-10px;cursor:pointer;}
+        .login-main .login-bottom .center .item .icon-5{background:url(/layuimini/images/icon-login.png) no-repeat -55px -43px;}
+        .login-main .login-bottom .center .item .icon-6{background:url(/layuimini/images/icon-login.png) no-repeat 0 -93px;position:absolute;right:-10px;margin-top:8px;cursor:pointer;}      /* 显示密码图标 */
+        .login-main .login-bottom .tip .icon-nocheck{display:inline-block;width:10px;height:10px;border-radius:2px;border:solid 1px #607d89;position:relative;top:2px;margin:1px 8px 1px 1px;cursor:pointer;}
+        .login-main .login-bottom .tip .icon-check{margin:0 7px 0 0;width:14px;height:14px;border:none;background:url(/layuimini/images/icon-login.png) no-repeat -111px -48px;}
+        .login-main .login-bottom .center .item .icon{display:inline-block;width:33px;height:22px;}
+        .login-main .login-bottom .center .item{width:288px;height:35px;border-bottom:1px solid #dae1e6;margin-bottom:35px;}
+        .login-main{width:428px;position:relative;float:left;}
+        .login-main .login-top{height:117px;background-color:#174c63;border-radius:12px 12px 0 0;font-family:SourceHanSansCN-Regular;font-size:30px;font-weight:400;font-stretch:normal;letter-spacing:0;color:#fff;line-height:117px;text-align:center;overflow:hidden;-webkit-transform:rotate(0);-moz-transform:rotate(0);-ms-transform:rotate(0);-o-transform:rotate(0);transform:rotate(0);}
+        .login-main .login-top .bg1{display:inline-block;width:74px;height:74px;background:#fff;opacity:.1;border-radius:0 74px 0 0;position:absolute;left:0;top:43px;}
+        .login-main .login-top .bg2{display:inline-block;width:94px;height:94px;background:#fff;opacity:.1;border-radius:50%;position:absolute;right:-16px;top:-16px;}
+        .login-main .login-bottom{width:428px;background:#fff;border-radius:0 0 12px 12px;padding-bottom:53px;}
+        .login-main .login-bottom .center{width:288px;margin:0 auto;padding-top:40px;padding-bottom:15px;position:relative;}
+        .login-main .login-bottom .tip{clear:both;height:16px;line-height:16px;width:288px;margin:0 auto;}
+        body{height:100%;width:100%;padding-bottom:41.8%;overflow:hidden;background-position:50%;background-repeat:no-repeat;background-size:cover;background-color:rgba(0,0,0,0.7);}
+        #background-video{position:fixed;right:0;bottom:0;min-width:100%;min-height:100%;z-index:-1;object-fit:cover;}
+        input::-webkit-input-placeholder{color:#a6aebf;}
+        input::-moz-placeholder{color:#a6aebf;}
+        input:-moz-placeholder{color:#a6aebf;}
+        input:-ms-input-placeholder{color:#a6aebf;}
+        input:-webkit-autofill{-webkit-box-shadow:0 0 0 1000px white inset !important;}
+        html{height:100%;}
+        .login-main .login-bottom .tip .login-tip{font-family:MicrosoftYaHei;font-size:12px;font-weight:400;font-stretch:normal;letter-spacing:0;color:#607783;cursor:pointer;}
+        .login-main .login-bottom .tip .forget-password{font-stretch:normal;letter-spacing:0;color:#246078;text-decoration:none;position:absolute;right:62px;}
+        .login-main .login-bottom .login-btn{width:288px;height:40px;background-color:#174c63;border-radius:16px;margin:24px auto 0;text-align:center;line-height:40px;color:#fff;font-size:14px;letter-spacing:0;cursor:pointer;border:none;}
+        .login-main .login-bottom .center .item .validateImg{position:absolute;right:1px;cursor:pointer;height:36px;border:1px solid #e6e6e6;}
+        .footer{left:0;bottom:0;color:#fff;width:100%;position:absolute;text-align:center;line-height:30px;padding-bottom:10px;text-shadow:#000 0.1em 0.1em 0.1em;font-size:14px;}
+        .padding-5{padding:5px !important;}
+        .footer a,.footer span{color:#fff;}
+        @media screen and (max-width:428px){
+            .login-main{width:360px !important;}
+            .login-main .login-top{width:360px !important;}
+            .login-main .login-bottom{width:360px !important;}
+        }
+        #canvas{float:right;display:inline-block;cursor:pointer;}
+        body{box-sizing:border-box;min-height:100vh;padding:24px 16px;overflow:auto;display:flex;align-items:center;justify-content:center;}
+        .main-body{position:relative;top:auto;left:auto;transform:none;-webkit-transform:none;max-width:100%;}
+        .login-main,.login-main .login-top,.login-main .login-bottom{width:min(428px,calc(100vw - 32px)) !important;}
+        .login-main .login-top{font-size:clamp(20px,6vw,30px);}
+        /* Lighthouse palette: subdued sea blue with a warm focus accent. */
+        .login-main .login-top .bg1,.login-main .login-top .bg2{background:#f2b35d;opacity:.08;}
+        .login-main .login-bottom .login-btn:hover{background-color:#123d50;}
+        .login-main .login-bottom .login-btn:active{background-color:#0e3242;}
+        .login-main .login-bottom a:hover{color:#174c63;}
+        .login-main .login-bottom .center .item:focus-within{border-bottom-color:#246078;}
+        .login-main .login-bottom .login-btn:focus-visible,.login-main .login-bottom a:focus-visible{outline:2px solid #ad6b20;outline-offset:3px;}
+    </style>
+</head>
+
+<body>
+<video autoplay muted loop id="background-video">
+    <source src="/img/9OLD.mp4" type="video/mp4">
+</video>
+
+<div class="main-body">
+    <div class="login-main">
+        <div class="login-top">
+            <img src="/layuimini/images/nuanxun-logo-20261014.png" alt="暖寻灯塔 Logo" style="width:44px;height:44px;object-fit:contain;vertical-align:middle;margin-right:10px;border-radius:6px;background:#fff"><span>暖寻灯塔-后台登录</span>
+            <span class="bg1"></span><span class="bg2"></span>
+        </div>
+
+        <form class="layui-form login-bottom">
+            <div class="center">
+                <div class="item">
+                    <span class="icon icon-2"></span>
+                    <input type="text" name="username" lay-verify="required" placeholder="请输入登录账号" maxlength="24"/>
+                </div>
+
+                <div class="item">
+                    <span class="icon icon-3"></span>
+                    <input type="password" name="password" lay-verify="required" placeholder="请输入密码" maxlength="72" autocomplete="current-password">
+                    <span class="bind-password icon icon-4"></span>
+                </div>
+
+                <div class="item" style="width:150px;">
+                    <input type="text" name="captcha" id="captcha" placeholder="请输入验证码" autocomplete="off" maxlength="4" value="">
+                    <canvas id="canvas" width="120" height="43" class="validateImg"></canvas>
+                </div>
+            </div>
+
+            <div class="tip">
+                <span class="icon-nocheck"></span><span class="login-tip">保持登录</span>
+                <a href="javascript:;" id="forgotPassword" class="forget-password">忘记密码？</a>
+            </div>
+
+            <div class="layui-form-item" style="text-align:center;width:100%;height:100%;margin:0;">
+                <button class="login-btn" lay-submit lay-filter="login">立即登录</button>
+            </div>
+
+            <div class="tip" style="text-align:center;margin-top:15px;">
+                <span>还没有账号？</span><a href="/register.html" class="forget-password">立即注册</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/layuimini/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script>
+layui.use(['form','jquery','layer'],function(){
+    var $    = layui.jquery,
+        form = layui.form,
+        layer= layui.layer;
+    $('#forgotPassword').on('click',function(){
+        layer.alert('请联系系统管理员重置密码；演示账号可在交付的账号文件中查看。', {title:'找回密码',icon:0});
+    });
+
+    /* ---------- 图形验证码 ---------- */
+    var show_num = [];
+    draw(show_num);
+    $('#canvas').on('click',function(){ draw(show_num); });
+
+    function draw(arr){
+        var canvas_width  = $('#canvas').width(),
+            canvas_height = $('#canvas').height(),
+            canvas  = document.getElementById('canvas'),
+            context = canvas.getContext('2d');
+
+        canvas.width  = canvas_width;
+        canvas.height = canvas_height;
+
+        var aCode = "A,B,C,E,F,G,H,J,K,L,M,N,P,Q,R,S,T,W,X,Y,Z,1,2,3,4,5,6,7,8,9,0".split(",");
+
+        for(var i=0;i<=3;i++){
+            var txt = aCode[Math.floor(Math.random()*aCode.length)];
+            arr[i]  = txt.toLowerCase();
+            var deg = Math.random()*30*Math.PI/180,
+                x   = 10 + i*20,
+                y   = 20 + Math.random()*8;
+            context.font      = "bold 23px 微软雅黑";
+            context.translate(x,y); context.rotate(deg);
+            context.fillStyle = randomColor(); context.fillText(txt,0,0);
+            context.rotate(-deg); context.translate(-x,-y);
+        }
+        for(var i=0;i<=5;i++){
+            context.strokeStyle = randomColor();
+            context.beginPath();
+            context.moveTo(Math.random()*canvas_width,Math.random()*canvas_height);
+            context.lineTo(Math.random()*canvas_width,Math.random()*canvas_height);
+            context.stroke();
+        }
+        for(var i=0;i<=30;i++){
+            context.strokeStyle = randomColor();
+            context.beginPath();
+            var x = Math.random()*canvas_width, y = Math.random()*canvas_height;
+            context.moveTo(x,y); context.lineTo(x+1,y+1); context.stroke();
+        }
+    }
+    function randomColor(){
+        return "rgb("+[0,0,0].map(function(){return ~~(Math.random()*256)}).join(",")+")";
+    }
+
+    /* ---------- 密码显/隐  ★ 修改 ---------- */
+    $('.bind-password').on('click',function(){
+        var $eye = $(this), $pwd = $eye.siblings('input[name="password"]');
+        if($pwd.attr('type')==='password'){
+            $pwd.attr('type','text');
+            $eye.removeClass('icon-4').addClass('icon-6');
+        }else{
+            $pwd.attr('type','password');
+            $eye.removeClass('icon-6').addClass('icon-4');
+        }
+    });
+
+    /* ---------- 记住我切换  ★ 修改 ---------- */
+    function toggleRemember(){
+        var $box = $('.icon-nocheck, .icon-check').first();
+        $box.hasClass('icon-nocheck')
+            ? $box.removeClass('icon-nocheck').addClass('icon-check')
+            : $box.removeClass('icon-check').addClass('icon-nocheck');
+    }
+    $('.icon-nocheck,.icon-check,.login-tip').on('click',toggleRemember);
+
+    /* ---------- 提交 ---------- */
+    form.on('submit(login)',function(obj){
+        if ($('.login-btn').prop('disabled')) return false;
+        var data = obj.field;
+
+        if(!data.username){ layer.msg('用户名不能为空'); return false; }
+        if(!data.password){ layer.msg('密码不能为空');   return false; }
+        if(!data.captcha){ layer.msg('验证码不能为空');   return false; }
+
+        if(data.captcha.toLowerCase()!==show_num.join("")){
+            layer.msg('验证码错误'); draw(show_num); return false;
+        }
+
+        var remember = $('.icon-check').length>0;     // ★ 修改：真正读取勾选状态
+
+        $.ajax({
+            url:'/api/users/login',
+            type:'POST',
+            contentType:'application/json',
+            data:JSON.stringify({username:data.username,password:data.password,remember:remember}),
+            beforeSend:function(){ $('.login-btn').prop('disabled',true).text('登录中…'); },
+            success:function(res){
+                if(res.success){
+                    localStorage.setItem('loginUser',data.username);
+                    localStorage.setItem('userType',res.userType);
+                    location.href='/index.html';
+                }else{
+                    layer.msg(res.message||'登录失败'); draw(show_num);
+                }
+            },
+            error:function(xhr){ layer.msg(xhr.responseJSON && xhr.responseJSON.message || '登录失败，请稍后重试'); draw(show_num); },
+            complete:function(){ $('.login-btn').prop('disabled',false).text('立即登录'); }
+        });
+
+        return false;   // 阻止表单默认提交
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,525 @@
+html,body{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+.wrap {
+    height: 2.54rem;
+    overflow: hidden;
+}
+
+.wrap li {
+    line-height: .42rem;
+    height: .42rem;
+    font-size: .18rem;
+    text-indent: .24rem;
+    margin-bottom: .1rem;
+}
+
+.wrap li p {
+    border: 1px solid rgba(25, 186, 139, .17);
+    color: rgba(255, 255, 255, .6);
+    text-align: left;
+}
+
+html{
+    font-size: 100px;
+}
+ul,h1,h2,h3,h4,h5,h6,p{
+    list-style: 0;
+    padding: 0;
+    margin: 0;
+}
+a{
+    text-decoration: none;
+}
+
+/*正文*/
+.t_container{
+    width: 100%;
+    height: available;
+    min-width: 1360px;
+    background: #142537;
+    background-size: 100% 100%;
+    position: relative;
+    min-height: 756px;
+}
+.t_header{
+    width: 100%;
+    height: 80px;
+    background: url('../img/linx.png') no-repeat;
+    background-size: 100% 100%;
+    position: relative;
+}
+.t_header span{
+    color: #fff;
+    font-size: 0.36rem;
+    position: absolute;
+    top: 50%;
+    margin-top: -0.24rem;
+    left: 9%;
+}
+.t_main{
+    width: 98%;
+    height: 100%;
+    margin: 0 auto;
+    margin-top: 0.2rem;
+    margin-bottom: 0;
+}
+.t_left_box{
+    position: relative;
+    width: 3.36rem;
+    height: 4.6rem;
+    display: inline-block;
+    text-align: center;
+}
+.t_l_line{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.t_r_line{
+    position: absolute;
+    bottom: 0;
+    right: -0.1rem;
+}
+.t_center_box{
+    width: 6.82rem;
+    display: inline-block;
+    min-width: 490px;
+}
+.t_top_box{
+    width: 100%;
+    height: 1.13rem;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 0.2rem;
+}
+.t_bottom_box {
+    width: 100%;
+    height: 4.7rem; /* 4.3rem = 3.17 + 1.13 */
+    overflow: hidden;
+    position: relative;
+}
+.t_right_box{
+    display: inline-block;
+    width: 7.8rem;
+    height: 4.6rem;
+    position: relative;
+    min-width: 560px;
+}
+.b_left_box{
+    display: inline-block;
+    width: 80%;
+    height: available;
+    position: relative;
+    min-width: 425px;
+}
+.b_center_box{
+    display: inline-block;
+    width: 6rem;
+    height: 3.6rem;
+    position: relative;
+    min-width: 432px;
+}
+.b_right_box{
+    display: inline-block;
+    width: 6rem;
+    height: 3.6rem;
+    position: relative;
+    min-width: 432px;
+}
+.t_mbox{
+    width: 3rem;
+    height: 1.28rem;
+    position: relative;
+    margin: 0 auto;
+    margin-top: 0.2rem;
+}
+.t_rbox{
+    background: #44aff0;
+}
+.t_gbox{
+    background: #4777f5;
+}
+.t_ybox{
+    background: #0089ff;
+}
+.t_mbox i{
+    display: inline-block;
+    width: 0.46rem;
+    height: 0.48rem;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 20%;
+    margin: auto;
+}
+.t_mbox h2{
+    font-size: 0.28rem;
+    color: #fff;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+.t_mbox span{
+    font-size: 0.2rem;
+    color: #fff;
+    position: absolute;
+    top: 24%;
+    left: 48%;
+}
+.t_rbox i{
+    background: url(../img/people.png) no-repeat;
+    background-size: 100% 100%;
+}
+.t_gbox i{
+    background: url(../img/processing.png) no-repeat;
+    background-size: 100% 100%;
+}
+.t_ybox i{
+    background: url(../img/finish.png) no-repeat;
+    background-size: 100% 100%;
+}
+.t_nav{
+    width: 100%;
+    height: 100%;
+}
+.t_nav li{
+    display: inline-block;
+    width: 30%;
+    height: 100%;
+    text-align: center;
+    position: relative;
+}
+.t_nav li span{
+    font-size: 0.16rem;
+    color: #1AA1FD;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: auto;
+    top: 25%;
+}
+.t_nav li h1{
+    font-size: 0.30rem;
+    color: #fff;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: auto;
+    top: 50%;
+}
+.t_nav li i{
+    width: 1px;
+    height: 100%;
+    position: absolute;
+    right: -0.2rem;
+    background: url('../img/sper.png') no-repeat;
+    background-size: 100% 100%;
+}
+.t_table{
+    font-size: 0.16rem;
+    color: #fff;
+    width: 94%;
+    margin: 0 auto;
+    border-spacing: 0;
+    text-align: center;
+    box-sizing: border-box;
+    margin-top: 12%;
+}
+.t_table tr{
+    margin: 0;
+    padding: 0;
+    height: 0.42rem;
+}
+.t_table thead tr{
+    background: #053A98;
+}
+.t_table tbody tr td:first-child{
+    border-left: 1px solid #053A98;
+}
+.t_table td{
+    border-bottom: 1px solid #053A98;
+    border-right: 1px solid #053A98;
+}
+.t_title{
+    position: absolute;
+    font-size: 0.18rem;
+    color: #fff;
+    left: 5%;
+    top: 10%;
+}
+.t_b_h,t_b_m{
+    position: absolute;
+    font-size: 0.16rem;
+    left: 54%;
+    width: 50%;
+    height: 4.6rem;
+}
+.t_b_h span{
+    position: absolute;
+    color: #fff;
+    top: 10%;
+}
+.t_b_h img{
+    position: absolute;
+    width: 0.53rem;
+    height: 0.53rem;
+    top: 6%;
+    left: 24%
+}
+.t_b_h h3{
+    font-size: 0.36rem;
+    color: #d9523f;
+    position: absolute;
+    left: 55%;
+    top: 8%;
+    width: 1rem;
+}
+.t_b_h h3 span{
+    font-size: 0.2rem;
+    position: absolute;
+    left: 50%;
+    top: 28%;
+    color: #0072FF;
+}
+.t_b_m img{
+    position: absolute;
+    left: 52%;
+    top: 22%;
+    border-top: 1px dotted #F0FF00;
+    padding: 0 0.18rem;
+    padding-top: 20px;
+    width: 3.19rem;
+    height: 1.67rem;
+}
+.t_b_box,.t_b_box1,.t_b_box2,.t_b_box3{
+    width: 1.3rem;
+    height: 0.56rem;
+    border: 1px dotted #F0FF00;
+    border-radius: 5px;
+    position: absolute;
+}
+.t_b_box{
+    top: 68%;
+    left: 56%;
+}
+.t_b_box span,.t_b_box1 span,.t_b_box2 span,.t_b_box3 span{
+    font-size: 0.14rem;
+    color: #fff;
+    position: absolute;
+    left: 10%;
+}
+.t_b_box i,.t_b_box1 i,.t_b_box2 i,.t_b_box3 i{
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 50%;
+    left: 15%
+}
+.t_b_box i{
+    background: url('../img/t.png') no-repeat;
+    background-size: 100% 100%;
+}
+.t_b_box1 i{
+    background: url('../img/s.png') no-repeat;
+    background-size: 100% 100%;
+}
+.t_b_box2 i{
+    background: url('../img/j.png') no-repeat;
+    background-size: 100% 100%;
+}
+.t_b_box3 i{
+    background: url('../img/g.png') no-repeat;
+    background-size: 100% 100%;
+}
+.t_b_box h2,.t_b_box1 h2,.t_b_box2 h2,.t_b_box3 h2{
+    font-size: 0.18rem;
+    color: #fff;
+    position: absolute;
+    top: 30%;
+    left: 40%;
+}
+.t_b_box1{
+    top: 68%;
+    left: 78%;
+}
+.t_b_box2{
+    top: 84%;
+    left: 56%;
+}
+.t_b_box3{
+    top: 84%;
+    left: 78%;
+}
+
+@media only screen and (max-width: 768px) {
+
+    /* 1. 父容器整体：去掉最小宽度限制，改为自适应 */
+    .t_container {
+        min-width: 0;            /* 取消桌面端的 min-width:1360px */
+        padding: 0.2rem 0;       /* 适当加内边距，让内容不要贴边 */
+        width: 120%;
+    }
+
+    /* 2. 主体内容区：让左右三块垂直排列 */
+    .t_main {
+        display: flex;
+        flex-direction: column;  /* 垂直堆叠 */
+        align-items: center;     /* 水平居中 */
+        margin-top: 0.2rem;      /* 保持与原来 margin 顶部间距相近 */
+    }
+
+    /* 3. 顶部三列：统一改为块级，宽度 90%，居中 */
+    .t_left_box,
+    .t_center_box,
+    .t_right_box {
+        display: block;          /* 从 inline-block 改为 block */
+        width: 90%;              /* 占可视区宽度的大致 90% */
+        max-width: none;         /* 取消原来 min-width: 固定px 影响 */
+        height: auto;            /* 高度自适应内容 */
+        margin: 0.1rem auto;     /* 上下留空隙，居中 */
+        text-align: center;      /* 保持居中，若不需要可删 */
+    }
+    /* 如果图片分割线（.t_l_line / .t_r_line）位置需要微调，可在此处再调整它们的宽高或 display */
+
+    /* 4. 底部左侧（.b_left_box）也做同样处理 */
+    .b_left_box {
+        display: block;
+        width: 90%;
+        max-width: none;
+        height: auto;
+        margin: 0.1rem auto;
+        text-align: center;
+    }
+
+    /* 如果你后续有 .b_center_box/.b_right_box 需要显示，可按需同样覆盖 */
+    .b_center_box,
+    .b_right_box {
+        display: block;
+        width: 90%;
+        max-width: none;
+        height: auto;
+        margin: 0.1rem auto;
+        text-align: center;
+    }
+
+    /* 5. 顶部标题字体和导航文字大小适当缩小 */
+    .t_header {
+        height: 3rem; /* 3rem = 30px * 0.1 转换，按 rem.js 的适配逻辑微调 */
+    }
+    .t_header span {
+        font-size: 0.28rem; /* 原来 0.36rem，移动端可以稍微小一点 */
+        left: 5%;           /* 距离左侧缩窄，让文字不要太靠边 */
+    }
+
+    /* 6. 如果存在 .t_nav（导航）组件，需要单独垂直排列 */
+    .t_nav {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .t_nav li {
+        display: block;
+        width: 100%;
+        height: auto;
+        padding: 0.1rem 0;
+        border-bottom: 1px solid rgba(25,186,139,0.3); /* 可选：让各项之间有分割线 */
+    }
+    .t_nav li span {
+        font-size: 0.14rem; /* 原 0.16rem */
+        top: 30%;
+    }
+    .t_nav li h1 {
+        font-size: 0.24rem; /* 原 0.30rem */
+        top: 55%;
+    }
+    .t_nav li i {
+        display: none; /* 小屏隐藏竖线分隔符 */
+    }
+
+    /* 7. 数据表格（.t_table）宽度自适应 → 100% */
+    .t_table {
+        width: 100%;
+        font-size: 0.14rem; /* 原 0.16rem */
+        margin-top: 8%;
+    }
+    .t_table tr {
+        height: auto;      /* 自动行高 */
+    }
+    .t_table td,
+    .t_table th {
+        padding: 0.05rem 0; /* 适当增加单元格内边距 */
+    }
+
+    /* 8. 各小组件（.t_mbox、.t_b_box 等）改为相对自适应宽高 */
+    .t_mbox {
+        width: 80%;
+        height: auto;
+        margin-top: 0.1rem;
+    }
+    .t_mbox i {
+        width: 0.4rem;
+        height: 0.4rem;
+        left: 15%;
+    }
+    .t_mbox h2 {
+        font-size: 0.24rem;
+        left: 50%;
+    }
+    .t_mbox span {
+        font-size: 0.18rem;
+        left: 48%;
+    }
+
+    /* 对底部四个小按钮 (.t_b_box 系列) 进行堆叠或自适应 */
+    .t_b_box,
+    .t_b_box1,
+    .t_b_box2,
+    .t_b_box3 {
+        width: 40%;              /* 原来 1.3rem，可换成相对宽度 */
+        height: auto;
+        border: 1px dotted #F0FF00;
+        border-radius: 5px;
+        position: relative;      /* 保留定位，但内部元素要相对定位 */
+        margin: 0.2rem auto 0;   /* 顶部留空 */
+        padding: 0.1rem 0;       /* 内边距让文字不贴边 */
+    }
+    .t_b_box span,
+    .t_b_box1 span,
+    .t_b_box2 span,
+    .t_b_box3 span {
+        font-size: 0.14rem;      /* 保持与原来一致或稍微调整 */
+        left: 10%;
+        top: 30%;
+    }
+    .t_b_box i,
+    .t_b_box1 i,
+    .t_b_box2 i,
+    .t_b_box3 i {
+        width: 20px;
+        height: 20px;
+        top: 50%;
+        left: 10%;
+    }
+    .t_b_box h2,
+    .t_b_box1 h2,
+    .t_b_box2 h2,
+    .t_b_box3 h2 {
+        font-size: 0.16rem;      /* 原 0.18rem */
+        top: 40%;
+        left: 40%;
+    }
+
+    /* 9. 其他绝对定位元素根据需要取消或改为相对布局 */
+    /* 举例：.t_title 元素在小屏幕下位置可能会遮挡，建议隐藏或重新放置 */
+    .t_title {
+        display: none; /* 如果不需要，可隐藏，否则可改为相对定位 */
+    }
+
+    /* 10. 适配 rem.js 计算后的 HTML 字体基准
+       若使用 rem.js 做自适应，需要在 JS 中根据屏幕宽度重新设置 root font-size，
+       这里假设 rem.js 已自动处理，无需额外改动 */
+}

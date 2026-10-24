@@ -1,0 +1,85 @@
+/* 外层卡片容器 */
+.rescue-stats-card {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: rgba(0, 0, 0, 0);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+/* 卡片标题栏 */
+.stats-card-header {
+    background-color: #1e9fff;
+    padding: 10px 14px;
+}
+
+.stats-card-header h3 {
+    margin: 0;
+    font-size: 20px; /* 缩小标题字体 */
+    color: #ffffff;
+    font-weight: 500;
+}
+
+/* 卡片主体 */
+.stats-card-body {
+    padding: 12px; /* 适当减少内边距 */
+}
+
+/* 四个统计项的网格布局 */
+.stats-grid {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    gap: 12px; /* 缩小间距 */
+}
+
+/* 每个统计项 */
+.stat-item {
+    flex: 1 1 calc(25% - 12px);
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 6px;
+    padding: 10px; /* 减少内边距 */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 40px; /* 限制最小高度，避免内容挤出 */
+    box-sizing: border-box;
+    overflow: hidden; /* 防止内容溢出 */
+}
+
+/* 统计项标签 */
+.stat-label {
+    font-size: 14px; /* 缩小标签字体 */
+    color: #ffffff;
+    margin-bottom: 6px; /* 缩小间距 */
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/* 统计项数值 */
+.stat-value h2 {
+    margin: 0;
+    font-size: 14px; /* 缩小数值字体 */
+    color: #ffffff;
+    line-height: 1.2;
+    word-break: break-word; /* 长数字自动换行 */
+    max-height: 2.4rem; /* 限制高度 */
+    overflow: hidden;
+}
+
+/* 针对小屏设备的响应式调整 */
+@media (max-width: 768px) {
+    .stat-item {
+        flex: 1 1 calc(50% - 12px);
+    }
+}
+
+/* 针对更小屏幕的调整 */
+@media (max-width: 480px) {
+    .stat-item {
+        flex: 1 1 100%;
+    }
+}

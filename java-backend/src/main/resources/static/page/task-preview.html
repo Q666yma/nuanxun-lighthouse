@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>任务预览</title>
+  <link rel="stylesheet" href="/layuimini/lib/layui-v2.5.5/css/layui.css" media="all">
+  <style>
+    body {
+      background-color: #f2f2f2;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .card {
+      background: linear-gradient(135deg, #80d0c7, #d6d6d6);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      max-width: 600px;
+      width: 100%;
+      transition: transform 0.2s; /* 添加动画效果 */
+    }
+
+    .card:hover {
+      transform: scale(1.02); /* 悬停效果 */
+    }
+
+    .card h2 {
+      text-align: center;
+      color: #333;
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+
+    .card-content {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: rgba(255, 255, 255, 0.8); /* 半透明白色背景 */
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-content p {
+      line-height: 1.6;
+      color: #555;
+      margin: 8px 0; /* 添加段落间距 */
+    }
+
+    .card-footer {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .layui-btn {
+      width: 100%;
+      font-size: 16px;
+      padding: 10px 0;
+      margin-top: 10px; /* 为返回按钮添加间距 */
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>任务预览</h2>
+  <div class="card-content">
+    <p id="rescuerGreeting">xxx，你好！</p>
+    <p>目前有人员走失，请尽力搜寻。如有线索请立刻上传，走失人员信息如下：</p>
+    <p><strong>走失人员姓名：</strong><span id="missingName">未提供</span></p>
+    <p><strong>走失时间：</strong><span id="missingTime">未提供</span></p>
+    <p><strong>走失地点：</strong><span id="missingLocation">未提供</span></p>
+    <p><strong>具体地址：</strong><span id="missingAddress">未提供</span></p>
+    <p><strong>联系人手机号：</strong><span id="contactNumber">未提供</span></p>
+    <p><strong>紧急等级：</strong><span id="emergencyLevel">未提供</span></p>
+  </div>
+  <div class="card-footer">
+    <button class="layui-btn layui-btn-normal" onclick="publishTask()">确认并发布任务</button>
+    <button class="layui-btn layui-btn-primary" onclick="goBack()">返回修改</button> <!-- 添加返回修改按钮 -->
+  </div>
+</div>
+
+<!-- 引入 layui.js -->
+<script src="/layuimini/lib/layui-v2.5.5/layui.js"></script>
+<script>
+  // 获取 URL 中的查询参数
+  const urlParams = new URLSearchParams(window.location.search);
+  const rescuerName = urlParams.get('rescuerName'); // 救援队员的名字
+  const missingName = urlParams.get('lost_person_name'); // 走失人员姓名
+  const missingTime = urlParams.get('lost_time'); // 走失时间
+  const missingLocation = urlParams.get('lost_location'); // 走失地点
+  const missingAddress = urlParams.get('specific_address'); // 具体地址
+  const contactNumber = urlParams.get('contact_phone'); // 联系人手机号
+  const emergencyLevel = urlParams.get('emergency_level'); // 紧急等级
+
+  // 显示救援队员名字
+  document.getElementById('rescuerGreeting').innerText = `${rescuerName || '亲爱的救援队员'}，你好！`;
+
+  // 显示走失人员信息
+  document.getElementById('missingName').innerText = missingName || '未提供';
+  document.getElementById('missingTime').innerText = missingTime || '未提供';
+  document.getElementById('missingLocation').innerText = missingLocation || '未提供';
+  document.getElementById('missingAddress').innerText = missingAddress || '未提供';
+  document.getElementById('contactNumber').innerText = contactNumber || '未提供';
+  document.getElementById('emergencyLevel').innerText = emergencyLevel || '未提供';
+
+  // 发布任务函数
+  function publishTask() {
+    alert("已将任务发布给救援队员！");
+  }
+
+  // 返回修改函数
+  function goBack() {
+    window.location.href = 'task-publish.html'; // 跳转至任务发布页面
+  }
+</script>
+
+</body>
+</html>

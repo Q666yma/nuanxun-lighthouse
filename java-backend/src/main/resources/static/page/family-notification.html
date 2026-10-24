@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script>
+(function(){document.documentElement.style.visibility='hidden';fetch('/api/users/me',{credentials:'same-origin',cache:'no-store'}).then(function(response){if(!response.ok)throw new Error();return response.json();}).then(function(user){var taskId=new URLSearchParams(location.search).get('taskId');location.replace(taskId&&/^\d+$/.test(taskId)?'/task/task-detail/'+taskId:user.userType==='admin'?'/page/admin.html?v=20260923-features&view=notifications':user.userType==='family'?'/task/task-manage':'/task/task-track');}).catch(function(){location.replace('/login');});})();
+</script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>通知家属页面</title>
+
+<link rel="stylesheet" href="/layuimini/lib/layui-v2.5.5/css/layui.css" />
+
+
+<style>
+/* ========= 桌面端：恢复原来效果 ========= */
+:root{
+  --primary:#007bff;
+  --bg-grad:linear-gradient(120deg,#f0f4f8,#e2e2e2);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:var(--bg-grad);
+  font-family:"Microsoft YaHei",sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  padding:20px;
+}
+
+/* 原始容器、卡片样式 -------------------------------- */
+.container{
+  display:flex;
+  flex-direction:column;
+  width:90%;
+  max-width:1600px;
+  gap:20px;
+}
+.card-container{
+  display:flex;
+  justify-content:space-between;
+  gap:40px;
+}
+.form-container,
+.preview-container{
+  background:#fff;
+  padding:50px;                 /* 恢复原 50px */
+  border-radius:12px;
+  box-shadow:0 8px 30px rgba(0,0,0,.2);
+  flex:1;
+  min-width:450px;              /* 恢复原宽度 */
+  transition:box-shadow .3s,transform .3s;
+}
+.form-container:hover,
+.preview-container:hover{
+  transform:translateY(-10px);
+  box-shadow:0 8px 30px rgba(0,0,0,.25);
+}
+.layui-form-label{
+  width:180px;                  /* 恢复桌面标签宽度 */
+  font-size:18px;
+}
+.layui-input{font-size:16px;border-radius:10px;}
+.layui-btn{
+  background:var(--primary);
+  color:#fff;
+  border-radius:8px;
+  padding:20px 40px;
+  font-size:22px;
+  width:100%;
+  margin-top:30px;
+  animation:pulse 1.6s infinite;
+  display:flex;justify-content:center;align-items:center;
+}
+.preview-content{
+  border:1px solid #ddd;
+  border-radius:8px;
+  padding:40px;
+  background:#f8f9fa;
+  margin-top:30px;
+  white-space:pre-wrap;
+  font-size:15px;
+  line-height:1.8;
+}
+.preview-header{
+  font-weight:700;
+  font-size:26px;
+  color:#0056b3;
+  margin-bottom:15px;
+  border-bottom:2px solid #0056b3;
+  padding-bottom:10px;
+}
+
+/* -------- 按钮脉冲动画 -------- */
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.03);}}
+
+/* ========= 手机端专属：保持现在良好效果 ========= */
+@media (max-width:768px){
+  body{align-items:flex-start;height:auto;padding:24px 8px;}
+  .card-container{flex-direction:column;gap:30px;}
+  .form-container,
+  .preview-container{
+    min-width:0;
+    padding:28px 24px;       /* 手机更紧凑 */
+  }
+  .layui-form-label{
+    width:100%;
+    text-align:left;
+    font-size:16px;
+  }
+  .layui-input-block{margin-left:0!important;}
+  .layui-btn{padding:16px 32px;font-size:20px;margin-top:10px;}
+  .preview-header{font-size:22px;}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card-container">
+    <!-- ===== 表单 ===== -->
+    <div class="form-container layui-form">
+      <div class="layui-form-item">
+        <label class="layui-form-label"><i class="layui-icon layui-icon-user"></i> 走失人员姓名</label>
+        <div class="layui-input-block">
+          <input id="elderlyName" name="elderlyName" placeholder="请输入走失人员姓名"
+                 class="layui-input" autocomplete="off" required />
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label"><i class="layui-icon layui-icon-location"></i> 最新线索地址</label>
+        <div class="layui-input-block">
+          <input id="location" name="location" placeholder="请输入最新线索地址"
+                 class="layui-input" autocomplete="off" required />
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label"><i class="layui-icon layui-icon-chart-screen"></i> 相似度</label>
+        <div class="layui-input-block">
+          <input id="confirmationLevel" name="confirmationLevel" placeholder="请输入相似度"
+                 class="layui-input" autocomplete="off" required />
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label"><i class="layui-icon layui-icon-email"></i> 家属邮箱</label>
+        <div class="layui-input-block">
+          <input id="familyPhone" name="familyPhone" placeholder="请输入家属邮箱"
+                 class="layui-input" autocomplete="off" required />
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label"><i class="layui-icon layui-icon-cellphone-fine"></i> 我们的联系方式</label>
+        <div class="layui-input-block">
+          <input id="contactNumber" name="contactNumber" placeholder="请输入我们的联系方式"
+                 class="layui-input" autocomplete="off" required />
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 预览 ===== -->
+    <div class="preview-container">
+      <div class="preview-content" id="notificationPreview">
+        <div class="preview-header">通知内容</div>
+        <div class="preview-body">请填写左侧信息以查看预览。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 提交按钮 -->
+  <button class="layui-btn" id="submitBtn">立即通知</button>
+</div>
+
+<!-- ========= 脚本 ========= -->
+<script src="/layuimini/lib/layui-v2.5.5/layui.js"></script>
+
+<script>
+layui.use(['form','layer'],function(){
+  var $=layui.jquery;
+  const form=layui.form,layer=layui.layer;
+
+  /* DOM */
+  const $id=id=>document.getElementById(id);
+  const elderlyName=$id('elderlyName'),
+        familyPhone=$id('familyPhone'),
+        contactNumber=$id('contactNumber'),
+        location=$id('location'),
+        confirmationLevel=$id('confirmationLevel'),
+        preview=$id('notificationPreview');
+
+  /* 预览更新 */
+  function render(){
+    const name = elderlyName.value||'走失人员';
+    const loc  = location.value||'未知地点';
+    const level= parseFloat(confirmationLevel.value)||0;
+    const tel  = contactNumber.value||'联系电话';
+
+    let message='信息不足，无法确认身份';
+    if(level>=90) message='与您提供的信息高度一致，我们认为这就是您要找的走失人员';
+    else if(level>=60) message='与您提供的信息较为相符，需要进一步核实身份';
+
+    preview.innerHTML=`
+      <div class="preview-header">通知内容</div>
+      <div class="preview-body">
+        您好！<br>
+        我们在 ${loc} 附近发现了一位疑似 ${name} 的走失人员，<br>
+        ${message}。<br>
+        请尽快与我们联系，联系邮箱：${tel}。谢谢！<br>
+      </div>`;
+  }
+  ['input','change'].forEach(evt=>{
+    [elderlyName,familyPhone,contactNumber,location,confirmationLevel]
+      .forEach(el=>el.addEventListener(evt,render));
+  });
+
+  /* 提交 */
+  /* 提交 */
+  /* 提交 */
+
+  document.getElementById('submitBtn').addEventListener('click',function(){
+
+    const level=parseFloat(confirmationLevel.value)||0;
+
+    let levelMsg='信息不足，无法确认身份。';
+
+    if(level>90)      levelMsg='与您提供的信息高度一致，我们认为这就是您要找的走失人员。';
+
+    else if(level>=60)levelMsg='与您提供的信息较为相符，需要进一步核实身份。';
+
+    const data={
+
+      email:familyPhone.value,
+
+      location:location.value,
+
+      elderlyName:elderlyName.value,
+
+      confirmationLevel:levelMsg,
+
+      contactNumber:contactNumber.value
+
+    };
+
+    layui.jquery.ajax({
+
+      url:'/api/sms/send',
+
+      type:'POST',
+
+      contentType:'application/json',
+
+      data:JSON.stringify(data),
+
+      success:function(){ layer.msg('通知邮件已发送'); },
+
+      error:function(){ layer.msg('邮件发送失败，请重试'); }
+
+    });
+
+  });
+
+});
+
+</script>
+</body>
+</html>

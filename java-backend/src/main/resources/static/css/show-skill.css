@@ -1,0 +1,197 @@
+.skill-chart-container {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.skill-chart-container .chart-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    position: relative;
+}
+
+.skill-chart-container .chart-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+}
+
+.skill-chart-container .chart-box {
+    width: 100%;
+    height: 320px;
+    position: relative;
+}
+
+.skill-chart-container .chart-info {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 5px;
+    color: #c6d5e5;
+}
+
+.skill-chart-container .chart-info .skill-chart-note {
+    margin: 4px 8px 0;
+    color: #b6c8da;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Logo容器 - 基础样式 */
+.skill-chart-container .center-logo-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;  /* 这里控制外圈容器大小 */
+    height: 100px; /* 这里控制外圈容器大小 */
+    z-index: 10;
+    border-radius: 50%;
+    background-color: #fff;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* 返回状态的高亮效果 */
+.skill-chart-container .center-logo-container.back-mode {
+    box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.3), 0 0 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.skill-chart-container .center-logo-container.back-mode:hover {
+    box-shadow: 0 0 0 5px rgba(24, 144, 255, 0.5), 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Logo图片本身 */
+.skill-chart-container .center-logo {
+    max-width: 80px;  /* 这里控制Logo图片大小 */
+    max-height: 80px; /* 这里控制Logo图片大小 */
+    object-fit: contain;
+    border-radius: 0;
+    transition: all 0.3s ease;
+}
+
+/* 返回模式下的Logo微小缩放效果 */
+.skill-chart-container .center-logo-container.back-mode .center-logo {
+    transform: scale(0.95);
+}
+
+.skill-chart-container .center-logo-container.back-mode:hover .center-logo {
+    transform: scale(1);
+}
+
+@media (max-width: 576px) {
+    .skill-chart-container .chart-box {
+        height: 280px;
+    }
+    
+    .skill-chart-container .center-logo-container {
+        width: 80px;  /* 小屏幕上的容器大小 */
+        height: 80px; /* 小屏幕上的容器大小 */
+    }
+    
+    .skill-chart-container .center-logo {
+        max-width: 65px;  /* 小屏幕上的Logo大小 */
+        max-height: 65px; /* 小屏幕上的Logo大小 */
+    }
+}
+/* 适配静态页面布局的样式 */
+.skill-chart-integrated {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    padding: 0.1rem;
+}
+
+.skill-chart-integrated .skill-chart-container {
+    margin-bottom: 0;
+    height: 100%;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.skill-chart-integrated .chart-header {
+    padding: 0.05rem 0;
+    background: transparent;
+}
+
+.skill-chart-integrated .skill-chart-title {
+    color: #fff;
+    font-size: 0.18rem;
+    text-align: center;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.skill-chart-integrated .skill-chart-box {
+    height: 2.8rem; /* 适应静态页面的高度 */
+}
+
+.skill-chart-integrated .center-logo-container {
+    width: 0.6rem;
+    height: 0.6rem;
+}
+
+.skill-chart-integrated .center-logo {
+    max-width: 0.5rem;
+    max-height: 0.5rem;
+}
+
+.skill-chart-integrated .chart-info {
+    color: #c6d5e5;
+    font-size: 0.14rem;
+    margin-top: 0.05rem;
+}
+
+.skill-chart-integrated .chart-info .layui-badge {
+    background-color: rgba(24, 144, 255, 0.8);
+    padding: 0.02rem 0.06rem;
+    font-size: 0.12rem;
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+    .skill-chart-integrated .skill-chart-box {
+        height: 2.2rem;
+    }
+    
+    .skill-chart-integrated .center-logo-container {
+        width: 0.4rem;
+        height: 0.4rem;
+    }
+    
+    .skill-chart-integrated .center-logo {
+        max-width: 0.35rem;
+        max-height: 0.35rem;
+    }
+    
+    .skill-chart-integrated .skill-chart-title {
+        font-size: 0.16rem;
+    }
+    
+    .skill-chart-integrated .chart-info {
+        font-size: 0.12rem;
+    }
+}
+
+/* 针对图例的额外样式优化 */
+.skill-chart-integrated .skill-chart-box {
+    position: relative;
+}
+
+/* 确保图例文字在深色背景下清晰可见 */
+.skill-chart-integrated .skill-chart-box::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 35%;
+    height: 30%;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    z-index: 1;
+}

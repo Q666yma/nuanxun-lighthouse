@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>人脸视频比对</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <style>
+    :root{
+      --primary:#007bff;
+      --bg-grad:linear-gradient(135deg,#e0f7fa,#80deea);
+    }
+    /* 全局基础样式 --------------------------------------------------- */
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{
+      font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+      background:var(--bg-grad);
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;               /* 允许页面滚动 */
+      min-height:100vh;
+      padding:24px 8px;
+    }
+
+    /* 外层容器 ------------------------------------------------------- */
+    .container{
+      display:flex;
+      gap:30px;
+      width:90%;
+      max-width:1400px;
+      background:#fff;
+      padding:40px;
+      border-radius:20px;
+      box-shadow:0 4px 12px rgba(0,0,0,.2);
+      animation:fadeIn .9s ease;
+      transition:transform .3s ease;
+    }
+    .container:hover{transform:scale(1.02);}
+
+    /* 主卡片 & 侧卡片 ------------------------------------------------- */
+    .main-card,.side-card{
+      background:#fff;
+      border-radius:20px;
+      padding:40px;
+      box-shadow:0 4px 12px rgba(0,0,0,.12);
+      transition:transform .3s ease,box-shadow .3s ease;
+    }
+    .main-card:hover,.side-card:hover{
+      transform:translateY(-6px);
+      box-shadow:0 8px 18px rgba(0,0,0,.18);
+    }
+    .main-card{flex:2;}
+    .side-card{flex:1;}
+
+    /* 文字样式 ------------------------------------------------------- */
+    h1{
+      font-size:clamp(24px,2.4vw,32px);
+      color:var(--primary);
+      margin-bottom:20px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .instructions{
+      font-size:clamp(14px,1.4vw,18px);
+      color:#555;
+      margin-bottom:20px;
+    }
+    label{
+      display:block;
+      font-size:clamp(14px,1.4vw,18px);
+      margin-bottom:10px;
+      color:#333;
+    }
+
+    /* 输入 ----------------------------------------------------------- */
+    .input-container{position:relative;margin-bottom:30px;}
+    .input-icon{position:relative;width:100%;}
+    .input-icon .icon{
+      position:absolute;left:12px;top:50%;
+      transform:translateY(-50%);
+      font-size:18px;color:var(--primary);
+    }
+    .input-icon input{
+      width:100%;
+      padding:12px 16px 12px 46px;
+      font-size:16px;
+      border:2px solid var(--primary);
+      border-radius:10px;
+      outline:none;
+    }
+
+    /* 预览区 --------------------------------------------------------- */
+    #preview-container{
+      margin-top:40px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:20px;
+    }
+    .preview-box{
+      flex:1 1 240px;
+      text-align:center;
+    }
+    .preview-box img{
+      max-width:100%;
+      max-height:350px;
+      border-radius:10px;
+      border:2px solid var(--primary);
+    }
+
+    /* 按钮 ----------------------------------------------------------- */
+    button{
+      background:var(--primary);
+      color:#fff;
+      padding:16px 32px;
+      font-size:18px;
+      border:none;
+      border-radius:10px;
+      cursor:pointer;
+      width:100%;
+      margin-top:30px;
+      transition:background .3s,box-shadow .3s;
+    }
+    button:hover{background:#0056b3;box-shadow:0 4px 12px rgba(0,0,0,.18);}
+
+    /* 结果文本 ------------------------------------------------------- */
+    #result,#result_temp{
+      font-size:16px;
+      color:#333;
+      margin-top:20px;
+      text-align:center;
+    }
+
+    /* 侧栏 ----------------------------------------------------------- */
+    .side-card h2{font-size:20px;margin-bottom:16px;color:var(--primary);}
+    .side-card ul{list-style:none;padding:0;margin:0 0 20px;}
+    .side-card li,.side-card p{font-size:14px;color:#555;margin-bottom:8px;}
+
+    /* 动画 ----------------------------------------------------------- */
+    @keyframes fadeIn{from{opacity:.0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+    /* ------------------ 移动端适配点 ------------------------------- */
+    @media (max-width:768px){
+      .container{
+        flex-direction:column;          /* 上下堆叠 */
+        padding:24px 20px;
+      }
+      .main-card,.side-card{padding:28px;}
+      .side-card{order:2;}              /* 帮助信息置后，如需置前把 2 改 -1 */
+      h1{font-size:24px;justify-content:center;text-align:center;}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- 主功能区 ----------------------------------------------------- -->
+    <div class="main-card">
+      <h1>人脸视频比对
+        <img src="../img/face.gif" alt="GIF" style="width:64px;height:64px;">
+      </h1>
+      <p class="instructions">请上传清晰的视频，并选择本人参与的任务进行比对。</p>
+
+      <form id="uploadForm" enctype="multipart/form-data">
+        <div class="input-container">
+          <label for="recognitionTask">本人参与的任务</label>
+          <select id="recognitionTask" name="taskId" required disabled style="width:100%;padding:12px;border:2px solid var(--primary);border-radius:10px;"><option value="">正在加载任务…</option></select>
+          <p id="taskScopeStatus" role="status"></p>
+        </div>
+
+        <div class="input-container">
+          <label for="videoFile">上传视频</label>
+          <div class="input-icon">
+            <input type="file" id="videoFile" name="file" accept="video/*" required />
+            <span class="icon"><i class="fas fa-camera"></i></span>
+          </div>
+        </div>
+
+        <!-- 预览区 -->
+        <div id="preview-container">
+          <div class="preview-box">
+            <label>上传的视频帧</label>
+            <img id="preview-left" style="display:none;" />
+          </div>
+          <div class="preview-box">
+            <label>当前任务的资料图片</label>
+            <img id="preview-right" style="display:none;" />
+          </div>
+        </div>
+
+        <button type="submit">立即比对</button>
+      </form>
+
+      <p id="result"></p>
+      <p id="result_temp"></p>
+    </div>
+
+    <!-- 侧边栏 ------------------------------------------------------- -->
+    <div class="side-card">
+      <h2>本次比对记录</h2>
+      <ul id="comparisonHistory"><li class="empty-history">暂无比对记录</li></ul>
+
+      <h2>帮助信息</h2>
+      <p>系统在视频全长范围内均匀抽取最多 6 个画面，提供可能匹配结果，仍需人工核实身份。</p>
+      <p>请确保上传的视频分辨率较高，且人脸尽量正面无遮挡。</p>
+      <p>每个抽样画面最多检测 10 张脸，先检查遮挡、光照和完整度，再选择模糊度最低的合格人脸，只与当前任务资料比对。不会逐帧检查所有人脸。</p>
+      <p>视频不得超过 30 MB，建议使用 MP4 格式。若没有合格人脸，请截取正面清晰片段或改用照片比对。</p>
+    </div>
+  </div>
+
+  <!-- 原有脚本 ------------------------------------------------------- -->
+  <script src="/layuimini/lib/jquery-3.4.1/jquery-3.4.1.min.js"></script>
+  <script src="/js/guitu-api.js?v=20260923-features"></script>
+  <script src="/js/task-selector.js?v=20260923-features"></script>
+  <script>
+    const taskSelect=document.getElementById('recognitionTask');
+    GuituTaskSelector.load(taskSelect,document.getElementById('taskScopeStatus'));
+    $('#uploadForm').submit(function(event){
+      event.preventDefault();
+      const button = $('#uploadForm button[type="submit"]');
+      if (button.prop('disabled')) return;
+      let taskId;try{taskId=GuituTaskSelector.requireTask(taskSelect);}catch(error){$('#result').text(error.message);return;}
+      const formData = new FormData();formData.append('taskId',taskId);
+      const videoFile = $('#videoFile')[0].files[0];
+      if (!videoFile) { $('#result').text('请先选择视频'); return; }
+      if (videoFile.size > 30 * 1024 * 1024) { $('#result').text('请选择不超过 30 MB 的视频'); return; }
+      formData.append('videoFile', videoFile);taskSelect.disabled=true;
+      button.prop('disabled', true).text('正在比对…');
+      $('#result').text('正在抽样视频、检查人脸质量并比对，请稍候…');
+      $('#result_temp').text(''); $('#preview-left, #preview-right').hide();
+
+      $.ajax({
+        url:'/face/compareVideo',
+        type:'POST',
+        data:formData,
+        processData:false,
+        contentType:false,
+        success: raw=>{
+          let res;
+          try { res = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch(error) { $('#result').text('搜索响应异常，请重试'); return; }
+          $('#comparisonHistory .empty-history').remove();
+          $('<li>').text(res.lostPerson && res.lostPerson !== '无' ? res.lostPerson + ' · 相似度 ' + res.similarity + '%（待人工确认）' : res.message || '未找到匹配人员').prependTo('#comparisonHistory');
+          $('#comparisonHistory li').slice(5).remove();
+          const analysis = res.videoAnalysis;
+          let sampling = '';
+          if (analysis && Array.isArray(analysis.sampledSeconds)) {
+            const times = analysis.sampledSeconds.filter(Number.isFinite);
+            sampling = '已检测 ' + analysis.qualityCheckedSamples + ' 个抽样画面';
+            if (times.length) sampling += '，时间范围 ' + Math.min(...times).toFixed(1) + '–' + Math.max(...times).toFixed(1) + ' 秒';
+            if (Number.isFinite(analysis.selectedSecond)) sampling += '；选中 ' + analysis.selectedSecond.toFixed(1) + ' 秒的人脸';
+            sampling += '。';
+          }
+          $('#result_temp').text(sampling);
+          if (res.bestFrame) $('#preview-left').attr('src', 'data:image/jpeg;base64,' + res.bestFrame).show();
+          if(res.lostPerson && res.lostPerson !== '无'){
+            $('#result_temp').text('走失人员：' + res.lostPerson + '。' + sampling);
+            $('#result').text('相似度：' + res.similarity + '%。这是可能匹配，请结合照片和身份信息人工确认。');
+            $('#preview-right').attr('src', res.img).show();
+          }else{
+            $('#result').text(res.message || '抽样中选出的清晰人脸未匹配当前任务资料；此结果不能排除视频其他画面中的人员。');
+            $('#preview-right').hide();
+          }
+        },
+        error: xhr => { const data = xhr.responseJSON || {}; $('#result').text(data.message || data.msg || '视频比对暂时不可用，请稍后重试'); },
+        complete: () => {taskSelect.disabled=false;button.prop('disabled', false).text('立即比对');}
+      });
+    });
+  </script>
+</body>
+</html>

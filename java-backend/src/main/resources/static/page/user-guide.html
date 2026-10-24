@@ -1,0 +1,213 @@
+<!--使用说明-->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>使用说明</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="../layuimini/lib/layui-v2.5.5/css/layui.css" media="all">
+  <link rel="stylesheet" href="../layuimini/css/public.css" media="all">
+  <style>
+    /* 鼠标悬停改变背景和字体颜色为白色 */
+    .layui-colla-title:hover {
+      background-color: #28333E;
+      color: white !important;
+      transition: color 0.3s, background-color 0.3s;
+    }
+    .view-progress-btn {
+      background-color: #1c528a;
+      color: white; /* 按钮文字颜色 */
+    }
+
+    /* 悬停时按钮颜色变化 */
+    .view-progress-btn:hover {
+      background-color: #0069d9; /* 悬停时的颜色 */
+    }
+
+    /* 鼠标悬停时显示提示 */
+    .layui-colla-title::after {
+      content: attr(data-hint);
+      color: #999;
+      font-size: 12px;
+      margin-left: 10px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    /* 鼠标悬停时提示文字显现 */
+    .layui-colla-title:hover::after {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+<div class="layuimini-container">
+  <div class="layuimini-main">
+
+    <!-- 使用说明标题 -->
+    <fieldset class="layui-elem-field layui-field-title" align="center" style="margin-top: 20px;">
+      <legend>系统使用说明</legend>
+    </fieldset>
+
+    <!-- 折叠面板 -->
+    <div class="layui-collapse" id="colla-panel">
+
+      <!-- 家属使用说明 -->
+      <div class="layui-colla-item">
+        <h2 class="layui-colla-title" data-hint="点击展开">家属：发布求助与确认结果</h2>
+        <div class="layui-colla-content">
+
+          <!-- 子折叠面板（救援申请和救援行动） -->
+          <div class="layui-collapse">
+            <div class="layui-colla-item">
+              <h2 class="layui-colla-title" data-hint="点击展开">发布和补充自己的求助</h2>
+              <div class="layui-colla-content">
+
+                <!-- 再次嵌套详细说明 -->
+                <div class="layui-collapse">
+                  <div class="layui-colla-item">
+                    <h2 class="layui-colla-title" data-hint="点击展开">如何填写救援申请</h2>
+                    <div class="layui-colla-content">
+                      <p>家属从“救援申请”填写亲属姓名、走失时间、地点及必要资料，可补充真实年龄。提交后可在“任务管理”查看自己的求助，并在有效任务中补充照片、录入声纹或更新信息。资料只供获授权的任务参与人员处理。</p>
+                      <p>AI 摘要会先显示预览，选择“追加”或“替换”后才写入原线索。发布页和本人任务详情可生成寻人海报，下载 HTML 或打印保存为 PDF。待接单任务可查看队员推荐及其依据，下载 Markdown、文本或 Word 报告；Word 导出失败时可单独重试。</p>
+                    </div>
+                  </div>
+                  <div class="layui-colla-item">
+                    <h2 class="layui-colla-title" data-hint="点击展开">提交后如何处理</h2>
+                    <div class="layui-colla-content">
+                      <p>任务发布后等待已审核搜救者接单或管理员指派。需要加急时，在该任务详情提交紧急情况，并查看“已提交、处理中、已处理”等实际状态；提交加急不代表已安排队员。消息通知可在消息中心查看。</p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="layui-colla-item">
+              <h2 class="layui-colla-title" data-hint="点击展开">跟进进度与确认找到</h2>
+              <div class="layui-colla-content">
+
+                <!-- 再次嵌套详细说明 -->
+                <div class="layui-collapse" lay-accordion>
+                  <div class="layui-colla-item">
+                    <h2 class="layui-colla-title" data-hint="点击展开">如何追踪救援行动</h2>
+                    <div class="layui-colla-content">
+                      <p>家属从自己的任务详情查看状态、相关队员、地图线索和任务沟通。任务地图显示队员主动共享的定位记录；可选择队员查看和回放历史轨迹。未开启共享、定位失败或停止共享时不会产生实时点，请以记录时间和精度判断新旧。这里展示的是自己求助的进展。</p>
+                    </div>
+                  </div>
+                  <div class="layui-colla-item">
+                    <h2 class="layui-colla-title" data-hint="点击展开">如何确认找到或继续寻找</h2>
+                    <div class="layui-colla-content">
+                      <p>搜救者提交行动结果后，任务进入“待家属确认”。家属核实后选择“确认找到”；线索不符时选择“继续寻找”。若亲属已自行回家，也可在自己的有效任务中确认找到。撤回求助会保留任务历史。</p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 搜救者使用说明 -->
+      <div class="layui-colla-item">
+        <h2 class="layui-colla-title" data-hint="点击展开">搜救者：申请审核与任务行动</h2>
+        <div class="layui-colla-content">
+
+          <!-- 子折叠面板 -->
+          <div class="layui-collapse" lay-accordion>
+            <div class="layui-colla-item">
+              <h2 class="layui-colla-title" data-hint="点击展开">未申请或审核中：完善资料与学习</h2>
+              <div class="layui-colla-content">
+                <p>注册搜救者账号后，在“申请状态与资料”提交申请并查看审核状态。审核通过前可完善资料、学习微课程和场景训练，不能接单或使用任务识别工具。申请被退回时，按说明补充资料后重新提交；修改资料不会自动通过审核。</p>
+              </div>
+            </div>
+            <div class="layui-colla-item">
+              <h2 class="layui-colla-title" data-hint="点击展开">审核通过：接单、上报与提交结果</h2>
+              <div class="layui-colla-content">
+                <p>已审核搜救者可在任务大厅查看必要摘要并接单，在自己的搜救任务中查看详细资料、地图和协作消息。图片、视频和声纹比对必须先选择本人参与的有效任务；相似度只作为线索，需要人工核实。</p>
+                <p>在任务详情可上报紧急情况，或向该任务绑定的家属发送线索通知，无需另填收件人。提交行动结果后等待家属确认，不会直接结束任务。邮件服务接受发送不代表家属已阅读，站内消息以消息中心记录为准。</p>
+                <p>在参与中的任务地图，可手绘搜索路径、添加地点或区域线索。需要共享位置时，主动点击“共享我的位置”并允许浏览器定位；点击停止、离开前台或任务结束后停止上报。位置共享默认关闭，只在本任务内显示。资料地址与实时定位分别标示。</p>
+                <p>队员信息中的“联系”可进入共同任务沟通；只有对方主动公开联系方式时才会显示电话或联系邮箱。</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 管理员使用说明 -->
+      <div class="layui-colla-item">
+        <h2 class="layui-colla-title" data-hint="点击展开">管理员：审核、调度与通知管理</h2>
+        <div class="layui-colla-content">
+          <p>管理员在专用后台审核队员申请、管理账号状态、向具体任务指派或调整已审核队员，并记录异常结束的原因。任务详情和识别操作必须有明确的任务上下文。</p>
+          <p>通知管理用于受理任务加急和现场上报、记录处理回复，并向选定任务的家属、搜救者或全部参与人员发送通知；这里的“全部”仅指该任务的参与人员，不是向全站群发。</p>
+          <p>内容管理可维护课程和公告、审核感谢墙内容；统计与系统页面显示真实汇总、配置状态及操作记录。公开注册不提供管理员身份。</p>
+        </div>
+      </div>
+
+      <!-- 通用使用说明 -->
+      <div class="layui-colla-item">
+        <h2 class="layui-colla-title" data-hint="点击展开">通用：消息、学习与个人设置</h2>
+        <div class="layui-colla-content">
+          <p>各账号可维护自己的个人资料和密码。菜单由实际登录身份和审核状态决定，上方说明用于了解各角色分工，不代表当前账号拥有所有功能。</p>
+          <p>个人设置可填写联系手机、联系邮箱，并自主选择是否向共同任务队友共享；默认不共享。注册需要填写邮箱并验证收到的验证码。</p>
+          <p>家属可学习基础课程，搜救者可学习相应专业课程和场景训练。家属及符合条件的搜救者可使用心理关怀、查看或提交感谢；感谢内容经审核后才公开。个人心理对话不会因对方是管理员而自动向其开放。</p>
+          <p>场景训练可选择恐惧、拒绝沟通或夜间场景，完成五轮后查看各维度评分和改进建议，并下载报告。“历史报告”可查看本人最近完成的训练结果；保存的是评分和建议，不保存对话原文。外部 AI 服务不可用时会显示实际错误或明确的本地降级说明。</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 常见问题部分 -->
+    <fieldset class="layui-elem-field layui-field-title" align="center" style="margin-top: 20px;">
+      <legend>常见问题解答</legend>
+    </fieldset>
+    <ul class="layui-text">
+      <li><strong>Q1：为什么看不到某个菜单？</strong>
+        <p>家属、搜救者和管理员的职责不同；搜救者还需审核通过才能接单和执行任务。请先核对当前登录身份与申请状态。页面地址或任务编号不能代替访问权限。</p>
+      </li>
+      <li><strong>Q2：紧急求助和通知家属在哪里？</strong>
+        <p>家属从自己的任务详情申请加急；已审核搜救者从参与任务的详情上报风险或通知绑定家属；管理员在通知管理中受理并按任务发送通知。</p>
+      </li>
+      <li><strong>Q3：识别匹配或提交行动结果后，任务会自动完成吗？</strong>
+        <p>不会。识别结果需要人工核实；搜救者提交结果后由家属确认找到，线索不符可继续寻找。只有明确的家属确认或管理员记录原因的异常处理才会结束任务。</p>
+      </li>
+    </ul>
+
+    <!-- 返回按钮 -->
+    <div class="layui-form-item" style="text-align: center; margin-top: 30px;">
+      <button class="layui-btn view-progress-btn" onclick="window.history.back()">返回</button>
+    </div>
+  </div>
+</div>
+
+<script src="../layuimini/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="../layuimini/lib/jquery-3.4.1/jquery-3.4.1.min.js"></script>
+<script>
+  // 初始化折叠面板
+  layui.use('element', function(){
+    var element = layui.element;
+
+    // 监听折叠面板的展开和关闭事件
+    $('#colla-panel .layui-colla-item').each(function () {
+      var $this = $(this);
+      $this.find('.layui-colla-title').on('click', function () {
+        setTimeout(function() { // 延时获取状态，确保已经展开或闭合
+          var isExpanded = $this.find('.layui-colla-content').hasClass('layui-show');
+          if (isExpanded) {
+            $this.find('.layui-colla-title').attr('data-hint', '点击闭合'); // 当展开时显示"点击闭合"
+          } else {
+            $this.find('.layui-colla-title').attr('data-hint', '点击展开'); // 当闭合时显示"点击展开"
+          }
+        }, 200); // 延迟200ms确保面板状态已更新
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!--地图管理-->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>地图管理</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="../layuimini/lib/layui-v2.5.5/css/layui.css" media="all">
+  <link rel="stylesheet" href="../layuimini/css/public.css" media="all">
+  <style>
+    /* 自定义查看进度按钮的样式 */
+    .view-progress-btn {
+      background-color: #1c528a;
+      color: white; /* 按钮文字颜色 */
+    }
+
+    /* 悬停时按钮颜色变化 */
+    .view-progress-btn:hover {
+      background-color: #0069d9; /* 悬停时的颜色 */
+    }
+  </style>
+</head>
+<body>
+<div class="layuimini-container">
+  <div class="layuimini-main">
+    <fieldset class="layui-elem-field layui-field-title" align="center" style="margin-top: 20px;">
+      <legend>地图管理</legend>
+    </fieldset>
+
+    <form class="layui-form" action="">
+      <div class="layui-form-item">
+        <label class="layui-form-label">机构名称</label>
+        <div class="layui-input-inline">
+          <input type="text" name="agency_name" lay-verify="required" placeholder="请输入机构名称" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">机构类型</label>
+        <div class="layui-input-block">
+          <input type="radio" name="agency_type" value="派出所" title="派出所" checked>
+          <input type="radio" name="agency_type" value="医院" title="医院">
+          <input type="radio" name="agency_type" value="收容站" title="收容站">
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">机构地址</label>
+        <div class="layui-input-inline">
+          <input type="text" name="agency_address" lay-verify="required" placeholder="请输入机构地址" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">联系电话</label>
+        <div class="layui-input-inline">
+          <input type="tel" name="phone" lay-verify="required|phone" placeholder="请输入联系电话" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <div class="layui-input-block" style="text-align: center;">
+          <button class="layui-btn view-progress-btn" lay-submit="" lay-filter="demo1">提交</button>
+          <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../layuimini/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script src="../layuimini/lib/jquery-3.4.1/jquery-3.4.1.min.js"></script>
+
+<script>
+  layui.use(['form', 'layedit', 'laydate'], function () {
+    var form = layui.form;
+
+    //监听提交
+    form.on('submit(demo1)', function (data) {
+      layer.alert('提交成功');
+      return false;
+    });
+  });
+</script>
+
+</body>
+</html>

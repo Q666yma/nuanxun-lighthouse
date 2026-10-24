@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 救援统计组件 -->
+<div th:fragment="rescue-stats">
+  <div class="rescue-stats-card layui-card">
+    <div class="layui-card-header stats-card-header">
+      <h3>授权范围内救援统计</h3>
+    </div>
+    <div class="layui-card-body stats-card-body">
+      <!-- 使用 Flex 布局将四项数据等分排列 -->
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-label">正在进行的救援</div>
+          <div class="stat-value">
+            <h2 id="rescuing">—</h2>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">家属确认找到</div>
+          <div class="stat-value">
+            <h2 id="rescued">—</h2>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">相关已审队员</div>
+          <div class="stat-value">
+            <h2 id="total_people">—</h2>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">任务总数</div>
+          <div class="stat-value">
+            <h2 id="total_rescue">—</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<link th:href="@{/css/show-num.css}" rel="stylesheet">
+</body>
+</html>

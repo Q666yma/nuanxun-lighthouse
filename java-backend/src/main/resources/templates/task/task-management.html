@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>任务接收</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <link rel="stylesheet" th:href="@{/layuimini/lib/layui-v2.5.5/css/layui.css}">
+  <link rel="stylesheet" th:href="@{/layuimini/css/public.css}">
+  <style>
+    body{background:#f2f2f2;}
+    .layuimini-container{margin:20px auto;background:#fff;border-radius:8px;
+      box-shadow:0 2px 8px rgba(0,0,0,.1);padding:20px;}
+    .layui-card-header{font-weight:bold;font-size:16px;}
+    .layui-badge-rim{margin-right:5px;}
+    .task-action-btn{margin-right:5px;}
+    .elder-photo{width:80px;height:80px;object-fit:cover;border-radius:4px;}
+    .task-status-waiting{color:#FF5722;}
+    .task-status-rescuing{color:#1E9FFF;}
+    .task-status-finished{color:#5FB878;}
+    .task-info{margin-bottom:10px;}
+    .search-box{margin-bottom:20px;}
+    .accept-btn{background:#1c528a;color:#fff;}
+    .accept-btn:hover{background:#0069d9;}
+    .detail-btn{background:#009688;}
+  </style>
+</head>
+<body>
+<div class="layuimini-container">
+  <div class="layuimini-main">
+    <fieldset class="layui-elem-field layui-field-title" align="center" style="margin-top:20px;">
+      <legend>任务接收</legend>
+    </fieldset>
+
+    <!-- 搜索栏 -->
+    <div class="layui-form search-box">
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">人员姓名</label>
+          <div class="layui-input-inline">
+            <input type="text" name="elderName" placeholder="请输入走失人员姓名" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">地点包含</label>
+          <div class="layui-input-inline">
+            <input type="text" name="location" placeholder="请输入地点关键词" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <button class="layui-btn" id="searchBtn" data-type="reload">搜索</button>
+          <button class="layui-btn layui-btn-primary" id="resetBtn">重置</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 动态表格 -->
+    <table id="taskTable" lay-filter="taskTable"></table>
+  </div>
+</div>
+
+<script th:src="@{/layuimini/lib/layui-v2.5.5/layui.js}"></script>
+<script th:src="@{/layuimini/lib/jquery-3.4.1/jquery-3.4.1.min.js}"></script>
+
+<!-- 关键：使用th:inline="none"来防止Thymeleaf解析JavaScript代码 -->
+<script th:inline="none" type="text/html" id="opBar">
+  <a class="layui-btn layui-btn-xs detail-btn" lay-event="detail">查看摘要</a>
+  {{# if(d.status === 'waiting' || d.status === 'rescuing'){ }}
+  <a class="layui-btn layui-btn-xs accept-btn" lay-event="accept">接受任务</a>
+  {{# } }}
+</script>
+
+<!-- 状态显示模板 -->
+<script th:inline="none" type="text/html" id="statusTpl">
+  {{#  if(d.status === 'waiting'){ }}
+  <span class="task-status-waiting">等待救援</span>
+  {{#  } else if(d.status === 'rescuing'){ }}
+  <span class="task-status-rescuing">救援中</span>
+  {{#  } else if(d.status === 'finished'){ }}
+  <span class="task-status-finished">已完成</span>
+      {{# } else if(d.status === 'confirming'){ }}
+      <span>待家属确认</span>
+      {{# } else if(d.status === 'cancelled'){ }}
+      <span>已撤回</span>
+  {{#  } else { }}
+  <span>{{ d.status }}</span>
+  {{#  } }}
+</script>
+
+<!-- 照片显示模板 -->
+<script th:inline="none" type="text/html" id="photoTpl">
+  <img src="{{ d.photoUrl }}" alt="{{ d.elderName }}" class="elder-photo">
+</script>
+
+<!-- 使用th:inline="javascript"而不是"none"，并正确处理JavaScript数组 -->
+<script th:inline="javascript">
+/*<![CDATA[*/
+layui.use(['table','layer','util','form'], function(){
+  const table = layui.table,
+        layer = layui.layer,
+        util  = layui.util,
+        form  = layui.form,
+        $     = layui.$;
+
+  /* ========= 1. 渲染表格 ========= */
+  table.render({
+    elem   : '#taskTable',
+    url    : '/task/list-data',
+    page   : true,
+    limit  : 10,
+    limits : [10, 20, 50, 100],
+    height : 'full-180',
+    cols   : [
+      [
+        {field:'id',        title:'任务编号',   width:80, sort:true, fixed:'left'},
+        {field:'elderName', title:'走失人员姓名', width:120},
+        {field:'lostTime',  title:'走失时间',   width:180, sort:true,
+          templet: function(d){
+            return util.toDateString(new Date(d.lostTime), "yyyy-MM-dd HH:mm:ss");
+          }
+        },
+        {field:'location',  title:'走失地点',   width:200},
+        {field:'status',    title:'任务状态',   width:120, sort:true, templet:'#statusTpl'},
+        {title:'操作',      fixed:'right',     align:'center', width:200, toolbar:'#opBar'}
+      ]
+    ],
+    id: 'taskTableReload',
+    done: function(res, curr, count) {
+        // 分页显示修正
+        setTimeout(function(){
+        // 强制把分页底部的"共 xx 条"改成 count
+        var countElems = document.querySelectorAll('.layui-laypage-count');
+        countElems.forEach(function(elem) {
+            elem.textContent = '共 ' + count + ' 条';
+        });
+        }, 100);
+    }
+  });
+
+  /* ========= 2. 监听工具条 ========= */
+  table.on('tool(taskTable)', function(obj){
+    var data = obj.data;
+    if(obj.event === 'accept'){
+      acceptTask(data.id);
+    } else if(obj.event === 'detail'){
+      // 跳转到详情页
+      layer.alert('任务 #'+data.id+'；状态：'+$('<span>').text(data.status).html()+'；大致地点：'+$('<span>').text(data.location||'接单后查看').html()+'。接单后可查看执行所需详情。');
+    }
+  });
+
+  /* ========= 3. 接受任务 ========= */
+  function acceptTask(id){
+    layer.confirm('确认接受任务 '+id+' 吗？',{icon:3,title:'提示'}, function(idx){
+      layer.close(idx);
+      $.post('/task/accept/'+id)
+       .done(function(res){
+         if(res.code === 0){
+           layer.msg('领取成功',{icon:1});
+           window.location.href='/task/task-detail/'+id;
+         } else {
+           layer.msg(res.msg || '操作失败',{icon:2});
+         }
+       })
+       .fail(function(xhr){
+         layer.msg(xhr.responseText || '操作失败',{icon:2});
+       });
+    });
+  }
+  
+  // 监听搜索按钮
+  $('#searchBtn').on('click', function(){
+    var elderName = $('input[name="elderName"]').val();
+    var location = $('input[name="location"]').val();
+    
+    // 执行重载
+    table.reload('taskTableReload', {
+      page: {
+        curr: 1  // 重新从第 1 页开始
+      },
+      where: {
+        elderName: elderName,
+        location: location
+      }
+    });
+  });
+  
+  // 监听重置按钮
+  $('#resetBtn').on('click', function(){
+    $('input[name="elderName"]').val('');
+    $('input[name="location"]').val('');
+    
+    // 重新加载表格
+    table.reload('taskTableReload', {
+      page: {
+        curr: 1
+      },
+      where: {
+        elderName: '',
+        location: ''
+      }
+    });
+  });
+});
+/*]]>*/
+</script>
+</body>
+</html>

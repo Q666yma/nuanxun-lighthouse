@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><title>基本资料</title><meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/layuimini/lib/layui-v2.5.5/css/layui.css"><link rel="stylesheet" href="/layuimini/css/public.css">
+  <style>.profile-form{max-width:640px}.layui-input[readonly]{background:#f6f7f8;color:#666}</style>
+  <link rel="stylesheet" href="/css/region-location.css?v=20261019-location">
+</head>
+<body>
+<div class="layuimini-container"><div class="layuimini-main">
+  <h2 style="margin-bottom:24px">基本资料</h2>
+  <form class="layui-form profile-form" lay-filter="profileForm">
+    <div class="layui-form-item"><label class="layui-form-label">登录账号</label><div class="layui-input-block"><input name="username" readonly class="layui-input"></div></div>
+    <div class="layui-form-item"><label class="layui-form-label">身份</label><div class="layui-input-block"><input name="roleLabel" readonly class="layui-input"></div></div>
+    <div class="layui-form-item"><label class="layui-form-label">邮箱</label><div class="layui-input-block"><input name="email" readonly class="layui-input" placeholder="未绑定邮箱"></div></div>
+    <div class="layui-form-item"><label class="layui-form-label">展示姓名</label><div class="layui-input-block"><input name="name" lay-verify="required" maxlength="20" class="layui-input" placeholder="比赛展示请使用化名"></div></div>
+    <div class="layui-form-item"><label class="layui-form-label">性别</label><div class="layui-input-block"><select name="gender"><option value="other">未填写</option><option value="M">男</option><option value="F">女</option></select></div></div>
+    <div class="layui-form-item" id="locationField"><label class="layui-form-label">所在地区</label><div class="layui-input-block" data-region-field><div class="region-locate-row"><input name="location" maxlength="100" class="layui-input" placeholder="请输入所在地区"><button type="button" class="region-locate-button" data-region-locate>自动定位</button></div><p class="region-locate-status" data-region-status role="status">点击授权后由高德解析省市区，可手动修改。</p></div></div>
+    <div class="layui-form-item"><label class="layui-form-label">联系电话</label><div class="layui-input-block"><input name="contactPhone" maxlength="40" type="tel" class="layui-input" placeholder="选填，用于任务联系"></div></div>
+    <div class="layui-form-item"><label class="layui-form-label">联系邮箱</label><div class="layui-input-block"><input name="contactEmail" maxlength="100" type="email" class="layui-input" placeholder="选填，不改变注册邮箱及邮件发件配置"></div></div>
+    <div class="layui-form-item"><div class="layui-input-block"><input type="checkbox" name="shareContact" lay-skin="primary" title="向共同任务参与者共享以上联系方式"><p class="layui-word-aux">不共享时仍可使用任务内沟通。请仅填写本人愿意提供的联系渠道。</p></div></div>
+    <div class="layui-form-item"><div class="layui-input-block"><button id="saveBtn" class="layui-btn layui-btn-normal" lay-submit lay-filter="saveProfile" disabled>保存资料</button><p id="profileStatus" class="layui-word-aux" role="status" style="margin-top:12px">正在读取资料…</p></div></div>
+  </form>
+</div></div>
+<script src="/layuimini/lib/layui-v2.5.5/layui.js"></script>
+<script>
+layui.use(['jquery','form','layer'], function () {
+  var $ = layui.jquery, form = layui.form, layer = layui.layer, currentUser;
+  function errorText(xhr) { var data = xhr.responseJSON || {}; return data.message || data.msg || '服务暂时不可用，请稍后重试'; }
+  function loginAgain() { window.top.location.href = '/login'; }
+  $.getJSON('/api/users/getCurrentUser').done(function (user) {
+    if (!user || !user.uuid) { loginAgain(); return; }
+    currentUser = user;
+    form.val('profileForm', {username:user.username,roleLabel:({rescuer:'搜救志愿者',family:'家属',admin:'管理员'})[user.userType]||'',email:user.email || '',name:user.name || '',location:user.location || '',gender:user.gender || 'other',contactPhone:user.contactPhone||'',contactEmail:user.contactEmail||'',shareContact:user.shareContact===true});
+    $('#locationField').toggle(user.userType === 'rescuer');
+    $('#saveBtn').prop('disabled', false);
+    $('#profileStatus').text('');
+  }).fail(function (xhr) {
+    if (xhr.status === 401) loginAgain();
+    else $('#profileStatus').text(errorText(xhr));
+  });
+  form.on('submit(saveProfile)', function (event) {
+    if (!currentUser || $('#saveBtn').prop('disabled')) return false;
+    var fields = event.field;
+    if (currentUser.userType === 'rescuer' && !fields.location.trim()) { layer.msg('请输入所在地区'); return false; }
+    $('#saveBtn').prop('disabled', true);
+    $.ajax({url:'/api/users/profile',type:'POST',contentType:'application/json',data:JSON.stringify({name:fields.name.trim(),gender:fields.gender,location:fields.location.trim(),contactPhone:fields.contactPhone.trim(),contactEmail:fields.contactEmail.trim(),shareContact:!!fields.shareContact}),
+      success:function (result) { if (result.success) { $('#profileStatus').text('资料已保存'); layer.msg('保存成功',{icon:1}); } else layer.msg(result.message || '保存失败',{icon:2}); },
+      error:function (xhr) { if (xhr.status === 401) loginAgain(); else layer.msg(errorText(xhr),{icon:2}); },
+      complete:function () { $('#saveBtn').prop('disabled',false); }
+    });
+    return false;
+  });
+});
+</script>
+<script src="/js/region-location.js?v=20261019-location"></script>
+</body></html>

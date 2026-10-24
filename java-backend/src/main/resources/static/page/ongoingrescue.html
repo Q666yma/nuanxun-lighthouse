@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../layuimini/lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../layuimini/css/public.css" media="all">
+    <style>
+        body {
+            background-color: #f4f7f9;
+        }
+
+        .layuimini-main {
+            min-height: 500px;
+            padding: 20px;
+        }
+
+        .table-search-fieldset {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .table-search-fieldset:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .layui-form-item {
+            margin-bottom: 15px;
+        }
+
+        .layui-btn {
+            margin-right: 10px;
+        }
+
+        .layui-table {
+            background-color: #ffffff;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        }
+        .layui-btn-edit {
+            background-color: #1c528a;
+            color: white;
+            border: none;
+        }
+
+
+        .layui-table th {
+            background-color: #003366;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .layui-table td {
+            padding: 15px;
+        }
+
+        .layui-table tr:nth-child(even) {
+            background-color: #f7f7f7;
+        }
+
+        .layui-table tr:hover {
+            background-color: #e9ecef;
+        }
+
+        .my_label {
+            width: auto !important;
+        }
+    </style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <form class="layui-form layui-form-pane" action="">
+                <div class="layui-row layui-col-space10">
+                    <div class="layui-col-xs4">
+                        <label class="layui-form-label">人员姓名</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="paperNo" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-col-xs4">
+                        <label class="layui-form-label">走失地</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="paperName" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-col-xs4">
+                        <label class="layui-form-label">当前状态</label>
+                        <div class="layui-input-block">
+                            <select name="state" lay-filter="aihao">
+                                <option value="">请选择</option>
+                                <option value="0">待接收</option>
+                                <option value="1">正在进行</option>
+                                <option value="2">已结束</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <button type="submit" class="layui-btn layui-btn-primary" lay-submit lay-filter="data-search-btn">
+                        <i class="layui-icon"></i> 搜 索
+                    </button>
+                </div>
+            </form>
+        </fieldset>
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加</button>
+                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>
+            </div>
+        </script>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-xs layui-btn-edit" lay-event="detail">查看进度</a>
+        </script>
+
+
+        <ul style="display: none" id="timeLine" class="layui-timeline"></ul>
+
+    </div>
+</div>
+
+<script src="../layuimini/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script th:inline="none">
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+        table.render({
+            elem: '#currentTableId',
+            url: '../data/table.json',
+            request: {
+                pageName: 'currentPage',
+                limitName: 'pageSize'
+            },
+            toolbar: '#toolbarDemo',
+            cols: [[
+                {type: "checkbox", width: 30},
+                {field: 'id', width: 80, title: '编号', sort: true, align: "center"},
+                {field: 'oldName', width: 100, title: '失踪人姓名', align: "center"},
+                {field: 'oldGender', width: 100, title: '失踪人性别', align: "center"},
+                {field: 'oldAge', width: 100, title: '失踪人年龄', align: "center"},
+                {field: 'lostTime', width: 180, title: '走失时间', align: "center", templet: '<div>{{layui.util.toDateString(d.lostTime, "yyyy-MM-dd HH:mm:ss") }}</div>', sort: true},
+                {field: 'lostPlace', width: 200, title: '走失地点', align: "center"},
+                {field: 'tel', width: 130, title: '联系人手机号'},
+                {field: 'status', width: 120, title: '当前状态', sort: true, align: "center", templet: function(d){
+                        if(d.status == 0) return "<button class=\"layui-btn layui-btn-sm layui-btn-radius layui-btn-primary\">待接收</button>";
+                        else if(d.status == 1) return "<button class=\"layui-btn layui-btn-sm layui-btn-radius layui-btn-normal\">进行中</button>";
+                        else if(d.status == 2) return "<button class=\"layui-btn layui-btn-sm layui-btn-radius layui-btn-danger\">已结束</button>"
+                    }},
+                {field: 'rescueNum', width: 120, title: '救援人数', sort: true, align: "center"},
+                {title: '操作', width: 120, toolbar: '#currentTableBar', align: "center"}
+            ]],
+            limits: [10, 15, 20, 25, 50, 100],
+            limit: 10,
+            page: true,
+            skin: 'line',
+            response: {
+                statusName: 'code',
+                statusCode: 200
+            }
+        });
+
+        form.on('submit(data-search-btn)', function (data) {
+            var result = JSON.stringify(data.field);
+            table.reload('currentTableId', {
+                page: {
+                    curr: 1
+                },
+                url: window.baseUrl + "/getPageOlaManByCondition",
+                where: {
+                    "name": result.name,
+                    "gender": result.address,
+                    "phone": result.phone
+                }
+            });
+            return false;
+        });
+
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'add') {
+                var index = layer.open({
+                    title: '添加用户',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: '../page/aid-application.html',
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+            } else if (obj.event === 'delete') {
+                var checkStatus = table.checkStatus('currentTableId'),
+                    data = checkStatus.data;
+                layer.alert(JSON.stringify(data));
+            }
+        });
+
+        form.on('submit(changeForm)', function (data) {
+            console.log(data.field);
+            $.post({
+                url: "/updateOldManInfo",
+                data: {
+                    "id": data.field.id,
+                    "myName": data.field.phone,
+                    "oldName": data.field.oldName,
+                    "oldGender": (data.field.oldGender == 1 ? "男" : "女"),
+                    "clothing": data.field.clothing,
+                    "health": data.field.health,
+                    "iq": data.field.iq,
+                    "lostPlace": data.field.lostPlace,
+                    "lostTime": data.field.lostTime,
+                    "oldAge": data.field.oldAge,
+                    "oldDesc": data.field.oldDesc,
+                    "tel": data.field.oldDesc
+                },
+                dataType: "json",
+                contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+                success: function (res) {
+                    if (res.code == 200) {
+                        layer.msg("更新成功");
+                        layer.closeAll('page');
+                        layui.table.reload("currentTableId");
+                    } else {
+                        layer.msg(res.message);
+                    }
+                },
+                error: function (res) {
+                    console.log(res);
+                }
+            });
+            return false;
+        });
+
+        table.on('tool(currentTableFilter)', function (obj) {
+            let data = obj.data;
+            if (obj.event === 'edit') {
+                let index = layer.open({
+                    type: 1,
+                    title: '更新信息',
+                    shade: 0,
+                    maxmin: true,
+                    area: ['80%', '80%'],
+                    shadeClose: true,
+                    content: $("#biaodan"),
+                    success: function () {
+                        form.val('changeForm', {
+                            "oldName": data.oldName,
+                            "id": data.id
+                        });
+                    }
+                });
+            } else if (obj.event === 'delete') {
+                layer.confirm('真的删除行么', function (index) {
+                    obj.del();
+                    layer.close(index);
+                });
+            } else if (obj.event === 'detail') {
+                let index = layer.open({
+                    type: 1,
+                    title: '更新信息',
+                    shade: 0,
+                    maxmin: true,
+                    area: ['80%', '80%'],
+                    shadeClose: true,
+                    content: $("#timeLine"),
+                    success: function () {
+                        $("#timeLine").html(" ");
+                        let temp = "<li class=\"layui-timeline-item\">\n" +
+                            "            <i class=\"layui-icon layui-timeline-axis\">&#xe63f;</i>\n" +
+                            "            <div class=\"layui-timeline-content layui-text\">\n" +
+                            "                <h3 class=\"layui-timeline-title\">" + data.lostTime + "</h3>\n" +
+                            "                <p>\n" +
+                            "                    " + data.oldName + "在" + data.lostPlace + "附近不慎走丢" +
+                            "                </p>\n" +
+                            "            </div>\n" +
+                            "        </li>";
+                        $("#timeLine").append(temp);
+                        $.post({
+                            url: "/getDetailOldManRescue",
+                            data: {
+                                "oldManId": data.id,
+                                "oldManName": data.oldName,
+                            },
+                            dataType: "json",
+                            contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+                            success: function (res) {
+                                if (res.code == 200) {
+                                    for (let i = 0; i < res.data.length; i++) {
+                                        let temp = "<li class=\"layui-timeline-item\">\n" +
+                                            "            <i class=\"layui-icon layui-timeline-axis\">&#xe63f;</i>\n" +
+                                            "            <div class=\"layui-timeline-content layui-text\">\n" +
+                                            "                <h3 class=\"layui-timeline-title\">2021年04月16日 19:00:01</h3>\n" +
+                                            "                <p>\n" +
+                                            "                    " + res.data[i].desc +
+                                            "                </p>\n" +
+                                            "            </div>\n" +
+                                            "        </li>";
+                                        $("#timeLine").append(temp);
+                                    }
+
+                                    let temp1 = "<li class=\"layui-timeline-item\">\n" +
+                                        "            <i class=\"layui-icon layui-timeline-axis\">&#xe63f;</i>\n" +
+                                        "            <div class=\"layui-timeline-content layui-text\">\n" +
+                                        "                <h3 class=\"layui-timeline-title\">2021年04月16日 19:30:00</h3>\n" +
+                                        "                <p>\n" +
+                                        "                    杨双月在拜伦广场附近没有发现走失人员" +
+                                        "                </p>\n" +
+                                        "            </div>\n" +
+                                        "        </li>";
+                                    $("#timeLine").append(temp1);
+
+                                    let temp2 = "<li class=\"layui-timeline-item\">\n" +
+                                        "            <i class=\"layui-icon layui-timeline-axis\">&#xe63f;</i>\n" +
+                                        "            <div class=\"layui-timeline-content layui-text\">\n" +
+                                        "                <h3 class=\"layui-timeline-title\">2021年04月16日 20:10:20</h3>\n" +
+                                        "                <p>\n" +
+                                        "                    杨双月在犀浦街道附近没有发现走失人员" +
+                                        "                </p>\n" +
+                                        "            </div>\n" +
+                                        "        </li>";
+                                    $("#timeLine").append(temp2);
+
+                                    let temp3 = "<li class=\"layui-timeline-item\">\n" +
+                                        "            <i class=\"layui-icon layui-timeline-axis\">&#xe63f;</i>\n" +
+                                        "            <div class=\"layui-timeline-content layui-text\">\n" +
+                                        "                <h3 class=\"layui-timeline-title\">2021年04月16日 20:50:20</h3>\n" +
+                                        "                <p>\n" +
+                                        "                    杨双月在国宁花园附近发现疑似走失人员" +
+                                        "                </p>\n" +
+                                        "            </div>\n" +
+                                        "        </li>";
+                                    $("#timeLine").append(temp3);
+                                } else {
+                                    layer.msg(res.message);
+                                }
+                            },
+                            error: function (res) {
+                                console.log(res);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+    });
+</script>
+</body>
+</html>

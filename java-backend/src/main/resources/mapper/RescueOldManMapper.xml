@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.maka.mapper.RescueOldManMapper">
+    <resultMap id="BaseResultMap" type="com.maka.pojo.RescueOldMan">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="my_name" jdbcType="VARCHAR" property="myName"/>
+        <result column="tel" jdbcType="VARCHAR" property="tel"/>
+        <result column="old_name" jdbcType="VARCHAR" property="oldName"/>
+        <result column="old_gender" jdbcType="VARCHAR" property="oldGender"/>
+        <result column="old_age" jdbcType="INTEGER" property="oldAge"/>
+        <result column="lost_time" jdbcType="TIMESTAMP" property="lostTime"/>
+        <result column="iq" jdbcType="VARCHAR" property="iq"/>
+        <result column="health" jdbcType="VARCHAR" property="health"/>
+        <result column="clothing" jdbcType="VARCHAR" property="clothing"/>
+        <result column="lost_place" jdbcType="VARCHAR" property="lostPlace"/>
+        <result column="oldman_img" jdbcType="VARCHAR" property="oldmanImg"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="open_id" jdbcType="VARCHAR" property="openId"/>
+        <result column="old_desc" jdbcType="VARCHAR" property="oldDesc"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, my_name, tel, old_name, old_gender, old_age, lost_time, iq, health, clothing,
+    lost_place, oldman_img, `status`, open_id, old_desc
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_applyform
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+
+    <select id="selectRescueOldManByPage" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_applyform limit #{currentPage},#{pageSize}
+    </select>
+
+    <select id="getOneOldManRescueNum" resultType="integer">
+        select count(rescue_experience_id)
+        from tb_rescue_experience
+                 inner join tb_applyform
+                            on rescue_id = tb_applyform.id
+        where confirm = true
+    </select>
+
+    <select id="getRescueOldManNum" resultType="integer">
+        select count(id)
+        from tb_applyform
+    </select>
+
+    <select id="getClueOfOldMan" resultType="com.maka.pojo.Clue">
+        select * from tb_clue where oldMan_id = #{oldMan}
+    </select>
+    <select id="getRandomOldMan" resultType="com.maka.pojo.OldMan4Two4">
+        SELECT old_name,old_gender,oldman_img oldManImg,lost_place,lost_time,iq,clothing,t1.tel FROM tb_applyform  AS t1
+                                                                                               JOIN (SELECT ROUND(RAND() * ((SELECT MAX(id) FROM tb_applyform)-(SELECT MIN(id) FROM tb_applyform))+(SELECT MIN(id) FROM tb_applyform)) AS userId) AS t2 WHERE t1.id >= t2.userId ORDER BY t1.id LIMIT 1
+    </select>
+    <select id="selectPageOldManByCondition" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_applyform
+        <where>
+            <if test="name!=null">
+                old_name = #{name}
+            </if>
+            <if test="lostPlace!=null">
+                and lost_place = #{lostPlace}
+            </if>
+            <if test="phone!=null">
+                and tel =#{phone}
+            </if>
+        </where>
+        limit #{from},#{size}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from tb_applyform
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.maka.pojo.RescueOldMan"
+            useGeneratedKeys="true">
+        insert into tb_applyform (my_name, tel, old_name,
+                                  old_gender, old_age, lost_time,
+                                  iq, health, clothing,
+                                  lost_place, oldman_img, `status`,
+                                  open_id, old_desc)
+        values (#{myName,jdbcType=VARCHAR}, #{tel,jdbcType=VARCHAR}, #{oldName,jdbcType=VARCHAR},
+                #{oldGender,jdbcType=VARCHAR}, #{oldAge,jdbcType=INTEGER}, #{lostTime,jdbcType=TIMESTAMP},
+                #{iq,jdbcType=VARCHAR}, #{health,jdbcType=VARCHAR}, #{clothing,jdbcType=VARCHAR},
+                #{lostPlace,jdbcType=VARCHAR}, #{oldmanImg,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
+                #{openId,jdbcType=VARCHAR}, #{oldDesc,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.maka.pojo.RescueOldMan"
+            useGeneratedKeys="true">
+        insert into tb_applyform
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="myName != null">
+                my_name,
+            </if>
+            <if test="tel != null">
+                tel,
+            </if>
+            <if test="oldName != null">
+                old_name,
+            </if>
+            <if test="oldGender != null">
+                old_gender,
+            </if>
+            <if test="oldAge != null">
+                old_age,
+            </if>
+            <if test="lostTime != null">
+                lost_time,
+            </if>
+            <if test="iq != null">
+                iq,
+            </if>
+            <if test="health != null">
+                health,
+            </if>
+            <if test="clothing != null">
+                clothing,
+            </if>
+            <if test="lostPlace != null">
+                lost_place,
+            </if>
+            <if test="oldmanImg != null">
+                oldman_img,
+            </if>
+            <if test="status != null">
+                `status`,
+            </if>
+            <if test="openId != null">
+                open_id,
+            </if>
+            <if test="oldDesc != null">
+                old_desc,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="myName != null">
+                #{myName,jdbcType=VARCHAR},
+            </if>
+            <if test="tel != null">
+                #{tel,jdbcType=VARCHAR},
+            </if>
+            <if test="oldName != null">
+                #{oldName,jdbcType=VARCHAR},
+            </if>
+            <if test="oldGender != null">
+                #{oldGender,jdbcType=VARCHAR},
+            </if>
+            <if test="oldAge != null">
+                #{oldAge,jdbcType=INTEGER},
+            </if>
+            <if test="lostTime != null">
+                #{lostTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="iq != null">
+                #{iq,jdbcType=VARCHAR},
+            </if>
+            <if test="health != null">
+                #{health,jdbcType=VARCHAR},
+            </if>
+            <if test="clothing != null">
+                #{clothing,jdbcType=VARCHAR},
+            </if>
+            <if test="lostPlace != null">
+                #{lostPlace,jdbcType=VARCHAR},
+            </if>
+            <if test="oldmanImg != null">
+                #{oldmanImg,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="openId != null">
+                #{openId,jdbcType=VARCHAR},
+            </if>
+            <if test="oldDesc != null">
+                #{oldDesc,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.maka.pojo.RescueOldMan">
+        update tb_applyform
+        <set>
+            <if test="myName != null and myName!='' ">
+                my_name = #{myName,jdbcType=VARCHAR},
+            </if>
+            <if test="tel != null and tel!='' ">
+                tel = #{tel,jdbcType=VARCHAR},
+            </if>
+            <if test="oldName != null and oldName!='' ">
+                old_name = #{oldName,jdbcType=VARCHAR},
+            </if>
+            <if test="oldGender != null and oldGender!='' ">
+                old_gender = #{oldGender,jdbcType=VARCHAR},
+            </if>
+            <if test="oldAge != null">
+                old_age = #{oldAge,jdbcType=INTEGER},
+            </if>
+            <if test="lostTime != null ">
+                lost_time = #{lostTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="iq != null and iq!='' ">
+                iq = #{iq,jdbcType=VARCHAR},
+            </if>
+            <if test="health != null and health!=''  ">
+                health = #{health,jdbcType=VARCHAR},
+            </if>
+            <if test="clothing != null and clothing!=''  ">
+                clothing = #{clothing,jdbcType=VARCHAR},
+            </if>
+            <if test="lostPlace != null and lostPlace!=''  ">
+                lost_place = #{lostPlace,jdbcType=VARCHAR},
+            </if>
+            <if test="oldmanImg != null and oldmanImg!=''  ">
+                oldman_img = #{oldmanImg,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                `status` = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="openId != null and openId!=''  ">
+                open_id = #{openId,jdbcType=VARCHAR},
+            </if>
+            <if test="oldDesc != null and oldDesc!=''  ">
+                old_desc = #{oldDesc,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.maka.pojo.RescueOldMan">
+        update tb_applyform
+        set my_name    = #{myName,jdbcType=VARCHAR},
+            tel        = #{tel,jdbcType=VARCHAR},
+            old_name   = #{oldName,jdbcType=VARCHAR},
+            old_gender = #{oldGender,jdbcType=VARCHAR},
+            old_age    = #{oldAge,jdbcType=INTEGER},
+            lost_time  = #{lostTime,jdbcType=TIMESTAMP},
+            iq         = #{iq,jdbcType=VARCHAR},
+            health     = #{health,jdbcType=VARCHAR},
+            clothing   = #{clothing,jdbcType=VARCHAR},
+            lost_place = #{lostPlace,jdbcType=VARCHAR},
+            oldman_img = #{oldmanImg,jdbcType=VARCHAR},
+            `status`   = #{status,jdbcType=INTEGER},
+            open_id    = #{openId,jdbcType=VARCHAR},
+            old_desc   = #{oldDesc,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

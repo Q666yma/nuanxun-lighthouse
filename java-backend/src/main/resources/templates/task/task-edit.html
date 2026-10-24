@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>编辑任务信息</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" th:href="@{/layuimini/lib/layui-v2.5.5/css/layui.css}">
+  <link rel="stylesheet" th:href="@{/layuimini/css/public.css}">
+  <link rel="stylesheet" href="/css/task-family-contact.css?v=20261020-contact">
+  <style>
+    body{background:#f2f2f2;}
+    .layuimini-container{margin:20px auto;background:#fff;border-radius:8px;
+      box-shadow:0 2px 8px rgba(0,0,0,.1);padding:20px;}
+    .layui-input-inline{width:300px;}
+    .view-progress-btn{background:#1c528a;color:#fff;}
+    .view-progress-btn:hover{background:#0069d9;}
+    .upload-preview{margin-top:10px;display:flex;align-items:center;}
+    .upload-preview img{max-width:120px;max-height:120px;border:1px solid #eee;}
+    .upload-preview audio{margin-top:5px;}
+    .required:after{content:'*';color:red;margin-left:4px;}
+    .extra-info{min-height:100px;}
+  </style>
+</head>
+<body>
+<div class="layuimini-container">
+  <div class="layuimini-main">
+    <div class="layui-breadcrumb" style="margin-bottom:20px;">
+      <a href="/task/task-manage">任务管理</a>
+      <a th:href="@{'/task/task-detail/' + ${task.id}}">任务详情</a>
+      <a><cite>编辑任务</cite></a>
+    </div>
+    
+    <fieldset class="layui-elem-field layui-field-title" align="center">
+      <legend>编辑走失人员信息</legend>
+    </fieldset>
+
+    <form class="layui-form" id="taskForm">
+      <!-- 隐藏字段 - 任务ID -->
+      <input type="hidden" name="id" th:value="${task.id}">
+      <fieldset class="family-contact-section" data-family-contact>
+        <legend>求助联系人</legend>
+        <p class="family-contact-note">用于搜救过程中的联系和核实，仅本账号、本任务实际参与的已审核搜救队员及管理员可见，不会出现在任务大厅或寻人海报中。<span data-contact-status role="status"></span></p>
+        <div class="layui-form-item"><label class="layui-form-label required" for="familyContactName">联系人姓名</label><div class="layui-input-inline"><input id="familyContactName" name="familyContactName" data-contact-field="name" type="text" maxlength="100" lay-verify="required" autocomplete="name" class="layui-input" placeholder="请输入本次求助联系人姓名"></div></div>
+        <div class="layui-form-item"><label class="layui-form-label required" for="familyContactRelationship">与走失人员关系</label><div class="layui-input-inline"><input id="familyContactRelationship" name="familyContactRelationship" data-contact-field="relationship" type="text" maxlength="60" lay-verify="required" class="layui-input" placeholder="例如：女儿、父亲、配偶、亲属"></div></div>
+        <div class="layui-form-item"><label class="layui-form-label" for="familyContactPhone">联系电话</label><div class="layui-input-inline"><input id="familyContactPhone" name="familyContactPhone" data-contact-field="phone" type="tel" maxlength="40" autocomplete="tel" class="layui-input" placeholder="无有效绑定邮箱时须填写"></div></div>
+        <div class="layui-form-item"><label class="layui-form-label" for="familyContactEmail">账号绑定邮箱</label><div class="layui-input-inline"><input id="familyContactEmail" data-contact-field="email" type="text" readonly aria-readonly="true" class="layui-input contact-readonly" placeholder="使用当前账号绑定邮箱"></div></div>
+        <p class="family-contact-note">已绑定有效邮箱时，联系电话可暂不填写；没有有效绑定邮箱时，请填写联系电话。这里的修改仅保存到本次求助，不修改账号基本资料。</p>
+      </fieldset>
+      
+      <!-- 走失人员姓名 -->
+      <div class="layui-form-item">
+        <label class="layui-form-label required">人员姓名</label>
+        <div class="layui-input-inline">
+          <input type="text" name="elderName" lay-verify="required"
+                 placeholder="请输入走失人员姓名" autocomplete="off" class="layui-input"
+                 th:value="${task.elderName}">
+        </div>
+      </div>
+
+      <div class="layui-form-item"><label class="layui-form-label">人员年龄</label><div class="layui-input-inline"><input type="number" name="elderAge" min="0" max="120" step="1" class="layui-input" placeholder="选填，0–120岁" th:value="${elderAge}"></div></div>
+
+      <!-- 走失时间 -->
+      <div class="layui-form-item">
+        <label class="layui-form-label required">走失时间</label>
+        <div class="layui-input-inline">
+          <input type="text" name="lostTime" id="lostTime" lay-verify="required"
+                 placeholder="请选择走失时间" autocomplete="off" class="layui-input"
+                 th:value="${#dates.format(task.lostTime, 'yyyy-MM-dd HH:mm:ss')}">
+        </div>
+      </div>
+
+      <!-- 走失地点 -->
+      <div class="layui-form-item">
+        <label class="layui-form-label required">走失地点</label>
+        <div class="layui-input-block">
+          <input type="text" name="location" lay-verify="required"
+                 placeholder="请输入详细走失地点" autocomplete="off" class="layui-input" style="width:600px;"
+                 th:value="${task.location}">
+        </div>
+      </div>
+
+      <!-- 上传照片 -->
+      <div class="layui-form-item">
+        <label class="layui-form-label required">人员照片</label>
+        <div class="layui-input-block">
+          <button type="button" class="layui-btn view-progress-btn" id="uploadImage">更换照片</button>
+          <div class="upload-preview" id="imagePreview">
+            <img th:src="${task.photoUrl}" width="120" alt="走失人员照片">
+          </div>
+          <input type="hidden" name="photoUrl" id="photoUrl" th:value="${task.photoUrl}">
+        </div>
+      </div>
+
+      <!-- 上传语音 -->
+      <div class="layui-form-item">
+        <label class="layui-form-label">语音描述</label>
+        <div class="layui-input-block">
+          <button type="button" class="layui-btn view-progress-btn" id="uploadAudio">上传/更换语音</button>
+          <div class="upload-preview" id="audioPreview">
+            <div th:if="${task.audioUrl != null && task.audioUrl != ''}">
+              <span>已上传：<span th:text="${task.audioUrl.split('/')[task.audioUrl.split('/').length-1]}"></span></span>
+              <audio controls style="display:block;margin-top:5px;">
+                <source th:src="${task.audioUrl}" type="audio/mpeg">
+              </audio>
+            </div>
+          </div>
+          <input type="hidden" name="audioUrl" id="audioUrl" th:value="${task.audioUrl}">
+        </div>
+      </div>
+
+      <!-- 额外信息 -->
+      <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">额外信息</label>
+        <div class="layui-input-block">
+          <textarea name="extraInfo" placeholder="请输入走失人员特征、着装、身体状况等额外信息" 
+                    class="layui-textarea extra-info" th:text="${task.extraInfo}"></textarea>
+        </div>
+      </div>
+
+      <!-- 状态 - 隐藏字段，保持原状态不变 -->
+      <input type="hidden" name="status" th:value="${task.status}">
+
+      <!-- 操作按钮 -->
+      <div class="layui-form-item" style="text-align:center;margin-top:30px;">
+        <button class="layui-btn layui-btn-normal" lay-submit lay-filter="updateTask">保存修改</button>
+        <button type="button" class="layui-btn layui-btn-primary" id="backToDetailBtn">返回详情</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script th:src="@{/layuimini/lib/layui-v2.5.5/layui.js}"></script>
+<script th:src="@{/layuimini/lib/jquery-3.4.1/jquery-3.4.1.min.js}"></script>
+<script src="/js/task-family-contact.js?v=20261020-contact2"></script>
+<script th:inline="javascript">
+/*<![CDATA[*/
+layui.use(['form','laydate','upload','layer'], function(){
+  var form = layui.form
+      ,laydate = layui.laydate
+      ,upload = layui.upload
+      ,layer = layui.layer;
+  var savedFamilyContact = /*[[${familyContact}]]*/ null;
+  var familyContactForm = GuituFamilyContact.bind(document.getElementById('taskForm'), {existing: savedFamilyContact});
+
+  // 初始化日期时间选择器
+  laydate.render({
+    elem: '#lostTime',
+    type: 'datetime',
+    format: 'yyyy-MM-dd HH:mm:ss'
+  });
+
+  // 图片上传
+  upload.render({
+    elem:'#uploadImage',
+    url :'/upload/image',
+    accept:'images',
+    done:function(res){
+      if (!(res.success === true || res.code === 0) || !res.url) { layer.msg(res.msg || res.message || '照片上传失败',{icon:2}); return; }
+      $('#imagePreview').html('<img src="'+res.url+'" width="120">');
+      $('#photoUrl').val(res.url);  // 同步写入input
+    }
+  });
+
+  // 语音上传
+  upload.render({
+    elem:'#uploadAudio',
+    url :'/upload/audio',
+    accept:'audio', 
+    exts:'mp3|wav|m4a',
+    done:function(res){
+      if (!(res.success === true || res.code === 0) || !res.url) { layer.msg(res.msg || res.message || '语音上传失败',{icon:2}); return; }
+      $('#audioPreview').html(
+        '<div><span>已上传：' + res.url.split('/').pop() + '</span>' +
+        '<audio controls style="display:block;margin-top:5px;"><source src="'+res.url+'" type="audio/mpeg"></audio></div>'
+      );
+      $('#audioUrl').val(res.url);
+    }
+  });
+
+  // 表单提交
+  form.on('submit(updateTask)', function(data){
+    var contactError = familyContactForm.validate();
+    if (contactError) { layer.msg(contactError, {icon:2}); return false; }
+    // 验证照片是否上传
+    if(!$('#photoUrl').val()){
+      layer.msg('请上传走失人员照片', {icon: 2});
+      return false;
+    }
+    
+    // 构建提交数据
+    var formData = {
+      id: data.field.id,
+      elderName: data.field.elderName,
+      elderAge: data.field.elderAge === '' ? null : Number(data.field.elderAge),
+      lostTime: data.field.lostTime,
+      location: data.field.location,
+      photoUrl: $('#photoUrl').val(),
+      audioUrl: $('#audioUrl').val() || '',
+      extraInfo: data.field.extraInfo || '',
+      familyContact: familyContactForm.read(),
+      status: data.field.status
+    };
+    
+    // 发送请求
+    $.ajax({
+      url: '/task/update',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(formData),
+      success: function(res){
+        if(res.code === 0){
+          layer.msg('更新成功', {icon: 1, time: 1500}, function(){
+            // 跳转到任务详情页面
+            window.location.href = '/task/task-detail/' + data.field.id;
+          });
+        } else {
+          layer.msg(res.msg || '更新失败', {icon: 2});
+        }
+      },
+      error: function(xhr){
+        var error = xhr.responseJSON || {};
+        layer.msg(error.msg || error.message || '服务器错误，请稍后重试', {icon: 2});
+      }
+    });
+    return false;
+  });
+  $('#backToDetailBtn').on('click', function(){
+    var taskId = $('input[name="id"]').val(); // 或其他方式获取id
+    var url = '/task/task-detail/' + taskId;
+    if(window.parent && window.parent.layui && window.parent.layui.index){
+      // 打开详情tab
+      window.parent.layui.index.openTab({
+        title: '任务详情',
+        href: url
+      });
+      // 关闭当前tab
+      window.parent.layui.index.closeCurrentTab();
+    } else {
+      // 兼容：如果不在layuimini下，普通跳转
+      window.location.href = url;
+    }
+  });
+});
+/*]]>*/
+</script>
+</body>
+</html>

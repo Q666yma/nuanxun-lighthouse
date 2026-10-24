@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>我的任务管理</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" th:href="@{/layuimini/lib/layui-v2.5.5/css/layui.css}">
+  <link rel="stylesheet" th:href="@{/layuimini/css/public.css}">
+  <style>
+    /* 基础样式 */
+    body{background:#f2f2f2;}
+    .layuimini-container{margin:20px auto;background:#fff;border-radius:8px;
+      box-shadow:0 2px 8px rgba(0,0,0,.1);padding:20px;}
+    .layui-card-header{font-weight:bold;font-size:16px;}
+    .layui-badge-rim{margin-right:5px;}
+    .task-action-btn{margin-right:5px;}
+    .elder-photo{width:80px;height:80px;object-fit:cover;border-radius:4px;}
+    .task-status-waiting{color:#FF5722;}
+    .task-status-rescuing{color:#1E9FFF;}
+    .task-status-finished{color:#5FB878;}
+    .task-info{margin-bottom:10px;}
+    .search-box{margin-bottom:20px;}
+    
+    /* 移动端响应式适配 */
+    @media screen and (max-width: 768px) {
+      /* 容器边距调整 */
+      .layuimini-container {
+        margin: 10px;
+        padding: 15px;
+      }
+      
+      /* 搜索框调整为垂直排列 */
+      .search-box .layui-inline {
+        display: block;
+        margin-right: 0;
+        margin-bottom: 10px;
+        width: 100%;
+      }
+      
+      .search-box .layui-input-inline {
+        display: block;
+        width: 100% !important; /* 覆盖layui的内联样式 */
+        margin-right: 0;
+      }
+      
+      .search-box .layui-form-label {
+        width: auto;
+        padding: 5px 0;
+        text-align: left;
+      }
+      
+      /* 按钮宽度调整 */
+      .search-box .layui-btn {
+        width: 100%;
+        margin-bottom: 5px;
+      }
+      
+      /* 表格横向滚动 */
+      .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      /* 缩小图片尺寸 */
+      .elder-photo {
+        width: 60px;
+        height: 60px;
+      }
+      
+      /* 操作按钮垂直排列 */
+      .task-action-btn {
+        display: block;
+        margin-bottom: 5px;
+        width: 100%;
+      }
+      
+      /* 调整表格内容字体大小 */
+      .layui-table td, .layui-table th {
+        font-size: 12px;
+        padding: 8px 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="layuimini-container">
+  <div class="layuimini-main">
+    <fieldset class="layui-elem-field layui-field-title" align="center">
+      <legend>我的任务管理</legend>
+    </fieldset>
+    
+    <!-- 搜索栏 -->
+    <div class="layui-form search-box">
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">人员姓名</label>
+          <div class="layui-input-inline">
+            <input type="text" name="elderName" placeholder="请输入走失人员姓名" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">任务状态</label>
+          <div class="layui-input-inline">
+            <select name="status">
+              <option value="">全部状态</option>
+              <option value="waiting">等待救援</option>
+              <option value="rescuing">救援中</option>
+              <option value="finished">已完成</option>
+              <option value="confirming">待家属确认</option>
+              <option value="cancelled">已撤回</option>
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <button class="layui-btn" id="searchBtn" data-type="reload">搜索</button>
+          <button class="layui-btn layui-btn-primary" id="resetBtn">重置</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 任务列表 - 添加响应式容器 -->
+    <div class="table-responsive">
+      <table id="taskTable" lay-filter="taskTable"></table>
+    </div>
+    
+    <!-- 操作栏模板 -->
+    <script type="text/html" id="taskActions">
+      <a class="layui-btn layui-btn-xs task-action-btn" lay-event="detail">查看详情</a>
+      {{#  if(d.status === 'waiting' || d.status === 'rescuing' || d.status === 'confirming'){ }}
+      <a class="layui-btn layui-btn-xs layui-btn-danger task-action-btn" lay-event="cancel">取消</a>
+      {{#  } }}
+    </script>
+    
+    <!-- 状态显示模板 -->
+    <script type="text/html" id="statusTpl">
+      {{#  if(d.status === 'waiting'){ }}
+      <span class="task-status-waiting">等待救援</span>
+      {{#  } else if(d.status === 'rescuing'){ }}
+      <span class="task-status-rescuing">救援中</span>
+      {{#  } else if(d.status === 'finished'){ }}
+      <span class="task-status-finished">已完成</span>
+      {{# } else if(d.status === 'confirming'){ }}
+      <span>待家属确认</span>
+      {{# } else if(d.status === 'cancelled'){ }}
+      <span>已撤回</span>
+      {{#  } else { }}
+      <span>{{ d.status }}</span>
+      {{#  } }}
+    </script>
+    
+    <!-- 照片显示模板 -->
+    <script type="text/html" id="photoTpl">
+      <img src="{{ d.photoUrl }}" alt="{{ d.elderName }}" class="elder-photo">
+    </script>
+  </div>
+</div>
+
+<script th:src="@{/layuimini/lib/layui-v2.5.5/layui.js}"></script>
+<script th:src="@{/layuimini/lib/jquery-3.4.1/jquery-3.4.1.min.js}"></script>
+<script th:inline="javascript">
+/*<![CDATA[*/
+layui.use(['table', 'form', 'layer', 'util'], function(){
+  var table = layui.table
+      ,form = layui.form
+      ,layer = layui.layer
+      ,util = layui.util;
+  
+  // 获取当前设备是否为移动设备
+  var isMobile = window.innerWidth <= 768;
+  
+  // 初始化表格
+  var taskTable = table.render({
+    elem: '#taskTable'
+    ,url: '/task/list'  // 数据接口
+    ,page: true  // 开启分页
+    ,limit: 10   // 每页显示的条数
+    ,limits: [10, 20, 50, 100]
+    ,cols: [[  // 表头设置
+      {field: 'id', title: 'ID', width: 80, sort: true, fixed: 'left'}
+      ,{field: 'photoUrl', title: '人员照片', width: 120, templet: '#photoTpl'}
+      ,{field: 'elderName', title: '人员姓名', width: 120}
+      ,{field: 'lostTime', title: '走失时间', width: 180, sort: true, templet: function(d){
+        return util.toDateString(new Date(d.lostTime), "yyyy-MM-dd HH:mm:ss");
+      }}
+      ,{field: 'location', title: '走失地点', width: 250}
+      ,{field: 'status', title: '任务状态', width: 120, sort: true, templet: '#statusTpl'}
+      ,{fixed: 'right', title: '操作', width: 180, align:'center', toolbar: '#taskActions'}
+    ]]
+    ,response: {
+      statusCode: 0  // 成功的状态码
+    }
+    ,parseData: function(res){ // 解析后端返回的数据
+      return {
+        "code": res.code,
+        "msg": res.msg,
+        "count": res.data ? res.data.total : 0,
+        "data": res.data ? res.data.records : []
+      };
+    }
+    ,id: 'taskTableReload',
+    done: function(res, curr, count) {
+        // 分页显示修正
+        setTimeout(function(){
+        // 强制把分页底部的"共 xx 条"改成 count
+        var countElems = document.querySelectorAll('.layui-laypage-count');
+        countElems.forEach(function(elem) {
+            elem.textContent = '共 ' + count + ' 条';
+        });
+        }, 100);
+    }
+  });
+  
+  // 监听搜索按钮
+  $('#searchBtn').on('click', function(){
+    var elderName = $('input[name="elderName"]').val();
+    var status = $('select[name="status"]').val();
+    
+    // 执行重载
+    table.reload('taskTableReload', {
+      page: {
+        curr: 1  // 重新从第 1 页开始
+      }
+      ,where: {
+        elderName: elderName,
+        status: status
+      }
+    });
+  });
+  
+  // 监听重置按钮
+  $('#resetBtn').on('click', function(){
+    $('input[name="elderName"]').val('');
+    $('select[name="status"]').val('');
+    form.render('select');
+    
+    // 重新加载表格
+    table.reload('taskTableReload', {
+      page: {
+        curr: 1
+      }
+      ,where: {
+        elderName: '',
+        status: ''
+      }
+    });
+  });
+  
+  // 监听表格行工具事件
+  table.on('tool(taskTable)', function(obj){
+    var data = obj.data;  // 获得当前行数据
+    var layEvent = obj.event;  // 获得 lay-event 对应的值
+    
+    if(layEvent === 'detail'){  // 查看详情
+      // 跳转到详情页
+      var url = '/task/task-detail/' + data.id;
+      var title = '任务详情'; // 可自定义
+      window.location.href = url;
+      // 如果在框架内，尝试使用框架的tab打开
+      if(window.parent && window.parent.layui && window.parent.layui.index){
+        window.parent.layui.index.openTab({
+          title: title,
+          href: url
+        });
+      }
+    } else if(layEvent === 'cancel'){  // 取消任务
+      layer.confirm('确定要取消该任务吗？', function(index){
+        // 发送请求取消任务
+        $.ajax({
+          url: '/task/cancel/' + data.id,
+          type: 'POST',
+          success: function(res){
+            if(res.code === 0){
+              layer.msg('任务已取消', {icon: 1});
+              obj.del();  // 删除对应行（tr）的DOM结构
+            } else {
+              layer.msg(res.msg || '操作失败', {icon: 2});
+            }
+            layer.close(index);
+          },
+          error: function(){
+            layer.msg('服务器错误，请稍后重试', {icon: 2});
+            layer.close(index);
+          }
+        });
+      });
+    }
+  });
+  
+  // 窗口大小改变时重新加载表格
+  $(window).resize(function(){
+    var newIsMobile = window.innerWidth <= 768;
+    // 只有移动状态改变时才重新加载表格
+    if(newIsMobile !== isMobile){
+      isMobile = newIsMobile;
+      table.reload('taskTableReload');
+    }
+  });
+});
+/*]]>*/
+</script>
+</body>
+</html>
