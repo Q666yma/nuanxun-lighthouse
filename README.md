@@ -2,7 +2,7 @@
 
 面向走失人员寻找与公益救援的 Web 协同平台。家属发布求助并跟进进展，搜救志愿者参与任务、反馈线索，管理员负责审核与协调。
 
-体验地址：<https://nuanxun.top/>。线上服务依赖服务器及第三方服务的有效期。
+体验地址：<https://nuanxun.top/>。
 
 ## 功能
 
@@ -22,7 +22,7 @@
 | `database/` | MySQL 表结构、迁移及技能标签基础数据 |
 | `deploy/` | 本地 Nginx 同源反向代理示例 |
 | `tools/` | 编译、启动及空库演示账号初始化工具 |
-| `docs/` | 系统说明、技术架构及源码整理说明 |
+| `docs/` | 系统说明与技术架构 |
 
 前端使用 HTML/CSS/JavaScript、Layui、ECharts 和高德地图；数据服务使用 MySQL、Redis。邮件、地图、智谱、百度人脸及讯飞声纹需要自行配置账号与授权。
 
@@ -34,7 +34,7 @@
 - MySQL 8.0.13+、Redis、Nginx；音视频功能还需要 FFmpeg。
 - 将 `java`、`javac`、`mvn`、`python` 加入 PATH，或设置 `JAVA_HOME`、`MAVEN_HOME`。
 
-本仓库保留源码和前端依赖，不提交第三方 Java JAR、课程 MP4、生产数据库或私人上传文件。首次编译通过 Maven 下载 Java 依赖；`javacv-platform` 包含多个平台的原生组件，下载量较大。课程视频需要自行补充至课程模块对应的资源路径。
+首次编译通过 Maven 下载 Java 依赖；`javacv-platform` 包含多个平台的原生组件，下载量较大。课程视频需要自行补充至课程模块对应的资源路径。
 
 ```bash
 git clone https://github.com/Q666yma/nuanxun-lighthouse.git
@@ -50,7 +50,7 @@ python -m pip install -r python-service/requirements.txt
 
 ### 2. 创建本地数据库与配置
 
-创建字符集为 `utf8mb4` 的 `web` 数据库，为本地应用创建有相应读写和建表权限的数据库用户。使用 MySQL 客户端连接该库，按 `01` 至 `08` 的顺序执行 `database/` 中的 SQL。基础脚本不包含生产用户或任务记录。
+创建字符集为 `utf8mb4` 的 `web` 数据库，为本地应用创建有相应读写和建表权限的数据库用户。使用 MySQL 客户端连接该库，按 `01` 至 `08` 的顺序执行 `database/` 中的 SQL。
 
 将根目录 `.env.example` 复制为 `.env`，填写 `DB_USER`、`DB_PASSWORD`、`DB_JDBC_URL`、`VOLUNTEER_DB_URL`。Java 和 Python 必须指向同一个数据库。Python 数据库连接串中的密码需要 URL 编码。
 
@@ -62,7 +62,7 @@ python -m pip install -r python-service/requirements.txt
 python tools/run.py init
 ```
 
-该工具仅允许在 `users` 表为空时执行，创建“灯塔管理员”“家属清禾”“队员远航”三个虚构账号，密码均为自设的 `DEMO_PASSWORD`，不会覆盖现有账号或发送邮件。
+该工具仅允许在 `users` 表为空时执行，创建“灯塔管理员”“家属清禾”“队员远航”三个演示账号，密码均为自设的 `DEMO_PASSWORD`。
 
 ### 3. 启动服务
 
@@ -82,15 +82,10 @@ python tools/run.py python
 
 ### 4. 可选外部服务
 
-在 `.env` 填写需要使用的邮件、AI、识别和地图配置。浏览器地图页面还需把 `YOUR_AMAP_WEB_KEY` 和 `YOUR_AMAP_SECURITY_JS_CODE` 换成自己的 Web 地图配置；可在 `java-backend/src/main/resources/templates/` 中搜索这两个占位符定位。不要把真实密钥提交到公开仓库。
+在 `.env` 填写需要使用的邮件、AI、识别和地图配置。浏览器地图页面还需把 `YOUR_AMAP_WEB_KEY` 和 `YOUR_AMAP_SECURITY_JS_CODE` 换成自己的 Web 地图配置；可在 `java-backend/src/main/resources/templates/` 中搜索这两个占位符定位。
 
 未配置或未授权的外部能力可能不可用；声纹接口尤其需要供应商账号开通相应权限。浏览器定位还依赖用户许可与安全上下文，公网部署应使用 HTTPS。
 
-## 文档与验证范围
+## 项目文档
 
 - [系统说明与技术架构](docs/系统说明与技术架构.md)
-- [源码整理与验证说明](docs/源码整理与验证说明.md)
-
-整理时已对 Java 主程序进行 JDK 11 编译，并检查 Python 语法及部分 Flask 会话访问限制。尚未在另一套全新的数据库和第三方服务账号下完成全部业务验收。
-
-第三方库及素材的原有版权与许可标记保留。仓库未包含生产密钥、真实用户数据、联系方式及实名账号对照。
